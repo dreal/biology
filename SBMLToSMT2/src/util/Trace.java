@@ -92,7 +92,6 @@ public class Trace {
 	}
 
 	public double[] getValues(String variable) {
-		double[] values = new double[data.length];
 		int var = -1;
 		for (int i = 0; i < variables.length; i ++) {
 			if (variables[i].equals(variable)) {
@@ -100,8 +99,9 @@ public class Trace {
 				break;
 			}
 		}
-		for (int i = 0; i < data.length; i ++) {
-			values[i] = data[i][var];
+		double[] values = new double[data[var].length];
+		for (int i = 0; i < data[var].length; i ++) {
+			values[i] = data[var][i];
 		}
 		return values;
 	}
