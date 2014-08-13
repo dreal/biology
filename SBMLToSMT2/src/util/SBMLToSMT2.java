@@ -109,7 +109,9 @@ public class SBMLToSMT2 {
 			output += "(assert (= [" + vars.replaceAll(" ", "_t ") + "] (integral 0. time_0 ["
 					+ vars.replaceAll(" ", "_0 ") + "] flow_1)))\n";
 		}
-		output += "(assert " + ODEModel.prefixASTNodeToString(property) + ")\n";
+		if (property != null) {
+			output += "(assert " + ODEModel.prefixASTNodeToString(property) + ")\n";
+		}
 		output += "(check-sat)\n(exit)\n";
 		return output;
 	}
@@ -164,9 +166,21 @@ public class SBMLToSMT2 {
 			}
 		}
 		else {
-			System.out.println("Invalid arguments.");
-			System.out
-					.println("Usage:  java SBMLToSMT2 <sbml_file> <trace_file> <property_to_check>");
+			if (args.length > 1) {
+				try {
+					System.out.println(SBMLToSMT2.writeSMT2ToString(
+							SBMLReader.read(new File(args[0])),
+							Trace.parseCopasiOutput(new File(args[1])), null));
+				}
+				catch (Exception e) {
+					System.out.println("Invalid arguments.");
+					System.out.println("Usage:  java SBMLToSMT2 <sbml_file> <trace_file>");
+				}
+			}
+			else {
+				System.out.println("Invalid arguments.");
+				System.out.println("Usage:  java SBMLToSMT2 <sbml_file> <trace_file>");
+			}
 		}
 	}
 }
