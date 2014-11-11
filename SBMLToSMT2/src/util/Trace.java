@@ -1,11 +1,6 @@
 package util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Trace {
 	
@@ -33,41 +28,6 @@ public class Trace {
 		this.variables = variables;
 		this.timePoints = timePoints;
 		this.data = data;
-	}
-	
-	public Trace(File file) throws FileNotFoundException {
-		Scanner scanner = new Scanner(file);
-		List<String> variables = new ArrayList<String>();
-		List<Double> timePoints = new ArrayList<Double>();
-		List<List<Double>> data = new ArrayList<List<Double>>();
-		if (scanner.hasNextLine()) {
-			String[] vars = scanner.nextLine().split("\t");
-			for (int i = 1; i < vars.length; i++) {
-				variables.add(vars[i]);
-			}
-		}
-		for (int i = 0; i < variables.size(); i++) {
-			data.add(new ArrayList<Double>());
-		}
-		while (scanner.hasNextLine()) {
-			String[] dataLine = scanner.nextLine().split("\t");
-			timePoints.add(Double.parseDouble(dataLine[0]));
-			for (int i = 1; i < dataLine.length; i++) {
-				data.get(i - 1).add(Double.parseDouble(dataLine[i]));
-			}
-		}
-		scanner.close();
-		this.variables = variables.toArray(new String[0]);
-		this.timePoints = new double[timePoints.size()];
-		for (int i = 0; i < timePoints.size(); i++) {
-			this.timePoints[i] = timePoints.get(i);
-		}
-		this.data = new double[data.size()][data.get(0).size()];
-		for (int i = 0; i < data.size(); i++) {
-			for (int j = 0; j < data.get(0).size(); j++) {
-				this.data[i][j] = data.get(i).get(j);
-			}
-		}
 	}
 	
 	public String[] getVariables() {
@@ -121,30 +81,5 @@ public class Trace {
 		}
 		trace += ")";
 		return trace;
-	}
-	
-	public static Trace parseCopasiOutput(File file) throws IOException {
-		Scanner scanner = new Scanner(file);
-		List<String> variables = new ArrayList<String>();
-		List<Double> timePoints = new ArrayList<Double>();
-		List<List<Double>> data = new ArrayList<List<Double>>();
-		if (scanner.hasNextLine()) {
-			String[] vars = scanner.nextLine().split("\t");
-			for (int i = 1; i < vars.length; i++) {
-				variables.add(vars[i]);
-			}
-		}
-		for (int i = 0; i < variables.size(); i++) {
-			data.add(new ArrayList<Double>());
-		}
-		while (scanner.hasNextLine()) {
-			String[] dataLine = scanner.nextLine().split("\t");
-			timePoints.add(Double.parseDouble(dataLine[0]));
-			for (int i = 1; i < dataLine.length; i++) {
-				data.get(i - 1).add(Double.parseDouble(dataLine[i]));
-			}
-		}
-		scanner.close();
-		return new Trace(variables, timePoints, data);
 	}
 }

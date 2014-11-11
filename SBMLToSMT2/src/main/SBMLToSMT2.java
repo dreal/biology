@@ -1,15 +1,20 @@
-package util;
+package main;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 
+import model.ODEModel;
+
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.text.parser.FormulaParserLL3;
 import org.sbml.jsbml.text.parser.IFormulaParser;
+
+import parser.TraceParser;
+import util.Trace;
 
 /**
  * 
@@ -157,7 +162,7 @@ public class SBMLToSMT2 {
 				IFormulaParser parser = new FormulaParserLL3(new StringReader(""));
 				ASTNode property = ASTNode.parseFormula(prop, parser);
 				System.out.println(SBMLToSMT2.writeSMT2ToString(SBMLReader.read(new File(args[0])),
-						Trace.parseCopasiOutput(new File(args[1])), property));
+						TraceParser.parseCopasiOutput(new File(args[1])), property));
 			}
 			catch (Exception e) {
 				System.out.println("Invalid arguments.");
@@ -170,7 +175,7 @@ public class SBMLToSMT2 {
 				try {
 					System.out.println(SBMLToSMT2.writeSMT2ToString(
 							SBMLReader.read(new File(args[0])),
-							Trace.parseCopasiOutput(new File(args[1])), null));
+							TraceParser.parseCopasiOutput(new File(args[1])), null));
 				}
 				catch (Exception e) {
 					System.out.println("Invalid arguments.");
