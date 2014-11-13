@@ -8,22 +8,24 @@ public class Settings {
 	
 	private ArrayList<String> params;
 	
-	private double noise, precision;
+	private double noise, precision, boxSize;
 	
 	public Settings() {
 		sbmlFile = "";
 		timeSeriesFile = "";
 		params = new ArrayList<String>();
-		noise = 0;
-		precision = 0;
+		noise = 1^(-1);
+		precision = 1^(-4);
+		boxSize = 1^(-9);
 	}
 	
-	public Settings(String sbmlFile, String timeSeriesFile, ArrayList<String> params, double noise, double precision) {
+	public Settings(String sbmlFile, String timeSeriesFile, ArrayList<String> params, double noise, double precision, double boxSize) {
 		this.sbmlFile = sbmlFile;
 		this.timeSeriesFile = timeSeriesFile;
 		this.params = params;
 		this.noise = noise;
 		this.precision = precision;
+		this.boxSize = boxSize;
 	}
 	
 	public String getSBMLFile() {
@@ -46,6 +48,10 @@ public class Settings {
 		return precision;
 	}
 	
+	public double getBoxSize() {
+		return boxSize;
+	}
+	
 	public void setSBMLFile(String sbmlFile) {
 		this.sbmlFile = sbmlFile;
 	}
@@ -64,6 +70,10 @@ public class Settings {
 	
 	public void setPrecision(double precision) {
 		this.precision = precision;
+	}
+	
+	public void setBoxSize(double boxSize) {
+		this.boxSize = boxSize;
 	}
 	
 	public void addParam(String param) {

@@ -43,7 +43,9 @@ public class SettingsParser {
 				.getTextContent());
 		double precision = Double.parseDouble(settings.getElementsByTagName("precision").item(0)
 				.getTextContent());
-		return new Settings(sbmlFile, timeSeriesFile, params, noise, precision);
+		double boxSize = Double.parseDouble(settings.getElementsByTagName("box_size").item(0)
+				.getTextContent());
+		return new Settings(sbmlFile, timeSeriesFile, params, noise, precision, boxSize);
 	}
 
 	public static void writeSettingsToFile(String filename, Settings settings)
@@ -70,6 +72,9 @@ public class SettingsParser {
 		Element precision = doc.createElement("precision");
 		precision.setTextContent("" + settings.getPrecision());
 		topLevelElement.appendChild(precision);
+		Element boxSize = doc.createElement("box_size");
+		boxSize.setTextContent("" + settings.getBoxSize());
+		topLevelElement.appendChild(boxSize);
 		doc.appendChild(topLevelElement);
 		Transformer tr = TransformerFactory.newInstance().newTransformer();
 		tr.setOutputProperty(OutputKeys.INDENT, "yes");
