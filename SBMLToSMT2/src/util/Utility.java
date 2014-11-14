@@ -1,14 +1,25 @@
 package util;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javax.xml.stream.XMLStreamException;
 
 import model.ODEModel;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBMLReader;
+
+import parser.TraceParser;
 
 public class Utility {
+	
+	public static String writeSMT2ToString(Settings settings) throws XMLStreamException, IOException {
+		return writeSMT2ToString(SBMLReader.read(new File(settings.getSBMLFile())),
+				TraceParser.parseCopasiOutput(new File(settings.getTimeSeriesFile())), null);
+	}
 
 	/**
 	 * 

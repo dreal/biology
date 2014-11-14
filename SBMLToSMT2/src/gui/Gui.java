@@ -3,9 +3,14 @@ package gui;
 import java.awt.AWTError;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -15,6 +20,14 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.xml.stream.XMLStreamException;
+
+import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBMLReader;
+import org.sbml.jsbml.Species;
+
+import util.Settings;
+import util.Utility;
 
 public class Gui implements ActionListener {
 	private JFrame gui;
@@ -39,25 +52,26 @@ public class Gui implements ActionListener {
 		gui = new JFrame("SBML To SMT2");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		sbml = new JTextField(60);
+		sbml = new JTextField(30);
 		sbmlLabel = new JLabel("SBML File:");
 		browseSBML = new JButton("Browse");
 		browseSBML.addActionListener(this);
-		series = new JTextField(60);
+		series = new JTextField(30);
 		seriesLabel = new JLabel("Time Series File:");
 		browseSeries = new JButton("Browse");
 		browseSeries.addActionListener(this);
 		params = new JList<String>();
+		params.setLayoutOrientation(JList.VERTICAL_WRAP);
 		paramsScroll = new JScrollPane();
-		paramsScroll.setMinimumSize(new Dimension(200, 150));
-		paramsScroll.setPreferredSize(new Dimension(200, 150));
+		paramsScroll.setMinimumSize(new Dimension(600, 150));
+		paramsScroll.setPreferredSize(new Dimension(600, 150));
 		paramsScroll.setViewportView(params);
 		paramsLabel = new JLabel("Parameters:");
-		noise = new JTextField(60);
+		noise = new JTextField("0.1", 10);
 		noiseLabel = new JLabel("Noise:");
-		precision = new JTextField(60);
+		precision = new JTextField("0.0001", 10);
 		precisionLabel = new JLabel("Precision:");
-		boxSize = new JTextField(60);
+		boxSize = new JTextField("0.000000001", 10);
 		boxSizeLabel = new JLabel("Box-size:");
 		generateSMT2 = new JButton("Generate SMT2");
 		generateSMT2.addActionListener(this);
@@ -65,39 +79,35 @@ public class Gui implements ActionListener {
 		run.addActionListener(this);
 
 		// Create panels for the inputs and buttons
+		JPanel topPanel = new JPanel(new GridLayout(2,2));
 		JPanel sbmlPanel = new JPanel();
 		JPanel seriesPanel = new JPanel();
 		JPanel paramsPanel = new JPanel();
-		JPanel noisePanel = new JPanel();
-		JPanel precisionPanel = new JPanel();
-		JPanel boxSizePanel = new JPanel();
+		JPanel bottomPanel = new JPanel(new GridLayout(3,2));
 		JPanel buttonsPanel = new JPanel();
-		JPanel topPanel = new JPanel(new BorderLayout());
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
-		sbmlPanel.add(sbmlLabel);
 		sbmlPanel.add(sbml);
 		sbmlPanel.add(browseSBML);
-		seriesPanel.add(seriesLabel);
 		seriesPanel.add(series);
 		seriesPanel.add(browseSeries);
+		topPanel.add(sbmlLabel);
+		topPanel.add(sbmlPanel);
+		topPanel.add(seriesLabel);
+		topPanel.add(seriesPanel);
 		paramsPanel.add(paramsLabel);
 		paramsPanel.add(paramsScroll);
-		noisePanel.add(noiseLabel);
-		noisePanel.add(noise);
-		precisionPanel.add(precisionLabel);
-		precisionPanel.add(precision);
-		boxSizePanel.add(boxSizeLabel);
-		boxSizePanel.add(boxSize);
+		bottomPanel.add(noiseLabel);
+		bottomPanel.add(noise);
+		bottomPanel.add(precisionLabel);
+		bottomPanel.add(precision);
+		bottomPanel.add(boxSizeLabel);
+		bottomPanel.add(boxSize);
 		buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
-		topPanel.add(sbmlPanel, BorderLayout.NORTH);
-		topPanel.add(seriesPanel, BorderLayout.CENTER);
-		topPanel.add(paramsPanel, BorderLayout.SOUTH);
-		middlePanel.add(noisePanel, BorderLayout.NORTH);
-		middlePanel.add(precisionPanel, BorderLayout.CENTER);
-		middlePanel.add(boxSizePanel, BorderLayout.SOUTH);
+		middlePanel.add(paramsPanel, BorderLayout.CENTER);
+		middlePanel.add(bottomPanel, BorderLayout.SOUTH);
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 		mainPanel.add(middlePanel, BorderLayout.CENTER);
 		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);		
@@ -138,7 +148,44 @@ public class Gui implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
+		if (e.getSource() == browseSBML) {
+	        int returnVal = fc.showOpenDialog(gui);
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            sbml.setText(fc.getSelectedFile().getAbsolutePath());
+	            try {
+					SBMLDocument document = SBMLReader.read(new File(sbml.getText()));
+					List<String> vars = new ArrayList<String>();
+					for (Species species : document.getModel().getListOfSpecies()) {
+						vars.add(species.getId());
+					}
+					params.setListData(vars.toArray(new String[0]));
+				} catch (XMLStreamException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+	    }
+		else if (e.getSource() == browseSeries) {
+	        int returnVal = fc.showOpenDialog(gui);
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            series.setText(fc.getSelectedFile().getAbsolutePath());
+	        }
+	    }
+		else if (e.getSource() == generateSMT2) {
+			try {
+				System.out.println(Utility.writeSMT2ToString(new Settings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
+			} catch (NumberFormatException | XMLStreamException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	    }
+		else if (e.getSource() == run) {
+			try {
+				System.out.println(Utility.writeSMT2ToString(new Settings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
+			} catch (NumberFormatException | XMLStreamException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	    }
 	}
 }

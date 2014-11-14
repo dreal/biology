@@ -1,12 +1,13 @@
 package util;
 
+import java.util.List;
 import java.util.ArrayList;
 
 public class Settings {
 	
 	private String sbmlFile, timeSeriesFile;
 	
-	private ArrayList<String> params;
+	private List<String> params;
 	
 	private double noise, precision, boxSize;
 	
@@ -14,12 +15,12 @@ public class Settings {
 		sbmlFile = "";
 		timeSeriesFile = "";
 		params = new ArrayList<String>();
-		noise = 1^(-1);
-		precision = 1^(-4);
-		boxSize = 1^(-9);
+		noise = 0.1;
+		precision = 0.0001;
+		boxSize = 0.000000001;
 	}
 	
-	public Settings(String sbmlFile, String timeSeriesFile, ArrayList<String> params, double noise, double precision, double boxSize) {
+	public Settings(String sbmlFile, String timeSeriesFile, List<String> params, double noise, double precision, double boxSize) {
 		this.sbmlFile = sbmlFile;
 		this.timeSeriesFile = timeSeriesFile;
 		this.params = params;
