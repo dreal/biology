@@ -3,7 +3,7 @@ package util;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Settings {
+public class ModelSettings {
 	
 	private String sbmlFile, timeSeriesFile;
 	
@@ -11,7 +11,7 @@ public class Settings {
 	
 	private double noise, precision, boxSize;
 	
-	public Settings() {
+	public ModelSettings() {
 		sbmlFile = "";
 		timeSeriesFile = "";
 		params = new ArrayList<String>();
@@ -20,7 +20,7 @@ public class Settings {
 		boxSize = 0.000000001;
 	}
 	
-	public Settings(String sbmlFile, String timeSeriesFile, List<String> params, double noise, double precision, double boxSize) {
+	public ModelSettings(String sbmlFile, String timeSeriesFile, List<String> params, double noise, double precision, double boxSize) {
 		this.sbmlFile = sbmlFile;
 		this.timeSeriesFile = timeSeriesFile;
 		this.params = params;

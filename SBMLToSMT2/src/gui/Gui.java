@@ -26,7 +26,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.Species;
 
-import util.Settings;
+import util.ModelSettings;
 import util.Utility;
 
 public class Gui implements ActionListener {
@@ -173,7 +173,7 @@ public class Gui implements ActionListener {
 	    }
 		else if (e.getSource() == generateSMT2) {
 			try {
-				System.out.println(Utility.writeSMT2ToString(new Settings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
+				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
 			} catch (NumberFormatException | XMLStreamException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -181,7 +181,7 @@ public class Gui implements ActionListener {
 	    }
 		else if (e.getSource() == run) {
 			try {
-				System.out.println(Utility.writeSMT2ToString(new Settings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
+				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
 			} catch (NumberFormatException | XMLStreamException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

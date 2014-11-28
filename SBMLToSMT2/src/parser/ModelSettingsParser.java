@@ -22,11 +22,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import util.Settings;
+import util.ModelSettings;
 
-public class SettingsParser {
+public class ModelSettingsParser {
 
-	public static Settings parseSettingsFile(String filename) throws ParserConfigurationException,
+	public static ModelSettings parseSettingsFile(String filename) throws ParserConfigurationException,
 			SAXException, IOException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
@@ -45,10 +45,10 @@ public class SettingsParser {
 				.getTextContent());
 		double boxSize = Double.parseDouble(settings.getElementsByTagName("box_size").item(0)
 				.getTextContent());
-		return new Settings(sbmlFile, timeSeriesFile, params, noise, precision, boxSize);
+		return new ModelSettings(sbmlFile, timeSeriesFile, params, noise, precision, boxSize);
 	}
 
-	public static void writeSettingsToFile(String filename, Settings settings)
+	public static void writeSettingsToFile(String filename, ModelSettings settings)
 			throws ParserConfigurationException, TransformerFactoryConfigurationError,
 			FileNotFoundException, TransformerException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

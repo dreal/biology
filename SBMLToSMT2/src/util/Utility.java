@@ -16,7 +16,7 @@ import parser.TraceParser;
 
 public class Utility {
 	
-	public static String writeSMT2ToString(Settings settings) throws XMLStreamException, IOException {
+	public static String writeSMT2ToString(ModelSettings settings) throws XMLStreamException, IOException {
 		return writeSMT2ToString(SBMLReader.read(new File(settings.getSBMLFile())),
 				TraceParser.parseCopasiOutput(new File(settings.getTimeSeriesFile())), null);
 	}
