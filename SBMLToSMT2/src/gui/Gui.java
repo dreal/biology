@@ -32,7 +32,7 @@ import util.Utility;
 public class Gui implements ActionListener {
 	private JFrame gui;
 
-	private JTextField sbml, series, noise, precision, boxSize;
+	private JTextField sbml, series, noise, precision;
 
 	private JList<String> params;
 
@@ -40,7 +40,7 @@ public class Gui implements ActionListener {
 
 	private JScrollPane paramsScroll;
 
-	private JLabel sbmlLabel, seriesLabel, paramsLabel, noiseLabel, precisionLabel, boxSizeLabel;
+	private JLabel sbmlLabel, seriesLabel, paramsLabel, noiseLabel, precisionLabel;
 
 	private JFileChooser fc;
 
@@ -71,8 +71,6 @@ public class Gui implements ActionListener {
 		noiseLabel = new JLabel("Noise:");
 		precision = new JTextField("0.0001", 10);
 		precisionLabel = new JLabel("Precision:");
-		boxSize = new JTextField("0.000000001", 10);
-		boxSizeLabel = new JLabel("Box-size:");
 		generateSMT2 = new JButton("Generate SMT2");
 		generateSMT2.addActionListener(this);
 		run = new JButton("Run");
@@ -83,7 +81,7 @@ public class Gui implements ActionListener {
 		JPanel sbmlPanel = new JPanel();
 		JPanel seriesPanel = new JPanel();
 		JPanel paramsPanel = new JPanel();
-		JPanel bottomPanel = new JPanel(new GridLayout(3,2));
+		JPanel bottomPanel = new JPanel(new GridLayout(2,2));
 		JPanel buttonsPanel = new JPanel();
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
@@ -102,8 +100,6 @@ public class Gui implements ActionListener {
 		bottomPanel.add(noise);
 		bottomPanel.add(precisionLabel);
 		bottomPanel.add(precision);
-		bottomPanel.add(boxSizeLabel);
-		bottomPanel.add(boxSize);
 		buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
 		middlePanel.add(paramsPanel, BorderLayout.CENTER);
@@ -173,7 +169,7 @@ public class Gui implements ActionListener {
 	    }
 		else if (e.getSource() == generateSMT2) {
 			try {
-				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
+				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()))));
 			} catch (NumberFormatException | XMLStreamException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -181,7 +177,7 @@ public class Gui implements ActionListener {
 	    }
 		else if (e.getSource() == run) {
 			try {
-				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()),Double.parseDouble(boxSize.getText().trim()))));
+				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()))));
 			} catch (NumberFormatException | XMLStreamException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
