@@ -1,5 +1,7 @@
 package main;
 
+import parser.SMT2SettingsParser;
+import util.SMT2Settings;
 import gui.Gui;
 
 /**
@@ -21,6 +23,15 @@ public class SBMLToSMT2 {
 	 */
 	public static void main(String[] args) {
 		new Gui();
+		SMT2Settings settings;
+		try {
+			settings = SMT2SettingsParser.parseSettingsFile("D:\\data.xml");
+			SMT2SettingsParser.writeSettingsToFile("D:\\test.xml", settings);
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //		if (args.length > 2) {
 //			try {
 //				String prop = args[2];

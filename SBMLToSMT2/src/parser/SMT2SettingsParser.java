@@ -3,8 +3,9 @@ package parser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -19,10 +20,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.sbml.jsbml.ASTNode;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import util.SMT2Settings;
 import util.Trace;
@@ -31,8 +32,7 @@ import util.Utility.Tuple;
 
 public class SMT2SettingsParser {
 
-	public static SMT2Settings parseSettingsFile(String filename) throws ParserConfigurationException,
-			SAXException, IOException {
+	public static SMT2Settings parseSettingsFile(String filename) throws DOMException, Exception {
 		Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
 		String time = "";
 		Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
@@ -53,12 +53,77 @@ public class SMT2SettingsParser {
 				time = name.getTextContent();
 			}
 			else {
-				double left = Double.parseDouble(((Element) ((Element) var.getElementsByTagName("domain").item(0)).getElementsByTagName("left").item(0)).getTextContent());
-				double right = Double.parseDouble(((Element) ((Element) var.getElementsByTagName("domain").item(0)).getElementsByTagName("right").item(0)).getTextContent());
-				variables.put(name.getTextContent(), new Utility().new Tuple<Double, Double>(left, right));
+				double left = Double.parseDouble(((Element) ((Element) var.getElementsByTagName(
+						"domain").item(0)).getElementsByTagName("left").item(0)).getTextContent());
+				double right = Double.parseDouble(((Element) ((Element) var.getElementsByTagName(
+						"domain").item(0)).getElementsByTagName("right").item(0)).getTextContent());
+				variables.put(name.getTextContent(), new Tuple<Double, Double>(left, right));
 			}
 		}
-		
+		Element equations = (Element) settings.getElementsByTagName("odes").item(0);
+		NodeList odeList = equations.getElementsByTagName("ode");
+		List<String> variableNames = new ArrayList<String>();
+		for (int i = 0; i < odeList.getLength(); i++) {
+			Element ode = (Element) odeList.item(i);
+			String variable = ode.getTextContent().substring(ode.getTextContent().indexOf('[') + 1,
+					ode.getTextContent().indexOf(']'));
+			variableNames.add(variable);
+			String formula = ode.getTextContent().substring(ode.getTextContent().indexOf("] ") + 2,
+					ode.getTextContent().length() - 1);
+			odes.put(variable, Utility.prefixStringToASTNode(formula));
+		}
+		Element series = (Element) settings.getElementsByTagName("series").item(0);
+		NodeList points = series.getElementsByTagName("point");
+		List<Double> timePoints = new ArrayList<Double>();
+		List<List<Double>> data = new ArrayList<List<Double>>();
+		for (int i = 0; i < variableNames.size(); i++) {
+			data.add(new ArrayList<Double>());
+		}
+		for (int i = 0; i < points.getLength(); i++) {
+			Element point = (Element) points.item(i);
+			timePoints.add(Double.parseDouble(point.getAttribute("time")));
+			NodeList intervals = point.getElementsByTagName("interval");
+			List<Tuple<String, Double>> dataPairs = new ArrayList<Tuple<String, Double>>();
+			for (int j = 0; j < intervals.getLength(); j++) {
+				Element interval = (Element) intervals.item(j);
+				String var = interval.getAttribute("var");
+				if (var.equals("")) {
+					var = variableNames.get(j);
+				}
+				double left = Double.parseDouble(((Element) interval.getElementsByTagName("left")
+						.item(0)).getTextContent());
+				double right = Double.parseDouble(((Element) interval.getElementsByTagName("right")
+						.item(0)).getTextContent());
+				dataPairs.add(new Tuple<String, Double>(var, (left + right) / 2));
+			}
+			for (int j = 0; j < variableNames.size(); j++) {
+				for (Tuple<String, Double> element : dataPairs) {
+					if (variableNames.get(j).equals(element.x)) {
+						data.get(j).add(element.y);
+						break;
+					}
+				}
+			}
+		}
+		trace = new Trace(variableNames, timePoints, data);
+		try {
+			delta = Double.parseDouble(((Element) settings.getElementsByTagName("delta").item(0))
+					.getTextContent());
+		}
+		catch (Exception e) {
+		}
+		try {
+			epsilon = Double.parseDouble(((Element) settings.getElementsByTagName("epsilon")
+					.item(0)).getTextContent());
+		}
+		catch (Exception e) {
+		}
+		try {
+			noise = Double.parseDouble(((Element) settings.getElementsByTagName("noise").item(0))
+					.getTextContent());
+		}
+		catch (Exception e) {
+		}
 		return new SMT2Settings(variables, time, odes, trace, epsilon, delta, noise);
 	}
 
@@ -99,27 +164,42 @@ public class SMT2SettingsParser {
 		declaration.appendChild(var);
 		topLevelElement.appendChild(declaration);
 		Element odes = doc.createElement("odes");
-		for (String variable : settings.getODEVariables()) {
-			Element ode = doc.createElement("ode");
-			ode.setTextContent("(= d/dt[" + variable + "] " + Utility.prefixASTNodeToString(settings.getODE(variable)) + ")");
-			odes.appendChild(ode);
+		for (String variable : settings.getAllVariables()) {
+			for (String odeVariable : settings.getODEVariables()) {
+				if (variable.equals(odeVariable)) {
+					Element ode = doc.createElement("ode");
+					ode.setTextContent("(= d/dt[" + odeVariable + "] "
+							+ Utility.prefixASTNodeToString(settings.getODE(odeVariable)) + ")");
+					odes.appendChild(ode);
+					break;
+				}
+			}
 		}
 		topLevelElement.appendChild(odes);
 		Element series = doc.createElement("series");
-		for(double timePoint : settings.getTrace().getTimePoints()) {
+		for (double timePoint : settings.getTrace().getTimePoints()) {
 			Element point = doc.createElement("point");
 			point.setAttribute("time", "" + timePoint);
-			for (String variable : settings.getTrace().getVariables()) {
-				if (settings.getODEVariables().contains(variable)) {
-					Element interval = doc.createElement("interval");
-					interval.setAttribute("var", variable);
-					Element left = doc.createElement("left");
-					left.setTextContent("" + (settings.getTrace().getValue(variable, timePoint) - settings.getNoise()));
-					Element right = doc.createElement("right");
-					right.setTextContent("" + (settings.getTrace().getValue(variable, timePoint) + settings.getNoise()));
-					interval.appendChild(left);
-					interval.appendChild(right);
-					point.appendChild(interval);
+			for (String variable : settings.getAllVariables()) {
+				for (String traceVariable : settings.getTrace().getVariables()) {
+					if (variable.equals(traceVariable)) {
+						if (settings.getODEVariables().contains(traceVariable)) {
+							Element interval = doc.createElement("interval");
+							interval.setAttribute("var", traceVariable);
+							Element left = doc.createElement("left");
+							left.setTextContent(""
+									+ (settings.getTrace().getValue(traceVariable, timePoint) - settings
+											.getNoise()));
+							Element right = doc.createElement("right");
+							right.setTextContent(""
+									+ (settings.getTrace().getValue(traceVariable, timePoint) + settings
+											.getNoise()));
+							interval.appendChild(left);
+							interval.appendChild(right);
+							point.appendChild(interval);
+						}
+						break;
+					}
 				}
 			}
 			series.appendChild(point);

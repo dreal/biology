@@ -3,6 +3,8 @@ package util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -15,8 +17,9 @@ import org.sbml.jsbml.SBMLReader;
 import parser.TraceParser;
 
 public class Utility {
-	
-	public static String writeSMT2ToString(ModelSettings settings) throws XMLStreamException, IOException {
+
+	public static String writeSMT2ToString(ModelSettings settings) throws XMLStreamException,
+			IOException {
 		return writeSMT2ToString(SBMLReader.read(new File(settings.getSBMLFile())),
 				TraceParser.parseCopasiOutput(new File(settings.getTimeSeriesFile())), null);
 	}
@@ -139,7 +142,74 @@ public class Utility {
 		output.flush();
 		output.close();
 	}
-	
+
+	/**
+	 * 
+	 * Returns an ASTNode representing the given String in prefix notation form.
+	 * 
+	 * @param math
+	 *            - the String equation to convert into an ASTNode
+	 * @return The ASTNode representing the given String in prefix notation form
+	 */
+	public static ASTNode prefixStringToASTNode(String math) {
+		if (!math.contains(" ")) {
+			try {
+				int n = Integer.parseInt(math);
+				return new ASTNode(n);
+			}
+			catch (Exception e) {
+			}
+			try {
+				double n = Double.parseDouble(math);
+				return new ASTNode(n);
+			}
+			catch (Exception e) {
+			}
+			if (math.length() == 1) {
+				char c = math.charAt(0);
+				if (Character.isAlphabetic(c)) {
+					return new ASTNode(math);
+				}
+				else {
+					return new ASTNode(c);
+				}
+			}
+			return new ASTNode(math);
+		}
+		List<String> tokens = new ArrayList<String>();
+		if (math.startsWith("(") && math.endsWith(")")) {
+			math = math.substring(1, math.length() - 1);
+		}
+		int parenCounter = 0;
+		String token = "";
+		for (char c : math.toCharArray()) {
+			if (c == ' ' && parenCounter == 0) {
+				tokens.add(token);
+				token = "";
+			}
+			else {
+				token += c;
+				if (c == '(') {
+					parenCounter++;
+				}
+				else if (c == ')') {
+					parenCounter--;
+				}
+			}
+		}
+		if (!token.equals("")) {
+			tokens.add(token);
+		}
+		ASTNode node = null;
+		if (tokens.size() > 0) {
+			node = prefixStringToASTNode(tokens.get(0));
+		}
+		for (int i = 1; i < tokens.size(); i++) {
+			node.addChild(prefixStringToASTNode(tokens.get(i)));
+		}
+		return node;
+	}
+
 	/**
 	 * 
 	 * Returns a String representation of the given ASTNode equation in prefix notation form.
@@ -462,8 +532,8 @@ public class Utility {
 		}
 		return "";
 	}
-	
-	public class Tuple<X, Y> {
+
+	public static class Tuple<X, Y> {
 		public final X x;
 		public final Y y;
 

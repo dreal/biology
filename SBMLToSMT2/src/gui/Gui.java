@@ -22,9 +22,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.xml.stream.XMLStreamException;
 
+import org.sbml.jsbml.LocalParameter;
+import org.sbml.jsbml.Parameter;
+import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
-import org.sbml.jsbml.Species;
 
 import util.ModelSettings;
 import util.Utility;
@@ -51,7 +53,7 @@ public class Gui implements ActionListener {
 		// Create the frame
 		gui = new JFrame("SBML To SMT2");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		sbml = new JTextField(30);
 		sbmlLabel = new JLabel("SBML File:");
 		browseSBML = new JButton("Browse");
@@ -77,15 +79,15 @@ public class Gui implements ActionListener {
 		run.addActionListener(this);
 
 		// Create panels for the inputs and buttons
-		JPanel topPanel = new JPanel(new GridLayout(2,2));
+		JPanel topPanel = new JPanel(new GridLayout(2, 2));
 		JPanel sbmlPanel = new JPanel();
 		JPanel seriesPanel = new JPanel();
 		JPanel paramsPanel = new JPanel();
-		JPanel bottomPanel = new JPanel(new GridLayout(2,2));
+		JPanel bottomPanel = new JPanel(new GridLayout(2, 2));
 		JPanel buttonsPanel = new JPanel();
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
-		
+
 		sbmlPanel.add(sbml);
 		sbmlPanel.add(browseSBML);
 		seriesPanel.add(series);
@@ -106,8 +108,8 @@ public class Gui implements ActionListener {
 		middlePanel.add(bottomPanel, BorderLayout.SOUTH);
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 		mainPanel.add(middlePanel, BorderLayout.CENTER);
-		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);		
-		
+		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
 		// Add the main panel to the frame
 		gui.setContentPane(mainPanel);
 		gui.pack();
@@ -145,43 +147,59 @@ public class Gui implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == browseSBML) {
-	        int returnVal = fc.showOpenDialog(gui);
-	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            sbml.setText(fc.getSelectedFile().getAbsolutePath());
-	            try {
+			int returnVal = fc.showOpenDialog(gui);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				sbml.setText(fc.getSelectedFile().getAbsolutePath());
+				try {
 					SBMLDocument document = SBMLReader.read(new File(sbml.getText()));
 					List<String> vars = new ArrayList<String>();
-					for (Species species : document.getModel().getListOfSpecies()) {
-						vars.add(species.getId());
+					for (Parameter param : document.getModel().getListOfParameters()) {
+						vars.add(param.getId());
+					}
+					for (Reaction reaction : document.getModel().getListOfReactions()) {
+						for (LocalParameter parameter : reaction.getKineticLaw()
+								.getListOfLocalParameters()) {
+							String newName = reaction.getId() + "-" + parameter.getId();
+							vars.add(newName);
+						}
 					}
 					params.setListData(vars.toArray(new String[0]));
-				} catch (XMLStreamException | IOException e1) {
+				}
+				catch (XMLStreamException | IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-	        }
-	    }
+			}
+		}
 		else if (e.getSource() == browseSeries) {
-	        int returnVal = fc.showOpenDialog(gui);
-	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            series.setText(fc.getSelectedFile().getAbsolutePath());
-	        }
-	    }
+			int returnVal = fc.showOpenDialog(gui);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				series.setText(fc.getSelectedFile().getAbsolutePath());
+			}
+		}
 		else if (e.getSource() == generateSMT2) {
 			try {
-				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()))));
-			} catch (NumberFormatException | XMLStreamException | IOException e1) {
+				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText()
+						.trim(), series.getText().trim(), params.getSelectedValuesList(), Double
+						.parseDouble(noise.getText().trim()), Double.parseDouble(precision
+						.getText().trim()))));
+			}
+			catch (NumberFormatException | XMLStreamException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-	    }
+		}
 		else if (e.getSource() == run) {
 			try {
-				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText().trim(), series.getText().trim(), params.getSelectedValuesList(), Double.parseDouble(noise.getText().trim()), Double.parseDouble(precision.getText().trim()))));
-			} catch (NumberFormatException | XMLStreamException | IOException e1) {
+				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText()
+						.trim(), series.getText().trim(), params.getSelectedValuesList(), Double
+						.parseDouble(noise.getText().trim()), Double.parseDouble(precision
+						.getText().trim()))));
+			}
+			catch (NumberFormatException | XMLStreamException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-	    }
+		}
 	}
 }
