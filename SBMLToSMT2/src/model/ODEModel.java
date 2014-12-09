@@ -1,6 +1,7 @@
 package model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sbml.jsbml.ASTNode;
@@ -29,7 +30,7 @@ public class ODEModel {
 	private Map<String, ASTNode> odes; // A mapping of variables to differential equations
 
 	private Map<String, Double> initialValues; // Initial values for each variable
-	
+
 	private Map<String, Double> parameters; // Parameters in the differential equations
 
 	/**
@@ -42,7 +43,7 @@ public class ODEModel {
 	 * @param document
 	 *            - the SBML document to convert into an ODE model
 	 */
-	public ODEModel(SBMLDocument document) {
+	public ODEModel(SBMLDocument document, List<String> interestingParameters) {
 		odes = new HashMap<String, ASTNode>();
 		initialValues = new HashMap<String, Double>();
 		for (Reaction reaction : document.getModel().getListOfReactions()) {
@@ -60,12 +61,17 @@ public class ODEModel {
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
 						String newName = reaction.getId() + "-" + parameter.getId();
-						replace(parameter.getId(), newName, newNode);
-						if (parameter.isSetValue()) {
-							parameters.put(newName, parameter.getValue());
+						if (interestingParameters.contains(newName)) {
+							replace(parameter.getId(), newName, newNode);
+							if (parameter.isSetValue()) {
+								parameters.put(newName, parameter.getValue());
+							}
+							else {
+								parameters.put(newName, 0.0);
+							}
 						}
 						else {
-							parameters.put(newName, 0.0);
+							replace(parameter.getId(), parameter.getValue(), newNode);
 						}
 					}
 					odes.put(product.getSpecies(), newNode);
@@ -76,12 +82,17 @@ public class ODEModel {
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
 						String newName = reaction.getId() + "-" + parameter.getId();
-						replace(parameter.getId(), newName, newNode);
-						if (parameter.isSetValue()) {
-							parameters.put(newName, parameter.getValue());
+						if (interestingParameters.contains(newName)) {
+							replace(parameter.getId(), newName, newNode);
+							if (parameter.isSetValue()) {
+								parameters.put(newName, parameter.getValue());
+							}
+							else {
+								parameters.put(newName, 0.0);
+							}
 						}
 						else {
-							parameters.put(newName, 0.0);
+							replace(parameter.getId(), parameter.getValue(), newNode);
 						}
 					}
 					math.addChild(newNode);
@@ -101,12 +112,17 @@ public class ODEModel {
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
 						String newName = reaction.getId() + "-" + parameter.getId();
-						replace(parameter.getId(), newName, newNode);
-						if (parameter.isSetValue()) {
-							parameters.put(newName, parameter.getValue());
+						if (interestingParameters.contains(newName)) {
+							replace(parameter.getId(), newName, newNode);
+							if (parameter.isSetValue()) {
+								parameters.put(newName, parameter.getValue());
+							}
+							else {
+								parameters.put(newName, 0.0);
+							}
 						}
 						else {
-							parameters.put(newName, 0.0);
+							replace(parameter.getId(), parameter.getValue(), newNode);
 						}
 					}
 					math.addChild(newNode);
@@ -118,12 +134,17 @@ public class ODEModel {
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
 						String newName = reaction.getId() + "-" + parameter.getId();
-						replace(parameter.getId(), newName, newNode);
-						if (parameter.isSetValue()) {
-							parameters.put(newName, parameter.getValue());
+						if (interestingParameters.contains(newName)) {
+							replace(parameter.getId(), newName, newNode);
+							if (parameter.isSetValue()) {
+								parameters.put(newName, parameter.getValue());
+							}
+							else {
+								parameters.put(newName, 0.0);
+							}
 						}
 						else {
-							parameters.put(newName, 0.0);
+							replace(parameter.getId(), parameter.getValue(), newNode);
 						}
 					}
 					math.addChild(newNode);
@@ -159,10 +180,10 @@ public class ODEModel {
 		for (Compartment compartment : document.getModel().getListOfCompartments()) {
 			if (!odes.containsKey(compartment.getId())) {
 				if (compartment.isSetValue()) {
-					parameters.put(compartment.getId(), compartment.getValue());
+					replaceWithValue(compartment.getId(), compartment.getValue());
 				}
 				else {
-					parameters.put(compartment.getId(), 0.0);
+					replaceWithValue(compartment.getId(), 0.0);
 				}
 			}
 			else {
@@ -176,11 +197,21 @@ public class ODEModel {
 		}
 		for (Parameter parameter : document.getModel().getListOfParameters()) {
 			if (!odes.containsKey(parameter.getId())) {
-				if (parameter.isSetValue()) {
-					parameters.put(parameter.getId(), parameter.getValue());
+				if (interestingParameters.contains(parameter.getId())) {
+					if (parameter.isSetValue()) {
+						parameters.put(parameter.getId(), parameter.getValue());
+					}
+					else {
+						parameters.put(parameter.getId(), 0.0);
+					}
 				}
 				else {
-					parameters.put(parameter.getId(), 0.0);
+					if (parameter.isSetValue()) {
+						replaceWithValue(parameter.getId(), parameter.getValue());
+					}
+					else {
+						replaceWithValue(parameter.getId(), 0.0);
+					}
 				}
 			}
 			else {
@@ -208,21 +239,6 @@ public class ODEModel {
 			replace(variable, value, equation);
 		}
 	}
-	
-	/**
-	 * 
-	 * Replaces a variable with a new name in all ODE equations.
-	 * 
-	 * @param variable
-	 *            - the variable to be replaced
-	 * @param newName
-	 *            - the new variable name
-	 */
-	private void replaceVariableName(String variable, String newName) {
-		for (ASTNode equation : odes.values()) {
-			replace(variable, newName, equation);
-		}
-	}
 
 	/**
 	 * 
@@ -245,7 +261,7 @@ public class ODEModel {
 		}
 		return equation;
 	}
-	
+
 	/**
 	 * 
 	 * Replaces a variable with a new name in the given ODE equation.

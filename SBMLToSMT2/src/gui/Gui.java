@@ -24,7 +24,9 @@ import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.Parameter;
+import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 
@@ -155,6 +157,14 @@ public class Gui implements ActionListener {
 					List<String> vars = new ArrayList<String>();
 					for (Parameter param : document.getModel().getListOfParameters()) {
 						vars.add(param.getId());
+					}
+					for (Rule r : document.getModel().getListOfRules()) {
+						if (r.isRate()) {
+							String var = ((RateRule) r).getVariable();
+							if (vars.contains(var)) {
+								vars.remove(var);
+							}
+						}
 					}
 					for (Reaction reaction : document.getModel().getListOfReactions()) {
 						for (LocalParameter parameter : reaction.getKineticLaw()
