@@ -10,15 +10,17 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.xml.stream.XMLStreamException;
 
@@ -29,6 +31,7 @@ import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
+import org.sbml.jsbml.Species;
 
 import util.ModelSettings;
 import util.Utility;
@@ -36,17 +39,17 @@ import util.Utility;
 public class Gui implements ActionListener {
 	private JFrame gui;
 
-	private JTextField sbml, series, noise, precision;
-
-	private JList<String> params;
+	private JTextField sbml, series, noise, precision, delta;
 
 	private JButton browseSBML, browseSeries, generateSMT2, run;
 
-	private JScrollPane paramsScroll;
+	private JScrollPane paramsScroll, speciesScroll;
 
-	private JLabel sbmlLabel, seriesLabel, paramsLabel, noiseLabel, precisionLabel;
+	private JLabel sbmlLabel, seriesLabel, noiseLabel, precisionLabel, deltaLabel;
 
 	private JFileChooser fc;
+	
+	private JPanel paramsPanel, speciesPanel;
 
 	public Gui() {
 
@@ -64,17 +67,18 @@ public class Gui implements ActionListener {
 		seriesLabel = new JLabel("Time Series File:");
 		browseSeries = new JButton("Browse");
 		browseSeries.addActionListener(this);
-		params = new JList<String>();
-		params.setLayoutOrientation(JList.VERTICAL_WRAP);
 		paramsScroll = new JScrollPane();
 		paramsScroll.setMinimumSize(new Dimension(600, 150));
 		paramsScroll.setPreferredSize(new Dimension(600, 150));
-		paramsScroll.setViewportView(params);
-		paramsLabel = new JLabel("Parameters:");
+		speciesScroll = new JScrollPane();
+		speciesScroll.setMinimumSize(new Dimension(600, 150));
+		speciesScroll.setPreferredSize(new Dimension(600, 150));
 		noise = new JTextField("0.1", 10);
 		noiseLabel = new JLabel("Noise:");
 		precision = new JTextField("0.0001", 10);
 		precisionLabel = new JLabel("Precision:");
+		delta = new JTextField("0.0001", 10);
+		deltaLabel = new JLabel("Delta:");
 		generateSMT2 = new JButton("Generate SMT2");
 		generateSMT2.addActionListener(this);
 		run = new JButton("Run");
@@ -84,12 +88,20 @@ public class Gui implements ActionListener {
 		JPanel topPanel = new JPanel(new GridLayout(2, 2));
 		JPanel sbmlPanel = new JPanel();
 		JPanel seriesPanel = new JPanel();
-		JPanel paramsPanel = new JPanel();
-		JPanel bottomPanel = new JPanel(new GridLayout(2, 2));
+		paramsPanel = new JPanel();
+		speciesPanel = new JPanel();
+		JPanel bottomPanel = new JPanel(new GridLayout(3, 2));
 		JPanel buttonsPanel = new JPanel();
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
+		paramsScroll.setViewportView(paramsPanel);
+		speciesScroll.setViewportView(speciesPanel);
+		
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("Parameters", paramsScroll);
+		tabbedPane.addTab("Variables", speciesScroll);
+		
 		sbmlPanel.add(sbml);
 		sbmlPanel.add(browseSBML);
 		seriesPanel.add(series);
@@ -98,15 +110,15 @@ public class Gui implements ActionListener {
 		topPanel.add(sbmlPanel);
 		topPanel.add(seriesLabel);
 		topPanel.add(seriesPanel);
-		paramsPanel.add(paramsLabel);
-		paramsPanel.add(paramsScroll);
 		bottomPanel.add(noiseLabel);
 		bottomPanel.add(noise);
 		bottomPanel.add(precisionLabel);
 		bottomPanel.add(precision);
+		bottomPanel.add(deltaLabel);
+		bottomPanel.add(delta);
 		buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
-		middlePanel.add(paramsPanel, BorderLayout.CENTER);
+		middlePanel.add(tabbedPane, BorderLayout.CENTER);
 		middlePanel.add(bottomPanel, BorderLayout.SOUTH);
 		mainPanel.add(topPanel, BorderLayout.NORTH);
 		mainPanel.add(middlePanel, BorderLayout.CENTER);
@@ -154,26 +166,56 @@ public class Gui implements ActionListener {
 				sbml.setText(fc.getSelectedFile().getAbsolutePath());
 				try {
 					SBMLDocument document = SBMLReader.read(new File(sbml.getText()));
+					List<String> parameters = new ArrayList<String>();
 					List<String> vars = new ArrayList<String>();
 					for (Parameter param : document.getModel().getListOfParameters()) {
-						vars.add(param.getId());
+						parameters.add(param.getId());
+					}
+					for (Species s : document.getModel().getListOfSpecies()) {
+						vars.add(s.getId());
 					}
 					for (Rule r : document.getModel().getListOfRules()) {
 						if (r.isRate()) {
 							String var = ((RateRule) r).getVariable();
-							if (vars.contains(var)) {
-								vars.remove(var);
+							if (parameters.contains(var)) {
+								parameters.remove(var);
 							}
+							vars.add(var);
 						}
 					}
 					for (Reaction reaction : document.getModel().getListOfReactions()) {
 						for (LocalParameter parameter : reaction.getKineticLaw()
 								.getListOfLocalParameters()) {
 							String newName = reaction.getId() + "-" + parameter.getId();
-							vars.add(newName);
+							parameters.add(newName);
 						}
 					}
-					params.setListData(vars.toArray(new String[0]));
+					Collections.sort(parameters);
+					Collections.sort(vars);
+					paramsPanel.removeAll();
+					paramsPanel.setLayout(new GridLayout(parameters.size() + 1,4));
+					paramsPanel.add(new JLabel("Synthesize?"));
+					paramsPanel.add(new JLabel("Name"));
+					paramsPanel.add(new JLabel("Lower Bound"));
+					paramsPanel.add(new JLabel("Upper Bound"));
+					for (String p : parameters) {
+						paramsPanel.add(new JCheckBox());
+						paramsPanel.add(new JLabel(p));
+						paramsPanel.add(new JTextField("0.0"));
+						paramsPanel.add(new JTextField("" + Double.MAX_VALUE));
+					}
+					paramsPanel.revalidate();
+					speciesPanel.removeAll();
+					speciesPanel.setLayout(new GridLayout(vars.size() + 1,3));
+					speciesPanel.add(new JLabel("Name"));
+					speciesPanel.add(new JLabel("Lower Bound"));
+					speciesPanel.add(new JLabel("Upper Bound"));
+					for (String s : vars) {
+						speciesPanel.add(new JLabel(s));
+						speciesPanel.add(new JTextField("0.0"));
+						speciesPanel.add(new JTextField("" + Double.MAX_VALUE));
+					}
+					speciesPanel.revalidate();
 				}
 				catch (XMLStreamException | IOException e1) {
 					// TODO Auto-generated catch block
@@ -189,8 +231,14 @@ public class Gui implements ActionListener {
 		}
 		else if (e.getSource() == generateSMT2) {
 			try {
+				List<String> params = new ArrayList<String>();
+				for (int i = 4 ; i < paramsPanel.getComponentCount(); i+=4) {
+					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
+						params.add(((JLabel) paramsPanel.getComponent(i + 1)).getText());
+					}
+				}
 				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText()
-						.trim(), series.getText().trim(), params.getSelectedValuesList(), Double
+						.trim(), series.getText().trim(), params, Double
 						.parseDouble(noise.getText().trim()), Double.parseDouble(precision
 						.getText().trim()))));
 			}
@@ -201,8 +249,14 @@ public class Gui implements ActionListener {
 		}
 		else if (e.getSource() == run) {
 			try {
+				List<String> params = new ArrayList<String>();
+				for (int i = 4 ; i < paramsPanel.getComponentCount(); i+=4) {
+					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
+						params.add(((JLabel) paramsPanel.getComponent(i + 1)).getText());
+					}
+				}
 				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText()
-						.trim(), series.getText().trim(), params.getSelectedValuesList(), Double
+						.trim(), series.getText().trim(), params, Double
 						.parseDouble(noise.getText().trim()), Double.parseDouble(precision
 						.getText().trim()))));
 			}
