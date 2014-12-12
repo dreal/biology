@@ -11,7 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -22,8 +24,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import model.ODEModel;
+
+import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.RateRule;
@@ -33,8 +41,12 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.Species;
 
+import parser.SMT2SettingsParser;
+import parser.TraceParser;
 import util.ModelSettings;
+import util.SMT2Settings;
 import util.Utility;
+import util.Utility.Tuple;
 
 public class Gui implements ActionListener {
 	private JFrame gui;
@@ -48,7 +60,7 @@ public class Gui implements ActionListener {
 	private JLabel sbmlLabel, seriesLabel, noiseLabel, precisionLabel, deltaLabel;
 
 	private JFileChooser fc;
-	
+
 	private JPanel paramsPanel, speciesPanel;
 
 	public Gui() {
@@ -97,11 +109,11 @@ public class Gui implements ActionListener {
 
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
-		
+
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Parameters", paramsScroll);
 		tabbedPane.addTab("Variables", speciesScroll);
-		
+
 		sbmlPanel.add(sbml);
 		sbmlPanel.add(browseSBML);
 		seriesPanel.add(series);
@@ -193,8 +205,8 @@ public class Gui implements ActionListener {
 					Collections.sort(parameters);
 					Collections.sort(vars);
 					paramsPanel.removeAll();
-					paramsPanel.setLayout(new GridLayout(parameters.size() + 1,4));
-					paramsPanel.add(new JLabel("Synthesize?"));
+					paramsPanel.setLayout(new GridLayout(parameters.size() + 1, 4));
+					paramsPanel.add(new JLabel("Synthesize"));
 					paramsPanel.add(new JLabel("Name"));
 					paramsPanel.add(new JLabel("Lower Bound"));
 					paramsPanel.add(new JLabel("Upper Bound"));
@@ -206,7 +218,7 @@ public class Gui implements ActionListener {
 					}
 					paramsPanel.revalidate();
 					speciesPanel.removeAll();
-					speciesPanel.setLayout(new GridLayout(vars.size() + 1,3));
+					speciesPanel.setLayout(new GridLayout(vars.size() + 1, 3));
 					speciesPanel.add(new JLabel("Name"));
 					speciesPanel.add(new JLabel("Lower Bound"));
 					speciesPanel.add(new JLabel("Upper Bound"));
@@ -232,15 +244,14 @@ public class Gui implements ActionListener {
 		else if (e.getSource() == generateSMT2) {
 			try {
 				List<String> params = new ArrayList<String>();
-				for (int i = 4 ; i < paramsPanel.getComponentCount(); i+=4) {
+				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
 						params.add(((JLabel) paramsPanel.getComponent(i + 1)).getText());
 					}
 				}
 				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText()
-						.trim(), series.getText().trim(), params, Double
-						.parseDouble(noise.getText().trim()), Double.parseDouble(precision
-						.getText().trim()))));
+						.trim(), series.getText().trim(), params, Double.parseDouble(noise
+						.getText().trim()), Double.parseDouble(precision.getText().trim()))));
 			}
 			catch (NumberFormatException | XMLStreamException | IOException e1) {
 				// TODO Auto-generated catch block
@@ -249,18 +260,52 @@ public class Gui implements ActionListener {
 		}
 		else if (e.getSource() == run) {
 			try {
+				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
+				Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
 				List<String> params = new ArrayList<String>();
-				for (int i = 4 ; i < paramsPanel.getComponentCount(); i+=4) {
+				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
+						variables.put(
+								((JLabel) paramsPanel.getComponent(i + 1)).getText(),
+								new Tuple<Double, Double>(Double
+										.parseDouble(((JTextField) paramsPanel.getComponent(i + 2))
+												.getText().trim()), Double
+										.parseDouble(((JTextField) paramsPanel.getComponent(i + 3))
+												.getText().trim())));
 						params.add(((JLabel) paramsPanel.getComponent(i + 1)).getText());
 					}
 				}
-				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText()
-						.trim(), series.getText().trim(), params, Double
-						.parseDouble(noise.getText().trim()), Double.parseDouble(precision
-						.getText().trim()))));
+				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml.getText().trim())),
+						params);
+				for (int i = 3; i < speciesPanel.getComponentCount(); i += 3) {
+					variables.put(
+							((JLabel) speciesPanel.getComponent(i)).getText(),
+							new Tuple<Double, Double>(Double.parseDouble(((JTextField) speciesPanel
+									.getComponent(i + 1)).getText().trim()), Double
+									.parseDouble(((JTextField) speciesPanel.getComponent(i + 2))
+											.getText().trim())));
+					odes.put(((JLabel) speciesPanel.getComponent(i)).getText(),
+							model.getODE(((JLabel) speciesPanel.getComponent(i)).getText()));
+				}
+				SMT2SettingsParser.writeSettingsToFile("D:\\test.xml", new SMT2Settings(variables, "t", odes,
+						TraceParser.parseCopasiOutput(new File(series.getText().trim())),
+						Double.parseDouble(precision.getText().trim()),
+						Double.parseDouble(delta.getText().trim()),
+						Double.parseDouble(noise.getText().trim())));
 			}
 			catch (NumberFormatException | XMLStreamException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (ParserConfigurationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (TransformerFactoryConfigurationError e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (TransformerException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}

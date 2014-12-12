@@ -46,6 +46,7 @@ public class ODEModel {
 	public ODEModel(SBMLDocument document, List<String> interestingParameters) {
 		odes = new HashMap<String, ASTNode>();
 		initialValues = new HashMap<String, Double>();
+		parameters = new HashMap<String, Double>();
 		for (Reaction reaction : document.getModel().getListOfReactions()) {
 			ListOf<SpeciesReference> products = reaction.getListOfProducts();
 			ListOf<SpeciesReference> reactants = reaction.getListOfReactants();
