@@ -1,0 +1,9 @@
+all
+build
+deploy
+deploy-javadoc
+exe
+init
+javadoc
+post-clean
+pre-clean

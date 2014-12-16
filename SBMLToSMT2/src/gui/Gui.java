@@ -7,8 +7,11 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -229,7 +233,11 @@ public class Gui implements ActionListener {
 					}
 					speciesPanel.revalidate();
 				}
-				catch (XMLStreamException | IOException e1) {
+				catch (XMLStreamException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -253,7 +261,15 @@ public class Gui implements ActionListener {
 						.trim(), series.getText().trim(), params, Double.parseDouble(noise
 						.getText().trim()), Double.parseDouble(precision.getText().trim()))));
 			}
-			catch (NumberFormatException | XMLStreamException | IOException e1) {
+			catch (NumberFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (XMLStreamException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -287,13 +303,53 @@ public class Gui implements ActionListener {
 					odes.put(((JLabel) speciesPanel.getComponent(i)).getText(),
 							model.getODE(((JLabel) speciesPanel.getComponent(i)).getText()));
 				}
-				SMT2SettingsParser.writeSettingsToFile("D:\\test.xml", new SMT2Settings(variables, "t", odes,
-						TraceParser.parseCopasiOutput(new File(series.getText().trim())),
-						Double.parseDouble(precision.getText().trim()),
-						Double.parseDouble(delta.getText().trim()),
-						Double.parseDouble(noise.getText().trim())));
+				SMT2SettingsParser.writeSettingsToFile(
+						"model.xml",
+						new SMT2Settings(variables, "t", odes, TraceParser
+								.parseCopasiOutput(new File(series.getText().trim())), Double
+								.parseDouble(precision.getText().trim()), Double.parseDouble(delta
+								.getText().trim()), Double.parseDouble(noise.getText().trim())));
+				Runtime exec = Runtime.getRuntime();
+				Process parsyn = exec.exec("ParSyn model.xml");
+				String error = "";
+				try {
+					InputStream par = parsyn.getInputStream();
+					InputStreamReader isr = new InputStreamReader(par);
+					BufferedReader br = new BufferedReader(isr);
+					// int count = 0;
+					String line;
+					while ((line = br.readLine()) != null) {
+						System.out.println(line);
+					}
+					InputStream par2 = parsyn.getErrorStream();
+					int read = par2.read();
+					while (read != -1) {
+						error += (char) read;
+						read = par2.read();
+					}
+					br.close();
+					isr.close();
+					par.close();
+					par2.close();
+				}
+				catch (Exception e1) {
+					// e.printStackTrace();
+				}
+				if (!error.equals("")) {
+					JOptionPane.showMessageDialog(gui, "Error in execution.", "ERROR",
+							JOptionPane.ERROR_MESSAGE);
+					System.err.println(error);
+				}
 			}
-			catch (NumberFormatException | XMLStreamException | IOException e1) {
+			catch (NumberFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (XMLStreamException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
