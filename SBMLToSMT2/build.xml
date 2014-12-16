@@ -65,7 +65,7 @@
 		   classpathref="classpath">
           <src path="${src.dir}"/>
 	      </javac>
-        <jar jarfile="${build.lib}/gui.jar" basedir="${build.classes}">
+        <jar jarfile="${build.lib}/ParSynGui.jar" basedir="${build.classes}">
             <manifest>
               <attribute name="Main-Class" value="main.SBMLToSMT2"/>
             </manifest>
