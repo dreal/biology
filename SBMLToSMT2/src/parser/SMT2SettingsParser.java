@@ -148,9 +148,11 @@ public class SMT2SettingsParser {
 			var.appendChild(name);
 			Element domain = doc.createElement("domain");
 			Element left = doc.createElement("left");
-			left.setTextContent("" + settings.getValues(variable).x);
+			left.setTextContent(("" + settings.getValues(variable).x).replace("E-", "e-").replace(
+					"E", "e+"));
 			Element right = doc.createElement("right");
-			right.setTextContent("" + settings.getValues(variable).y);
+			right.setTextContent(("" + settings.getValues(variable).y).replace("E-", "e-").replace(
+					"E", "e+"));
 			domain.appendChild(left);
 			domain.appendChild(right);
 			var.appendChild(domain);
@@ -187,13 +189,13 @@ public class SMT2SettingsParser {
 							Element interval = doc.createElement("interval");
 							interval.setAttribute("var", traceVariable);
 							Element left = doc.createElement("left");
-							left.setTextContent(""
-									+ (settings.getTrace().getValue(traceVariable, timePoint) - settings
-											.getNoise()));
+							left.setTextContent(("" + (settings.getTrace().getValue(traceVariable,
+									timePoint) - settings.getNoise())).replace("E-", "e-").replace(
+									"E", "e+"));
 							Element right = doc.createElement("right");
-							right.setTextContent(""
-									+ (settings.getTrace().getValue(traceVariable, timePoint) + settings
-											.getNoise()));
+							right.setTextContent(("" + (settings.getTrace().getValue(traceVariable,
+									timePoint) + settings.getNoise())).replace("E-", "e-").replace(
+									"E", "e+"));
 							interval.appendChild(left);
 							interval.appendChild(right);
 							point.appendChild(interval);
@@ -206,13 +208,13 @@ public class SMT2SettingsParser {
 		}
 		topLevelElement.appendChild(series);
 		Element delta = doc.createElement("delta");
-		delta.setTextContent("" + settings.getDelta());
+		delta.setTextContent(("" + settings.getDelta()).replace("E-", "e-").replace("E", "e+"));
 		topLevelElement.appendChild(delta);
 		Element epsilon = doc.createElement("epsilon");
-		epsilon.setTextContent("" + settings.getEpsilon());
+		epsilon.setTextContent(("" + settings.getEpsilon()).replace("E-", "e-").replace("E", "e+"));
 		topLevelElement.appendChild(epsilon);
 		Element noise = doc.createElement("noise");
-		noise.setTextContent("" + settings.getNoise());
+		noise.setTextContent(("" + settings.getNoise()).replace("E-", "e-").replace("E", "e+"));
 		topLevelElement.appendChild(noise);
 		doc.appendChild(topLevelElement);
 		Transformer tr = TransformerFactory.newInstance().newTransformer();
