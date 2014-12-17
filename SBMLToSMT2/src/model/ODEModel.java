@@ -7,6 +7,7 @@ import java.util.Map;
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.ExplicitRule;
+import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.Parameter;
@@ -181,10 +182,10 @@ public class ODEModel {
 		for (Compartment compartment : document.getModel().getListOfCompartments()) {
 			if (!odes.containsKey(compartment.getId())) {
 				if (compartment.isSetValue()) {
-					replaceWithValue(compartment.getId(), compartment.getValue());
+					replaceAllWithValue(compartment.getId(), compartment.getValue());
 				}
 				else {
-					replaceWithValue(compartment.getId(), 0.0);
+					replaceAllWithValue(compartment.getId(), 0.0);
 				}
 			}
 			else {
@@ -208,10 +209,10 @@ public class ODEModel {
 				}
 				else {
 					if (parameter.isSetValue()) {
-						replaceWithValue(parameter.getId(), parameter.getValue());
+						replaceAllWithValue(parameter.getId(), parameter.getValue());
 					}
 					else {
-						replaceWithValue(parameter.getId(), 0.0);
+						replaceAllWithValue(parameter.getId(), 0.0);
 					}
 				}
 			}
@@ -224,6 +225,39 @@ public class ODEModel {
 				}
 			}
 		}
+		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
+	}
+
+	private void replaceAllFunctionDefinitions(ListOf<FunctionDefinition> functions) {
+		for (String key : odes.keySet()) {
+			odes.put(key, replaceFunctionDefinition(odes.get(key), functions));
+		}
+	}
+
+	private ASTNode replaceFunctionDefinition(ASTNode equation, ListOf<FunctionDefinition> functions) {
+		if (equation.getType() == ASTNode.Type.FUNCTION) {
+			FunctionDefinition fd = functions.get(equation.getName());
+			ASTNode newNode = fd.getBody();
+			for (int i = 0; i < fd.getArgumentCount(); i++) {
+				newNode = replace(fd.getArgument(i).getName(), equation.getChild(i), newNode);
+			}
+			return newNode;
+		}
+		for (int i = 0; i < equation.getChildCount(); i++) {
+			equation.replaceChild(i, replaceFunctionDefinition(equation.getChild(i), functions));
+		}
+		return equation;
+	}
+
+	private ASTNode replace(String variable, ASTNode replacement, ASTNode equation) {
+		if (equation.getType() == ASTNode.Type.NAME && equation.getName().equals(variable)) {
+			return new ASTNode(replacement);
+		}
+		for (int i = 0; i < equation.getChildCount(); i++) {
+			equation.replaceChild(i,
+					replace(variable, new ASTNode(replacement), equation.getChild(i)));
+		}
+		return equation;
 	}
 
 	/**
@@ -235,9 +269,9 @@ public class ODEModel {
 	 * @param value
 	 *            - the real value replacing the variable
 	 */
-	private void replaceWithValue(String variable, double value) {
-		for (ASTNode equation : odes.values()) {
-			replace(variable, value, equation);
+	private void replaceAllWithValue(String variable, double value) {
+		for (String key : odes.keySet()) {
+			odes.put(key, replace(variable, value, odes.get(key)));
 		}
 	}
 

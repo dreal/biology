@@ -1,0 +1,49 @@
+[14:51:09,532  WARN MathMLStaxParser:182] - Cannot recognize functionDefinition with id 'k'
+[14:51:45,003  WARN MathMLStaxParser:182] - Cannot recognize functionDefinition with id 'k'
+[14:52:49,251  WARN MathMLStaxParser:182] - Cannot recognize functionDefinition with id 'k'
+[14:53:27,791  WARN MathMLStaxParser:182] - Cannot recognize functionDefinition with id 'k'
+[14:53:38,929  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:53:48,192  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:53:49,597  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:04,620  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:05,528  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:11,377  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:14,512  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:15,863  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:16,766  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:20,400  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:21,836  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:22,163  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:22,225  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:22,756  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:22,798  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:54:23,261  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:41,008  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:45,445  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:47,322  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:49,432  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:52,076  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:54,068  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:55,281  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:55,756  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:55,794  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[14:56:55,836  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (k, null)! Check that your object is linked to a Model.
+[15:10:12,552  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:12,905  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:13,834  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:16,645  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:17,460  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:27,971  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:28,445  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:29,129  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:32,167  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:32,601  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:38,427  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:38,998  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:40,735  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:41,916  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:42,335  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:42,383  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:42,455  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:44,742  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.
+[15:10:45,099  WARN ASTNode:1860] - ASTNode of type FUNCTION but the variable is null: (Rate_Law_for_rate, null)! Check that your object is linked to a Model.

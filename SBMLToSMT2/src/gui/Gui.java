@@ -217,8 +217,8 @@ public class Gui implements ActionListener {
 					for (String p : parameters) {
 						paramsPanel.add(new JCheckBox());
 						paramsPanel.add(new JLabel(p));
-						paramsPanel.add(new JTextField("0.0"));
-						paramsPanel.add(new JTextField("" + Double.MAX_VALUE));
+						paramsPanel.add(new JTextField("0"));
+						paramsPanel.add(new JTextField("1000000000"));
 					}
 					paramsPanel.revalidate();
 					speciesPanel.removeAll();
@@ -228,8 +228,8 @@ public class Gui implements ActionListener {
 					speciesPanel.add(new JLabel("Upper Bound"));
 					for (String s : vars) {
 						speciesPanel.add(new JLabel(s));
-						speciesPanel.add(new JTextField("0.0"));
-						speciesPanel.add(new JTextField("" + Double.MAX_VALUE));
+						speciesPanel.add(new JTextField("0"));
+						speciesPanel.add(new JTextField("1000000000"));
 					}
 					speciesPanel.revalidate();
 				}
