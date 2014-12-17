@@ -236,12 +236,19 @@ public class ODEModel {
 
 	private ASTNode replaceFunctionDefinition(ASTNode equation, ListOf<FunctionDefinition> functions) {
 		if (equation.getType() == ASTNode.Type.FUNCTION) {
-			FunctionDefinition fd = functions.get(equation.getName());
-			ASTNode newNode = fd.getBody();
-			for (int i = 0; i < fd.getArgumentCount(); i++) {
-				newNode = replace(fd.getArgument(i).getName(), equation.getChild(i), newNode);
+			FunctionDefinition fd = null;
+			for (int i = 0; i < functions.getChildCount(); i++) {
+				if (functions.get(i).getName().equals(equation.getName())) {
+					fd = functions.get(i);
+				}
 			}
-			return newNode;
+			if (fd != null) {
+				ASTNode newNode = fd.getBody();
+				for (int i = 0; i < fd.getArgumentCount(); i++) {
+					newNode = replace(fd.getArgument(i).getName(), equation.getChild(i), newNode);
+				}
+				return newNode;
+			}
 		}
 		for (int i = 0; i < equation.getChildCount(); i++) {
 			equation.replaceChild(i, replaceFunctionDefinition(equation.getChild(i), functions));
