@@ -62,7 +62,7 @@ public class ODEModel {
 				if (!odes.containsKey(product.getSpecies())) {
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "" + parameter.getId();
+						String newName = reaction.getId() + "_" + parameter.getId();
 						if (interestingParameters.contains(newName)) {
 							replace(parameter.getId(), newName, newNode);
 							if (parameter.isSetValue()) {
@@ -83,7 +83,7 @@ public class ODEModel {
 					math.addChild(odes.get(product.getSpecies()));
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "" + parameter.getId();
+						String newName = reaction.getId() + "_" + parameter.getId();
 						if (interestingParameters.contains(newName)) {
 							replace(parameter.getId(), newName, newNode);
 							if (parameter.isSetValue()) {
@@ -113,7 +113,7 @@ public class ODEModel {
 					ASTNode math = new ASTNode('-');
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "" + parameter.getId();
+						String newName = reaction.getId() + "_" + parameter.getId();
 						if (interestingParameters.contains(newName)) {
 							replace(parameter.getId(), newName, newNode);
 							if (parameter.isSetValue()) {
@@ -135,7 +135,7 @@ public class ODEModel {
 					math.addChild(odes.get(reactant.getSpecies()));
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "" + parameter.getId();
+						String newName = reaction.getId() + "_" + parameter.getId();
 						if (interestingParameters.contains(newName)) {
 							replace(parameter.getId(), newName, newNode);
 							if (parameter.isSetValue()) {
