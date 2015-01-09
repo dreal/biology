@@ -202,7 +202,7 @@ public class Gui implements ActionListener {
 					for (Reaction reaction : document.getModel().getListOfReactions()) {
 						for (LocalParameter parameter : reaction.getKineticLaw()
 								.getListOfLocalParameters()) {
-							String newName = reaction.getId() + "" + parameter.getId();
+							String newName = reaction.getId() + "_" + parameter.getId();
 							parameters.add(newName);
 						}
 					}

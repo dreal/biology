@@ -148,11 +148,9 @@ public class SMT2SettingsParser {
 			var.appendChild(name);
 			Element domain = doc.createElement("domain");
 			Element left = doc.createElement("left");
-			left.setTextContent(("" + settings.getValues(variable).x).replace("E-", "e-").replace(
-					"E", "e+"));
+			left.setTextContent("" + settings.getValues(variable).x);
 			Element right = doc.createElement("right");
-			right.setTextContent(("" + settings.getValues(variable).y).replace("E-", "e-").replace(
-					"E", "e+"));
+			right.setTextContent("" + settings.getValues(variable).y);
 			domain.appendChild(left);
 			domain.appendChild(right);
 			var.appendChild(domain);
@@ -207,11 +205,9 @@ public class SMT2SettingsParser {
 								rightValue += settings.getNoise();
 							}
 							Element left = doc.createElement("left");
-							left.setTextContent(("" + leftValue).replace("E-", "e-").replace("E",
-									"e+"));
+							left.setTextContent("" + leftValue);
 							Element right = doc.createElement("right");
-							right.setTextContent(("" + rightValue).replace("E-", "e-").replace("E",
-									"e+"));
+							right.setTextContent("" + rightValue);
 							interval.appendChild(left);
 							interval.appendChild(right);
 							point.appendChild(interval);
@@ -224,13 +220,13 @@ public class SMT2SettingsParser {
 		}
 		topLevelElement.appendChild(series);
 		Element delta = doc.createElement("delta");
-		delta.setTextContent(("" + settings.getDelta()).replace("E-", "e-").replace("E", "e+"));
+		delta.setTextContent("" + settings.getDelta());
 		topLevelElement.appendChild(delta);
 		Element epsilon = doc.createElement("epsilon");
-		epsilon.setTextContent(("" + settings.getEpsilon()).replace("E-", "e-").replace("E", "e+"));
+		epsilon.setTextContent("" + settings.getEpsilon());
 		topLevelElement.appendChild(epsilon);
 		Element noise = doc.createElement("noise");
-		noise.setTextContent(("" + settings.getNoise()).replace("E-", "e-").replace("E", "e+"));
+		noise.setTextContent("" + settings.getNoise());
 		topLevelElement.appendChild(noise);
 		doc.appendChild(topLevelElement);
 		Transformer tr = TransformerFactory.newInstance().newTransformer();
