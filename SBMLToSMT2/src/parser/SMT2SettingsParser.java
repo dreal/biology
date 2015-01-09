@@ -179,7 +179,8 @@ public class SMT2SettingsParser {
 		}
 		topLevelElement.appendChild(odes);
 		Element series = doc.createElement("series");
-		for (double timePoint : settings.getTrace().getTimePoints()) {
+		for (int i = 0; i < settings.getTrace().getTimePoints().length; i++) {
+			double timePoint = settings.getTrace().getTimePoints()[i];
 			Element point = doc.createElement("point");
 			point.setAttribute("time", "" + timePoint);
 			for (String variable : settings.getAllVariables()) {
@@ -188,14 +189,29 @@ public class SMT2SettingsParser {
 						if (settings.getODEVariables().contains(traceVariable)) {
 							Element interval = doc.createElement("interval");
 							interval.setAttribute("var", traceVariable);
+							double leftValue = settings.getTrace().getValue(traceVariable,
+									timePoint);
+							double rightValue = leftValue;
+							if (i == 0) {
+								if (leftValue == 0) {
+									leftValue -= 0.0001;
+									rightValue += 0.0001;
+								}
+								else {
+									leftValue -= (leftValue * 0.00001);
+									rightValue += (rightValue * 0.00001);
+								}
+							}
+							else {
+								leftValue -= settings.getNoise();
+								rightValue += settings.getNoise();
+							}
 							Element left = doc.createElement("left");
-							left.setTextContent(("" + (settings.getTrace().getValue(traceVariable,
-									timePoint) - settings.getNoise())).replace("E-", "e-").replace(
-									"E", "e+"));
+							left.setTextContent(("" + leftValue).replace("E-", "e-").replace("E",
+									"e+"));
 							Element right = doc.createElement("right");
-							right.setTextContent(("" + (settings.getTrace().getValue(traceVariable,
-									timePoint) + settings.getNoise())).replace("E-", "e-").replace(
-									"E", "e+"));
+							right.setTextContent(("" + rightValue).replace("E-", "e-").replace("E",
+									"e+"));
 							interval.appendChild(left);
 							interval.appendChild(right);
 							point.appendChild(interval);
