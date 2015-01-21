@@ -91,9 +91,9 @@ public class Gui implements ActionListener {
 		speciesScroll.setPreferredSize(new Dimension(600, 150));
 		noise = new JTextField("0.1", 10);
 		noiseLabel = new JLabel("Noise:");
-		precision = new JTextField("0.0001", 10);
+		precision = new JTextField("0.000001", 10);
 		precisionLabel = new JLabel("Precision:");
-		delta = new JTextField("0.0001", 10);
+		delta = new JTextField("0.000001", 10);
 		deltaLabel = new JLabel("Delta:");
 		generateSMT2 = new JButton("Generate SMT2");
 		generateSMT2.addActionListener(this);

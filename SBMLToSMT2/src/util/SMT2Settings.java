@@ -27,7 +27,7 @@ public class SMT2Settings {
 		trace = null;
 		epsilon = 0.000001;
 		delta = 0.000001;
-		noise = 0.01;
+		noise = 0.1;
 	}
 	
 	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, double epsilon, double delta, double noise) {
