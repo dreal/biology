@@ -130,12 +130,28 @@ public class SMT2SettingsParser {
 	public static void writeSettingsToFile(String filename, SMT2Settings settings)
 			throws ParserConfigurationException, TransformerFactoryConfigurationError,
 			FileNotFoundException, TransformerException {
+		List<String> variables = new ArrayList<String>();
+		for (String traceVariable : settings.getTrace().getVariables()) {
+			if (settings.getODEVariables().contains(traceVariable)) {
+				variables.add(traceVariable);
+			}
+		}
+		for (String odeVariable : settings.getODEVariables()) {
+			if (!variables.contains(odeVariable)) {
+				variables.add(odeVariable);
+			}
+		}
+		for (String variable : settings.getAllVariables()) {
+			if (!variables.contains(variable)) {
+				variables.add(variable);
+			}
+		}
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document doc = db.newDocument();
 		Element topLevelElement = doc.createElement("data");
 		Element declaration = doc.createElement("declare");
-		for (String variable : settings.getAllVariables()) {
+		for (String variable : variables) {
 			Element var = doc.createElement("var");
 			if (settings.getODEVariables().contains(variable)) {
 				var.setAttribute("type", "var");
@@ -164,15 +180,12 @@ public class SMT2SettingsParser {
 		declaration.appendChild(var);
 		topLevelElement.appendChild(declaration);
 		Element odes = doc.createElement("odes");
-		for (String variable : settings.getAllVariables()) {
-			for (String odeVariable : settings.getODEVariables()) {
-				if (variable.equals(odeVariable)) {
-					Element ode = doc.createElement("ode");
-					ode.setTextContent("(= d/dt[" + odeVariable + "] "
-							+ Utility.prefixASTNodeToString(settings.getODE(odeVariable)) + ")");
-					odes.appendChild(ode);
-					break;
-				}
+		for (String variable : variables) {
+			if (settings.getODEVariables().contains(variable)) {
+				Element ode = doc.createElement("ode");
+				ode.setTextContent("(= d/dt[" + variable + "] "
+						+ Utility.prefixASTNodeToString(settings.getODE(variable)) + ")");
+				odes.appendChild(ode);
 			}
 		}
 		topLevelElement.appendChild(odes);
@@ -181,7 +194,7 @@ public class SMT2SettingsParser {
 			double timePoint = settings.getTrace().getTimePoints()[i];
 			Element point = doc.createElement("point");
 			point.setAttribute("time", "" + timePoint);
-			for (String variable : settings.getAllVariables()) {
+			for (String variable : variables) {
 				for (String traceVariable : settings.getTrace().getVariables()) {
 					if (variable.equals(traceVariable)) {
 						if (settings.getODEVariables().contains(traceVariable)) {
