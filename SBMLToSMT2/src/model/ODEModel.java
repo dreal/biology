@@ -226,6 +226,16 @@ public class ODEModel {
 			}
 		}
 		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
+		for (Species s : document.getModel().getListOfSpecies()) {
+			if (!s.getHasOnlySubstanceUnits()) {
+				if (odes.containsKey(s.getId())) {
+					ASTNode math = new ASTNode('*');
+					math.addChild(new ASTNode(s.getId()));
+					math.addChild(odes.get(s.getId()));
+					odes.put(s.getId(), math);
+				}
+			}
+		}
 	}
 
 	private void replaceAllFunctionDefinitions(ListOf<FunctionDefinition> functions) {
