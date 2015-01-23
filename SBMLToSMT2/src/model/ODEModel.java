@@ -56,17 +56,17 @@ public class ODEModel {
 			List<ASTNode> reacts = new ArrayList<ASTNode>();
 			for (SpeciesReference reactant : reactants) {
 				if (reactant.isSetStoichiometry()) {
-					ASTNode r = new ASTNode('^');
-					r.addChild(new ASTNode(reactant.getId()));
+					ASTNode r = new ASTNode(ASTNode.Type.FUNCTION_POWER);
+					r.addChild(new ASTNode(reactant.getSpecies()));
 					r.addChild(new ASTNode(reactant.getStoichiometry()));
 					reacts.add(r);
 				}
 			}
 			for (ASTNode n : reacts) {
-				ASTNode mult = new ASTNode('*');
-				mult.addChild(n);
-				mult.addChild(newNode);
-				newNode = mult;
+				ASTNode oldNode = newNode;
+				newNode = new ASTNode('*');
+				newNode.addChild(n);
+				newNode.addChild(oldNode);
 			}
 			for (SpeciesReference product : products) {
 				if (product.isSetStoichiometry() && product.getStoichiometry() != 1) {
