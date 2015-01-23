@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +52,23 @@ public class ODEModel {
 		for (Reaction reaction : document.getModel().getListOfReactions()) {
 			ListOf<SpeciesReference> products = reaction.getListOfProducts();
 			ListOf<SpeciesReference> reactants = reaction.getListOfReactants();
+			ASTNode newNode = new ASTNode(reaction.getKineticLaw().getMath());
+			List<ASTNode> reacts = new ArrayList<ASTNode>();
+			for (SpeciesReference reactant : reactants) {
+				if (reactant.isSetStoichiometry()) {
+					ASTNode r = new ASTNode('^');
+					r.addChild(new ASTNode(reactant.getId()));
+					r.addChild(new ASTNode(reactant.getStoichiometry()));
+					reacts.add(r);
+				}
+			}
+			for (ASTNode n : reacts) {
+				ASTNode mult = new ASTNode('*');
+				mult.addChild(n);
+				mult.addChild(newNode);
+				newNode = mult;
+			}
 			for (SpeciesReference product : products) {
-				ASTNode newNode = new ASTNode(reaction.getKineticLaw().getMath());
 				if (product.isSetStoichiometry() && product.getStoichiometry() != 1) {
 					ASTNode multiplyStoich = new ASTNode('*');
 					multiplyStoich.addChild(new ASTNode(product.getStoichiometry()));
@@ -102,7 +118,6 @@ public class ODEModel {
 				}
 			}
 			for (SpeciesReference reactant : reactants) {
-				ASTNode newNode = new ASTNode(reaction.getKineticLaw().getMath());
 				if (reactant.isSetStoichiometry() && reactant.getStoichiometry() != 1) {
 					ASTNode multiplyStoich = new ASTNode('*');
 					multiplyStoich.addChild(new ASTNode(reactant.getStoichiometry()));
@@ -226,16 +241,6 @@ public class ODEModel {
 			}
 		}
 		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
-		for (Species s : document.getModel().getListOfSpecies()) {
-			if (!s.getHasOnlySubstanceUnits()) {
-				if (odes.containsKey(s.getId())) {
-					ASTNode math = new ASTNode('*');
-					math.addChild(new ASTNode(s.getId()));
-					math.addChild(odes.get(s.getId()));
-					odes.put(s.getId(), math);
-				}
-			}
-		}
 	}
 
 	private void replaceAllFunctionDefinitions(ListOf<FunctionDefinition> functions) {
