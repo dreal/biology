@@ -53,14 +53,14 @@ public class ODEModel {
 			ListOf<SpeciesReference> products = reaction.getListOfProducts();
 			ListOf<SpeciesReference> reactants = reaction.getListOfReactants();
 			ASTNode newNode = new ASTNode(reaction.getKineticLaw().getMath());
-			List<ASTNode> reacts = new ArrayList<ASTNode>();
-			for (SpeciesReference reactant : reactants) {
-				if (reactant.isSetStoichiometry()) {
-					reacts.add(ASTNode.pow(new ASTNode(reactant.getSpecies()),
-							reactant.getStoichiometry()));
-				}
-			}
-			newNode = ASTNode.times(ASTNode.times(reacts.toArray(new ASTNode[0])), newNode);
+//			List<ASTNode> reacts = new ArrayList<ASTNode>();
+//			for (SpeciesReference reactant : reactants) {
+//				if (reactant.isSetStoichiometry()) {
+//					reacts.add(ASTNode.pow(new ASTNode(reactant.getSpecies()),
+//							reactant.getStoichiometry()));
+//				}
+//			}
+//			newNode = ASTNode.times(ASTNode.times(reacts.toArray(new ASTNode[0])), newNode);
 			for (SpeciesReference product : products) {
 				if (product.isSetStoichiometry() && product.getStoichiometry() != 1) {
 					newNode = ASTNode.times(new ASTNode(product.getStoichiometry()), newNode);
