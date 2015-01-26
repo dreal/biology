@@ -56,24 +56,14 @@ public class ODEModel {
 			List<ASTNode> reacts = new ArrayList<ASTNode>();
 			for (SpeciesReference reactant : reactants) {
 				if (reactant.isSetStoichiometry()) {
-					ASTNode r = new ASTNode(ASTNode.Type.FUNCTION_POWER);
-					r.addChild(new ASTNode(reactant.getSpecies()));
-					r.addChild(new ASTNode(reactant.getStoichiometry()));
-					reacts.add(r);
+					reacts.add(ASTNode.pow(new ASTNode(reactant.getSpecies()),
+							reactant.getStoichiometry()));
 				}
 			}
-			for (ASTNode n : reacts) {
-				ASTNode oldNode = newNode;
-				newNode = new ASTNode('*');
-				newNode.addChild(n);
-				newNode.addChild(oldNode);
-			}
+			newNode = ASTNode.times(ASTNode.times(reacts.toArray(new ASTNode[0])), newNode);
 			for (SpeciesReference product : products) {
 				if (product.isSetStoichiometry() && product.getStoichiometry() != 1) {
-					ASTNode multiplyStoich = new ASTNode('*');
-					multiplyStoich.addChild(new ASTNode(product.getStoichiometry()));
-					multiplyStoich.addChild(newNode);
-					newNode = multiplyStoich;
+					newNode = ASTNode.times(new ASTNode(product.getStoichiometry()), newNode);
 				}
 				if (!odes.containsKey(product.getSpecies())) {
 					for (LocalParameter parameter : reaction.getKineticLaw()
@@ -95,8 +85,6 @@ public class ODEModel {
 					odes.put(product.getSpecies(), newNode);
 				}
 				else {
-					ASTNode math = new ASTNode('+');
-					math.addChild(odes.get(product.getSpecies()));
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
 						String newName = reaction.getId() + "_" + parameter.getId();
@@ -113,19 +101,15 @@ public class ODEModel {
 							replace(parameter.getId(), parameter.getValue(), newNode);
 						}
 					}
-					math.addChild(newNode);
-					odes.put(product.getSpecies(), math);
+					odes.put(product.getSpecies(),
+							ASTNode.sum(odes.get(product.getSpecies()), newNode));
 				}
 			}
 			for (SpeciesReference reactant : reactants) {
 				if (reactant.isSetStoichiometry() && reactant.getStoichiometry() != 1) {
-					ASTNode multiplyStoich = new ASTNode('*');
-					multiplyStoich.addChild(new ASTNode(reactant.getStoichiometry()));
-					multiplyStoich.addChild(newNode);
-					newNode = multiplyStoich;
+					newNode = ASTNode.times(new ASTNode(reactant.getStoichiometry()), newNode);
 				}
 				if (!odes.containsKey(reactant.getSpecies())) {
-					ASTNode math = new ASTNode('-');
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
 						String newName = reaction.getId() + "_" + parameter.getId();
@@ -142,12 +126,11 @@ public class ODEModel {
 							replace(parameter.getId(), parameter.getValue(), newNode);
 						}
 					}
-					math.addChild(newNode);
-					odes.put(reactant.getSpecies(), math);
+					ASTNode negNode = new ASTNode('-');
+					negNode.addChild(newNode);
+					odes.put(reactant.getSpecies(), negNode);
 				}
 				else {
-					ASTNode math = new ASTNode('-');
-					math.addChild(odes.get(reactant.getSpecies()));
 					for (LocalParameter parameter : reaction.getKineticLaw()
 							.getListOfLocalParameters()) {
 						String newName = reaction.getId() + "_" + parameter.getId();
@@ -164,8 +147,8 @@ public class ODEModel {
 							replace(parameter.getId(), parameter.getValue(), newNode);
 						}
 					}
-					math.addChild(newNode);
-					odes.put(reactant.getSpecies(), math);
+					odes.put(reactant.getSpecies(),
+							ASTNode.diff(odes.get(reactant.getSpecies()), newNode));
 				}
 			}
 		}
@@ -176,10 +159,10 @@ public class ODEModel {
 					odes.put(rateRule.getVariable(), new ASTNode(rateRule.getMath()));
 				}
 				else {
-					ASTNode math = new ASTNode('+');
-					math.addChild(odes.get(rateRule.getVariable()));
-					math.addChild(new ASTNode(rateRule.getMath()));
-					odes.put(rateRule.getVariable(), math);
+					odes.put(
+							rateRule.getVariable(),
+							ASTNode.sum(odes.get(rateRule.getVariable()),
+									new ASTNode(rateRule.getMath())));
 				}
 			}
 		}
