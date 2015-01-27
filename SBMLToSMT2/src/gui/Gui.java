@@ -196,7 +196,9 @@ public class Gui implements ActionListener {
 							if (parameters.contains(var)) {
 								parameters.remove(var);
 							}
-							vars.add(var);
+							if (!vars.contains(var)) {
+								vars.add(var);
+							}
 						}
 					}
 					for (Reaction reaction : document.getModel().getListOfReactions()) {
