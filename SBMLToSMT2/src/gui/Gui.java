@@ -36,6 +36,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import model.ODEModel;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.RateRule;
@@ -182,13 +183,24 @@ public class Gui implements ActionListener {
 				sbml.setText(fc.getSelectedFile().getAbsolutePath());
 				try {
 					SBMLDocument document = SBMLReader.read(new File(sbml.getText()));
+					List<String> assignments = new ArrayList<String>();
+					for (Rule rule : document.getModel().getListOfRules()) {
+						if (rule.isAssignment()) {
+							AssignmentRule aRule = ((AssignmentRule) rule);
+							assignments.add(aRule.getVariable());
+						}
+					}
 					List<String> parameters = new ArrayList<String>();
 					List<String> vars = new ArrayList<String>();
 					for (Parameter param : document.getModel().getListOfParameters()) {
-						parameters.add(param.getId());
+						if (!assignments.contains(param.getId())) {
+							parameters.add(param.getId());
+						}
 					}
 					for (Species s : document.getModel().getListOfSpecies()) {
-						vars.add(s.getId());
+						if (!assignments.contains(s.getId())) {
+							vars.add(s.getId());
+						}
 					}
 					for (Rule r : document.getModel().getListOfRules()) {
 						if (r.isRate()) {
@@ -196,7 +208,7 @@ public class Gui implements ActionListener {
 							if (parameters.contains(var)) {
 								parameters.remove(var);
 							}
-							if (!vars.contains(var)) {
+							if (!vars.contains(var) && !assignments.contains(var)) {
 								vars.add(var);
 							}
 						}

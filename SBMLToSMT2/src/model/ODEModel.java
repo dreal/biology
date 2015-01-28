@@ -238,6 +238,9 @@ public class ODEModel {
 			if (rule.isAssignment()) {
 				AssignmentRule aRule = ((AssignmentRule) rule);
 				replaceAllWithMath(aRule.getVariable(), aRule.getMath());
+				odes.remove(aRule.getVariable());
+				parameters.remove(aRule.getVariable());
+				initialValues.remove(aRule.getVariable());
 			}
 		}
 	}
