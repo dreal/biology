@@ -1,11 +1,11 @@
 package model;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.ExplicitRule;
 import org.sbml.jsbml.FunctionDefinition;
@@ -53,102 +53,108 @@ public class ODEModel {
 			ListOf<SpeciesReference> products = reaction.getListOfProducts();
 			ListOf<SpeciesReference> reactants = reaction.getListOfReactants();
 			ASTNode newNode = new ASTNode(reaction.getKineticLaw().getMath());
-//			List<ASTNode> reacts = new ArrayList<ASTNode>();
-//			for (SpeciesReference reactant : reactants) {
-//				if (reactant.isSetStoichiometry()) {
-//					reacts.add(ASTNode.pow(new ASTNode(reactant.getSpecies()),
-//							reactant.getStoichiometry()));
-//				}
-//			}
-//			newNode = ASTNode.times(ASTNode.times(reacts.toArray(new ASTNode[0])), newNode);
+			// List<ASTNode> reacts = new ArrayList<ASTNode>();
+			// for (SpeciesReference reactant : reactants) {
+			// if (reactant.isSetStoichiometry()) {
+			// reacts.add(ASTNode.pow(new ASTNode(reactant.getSpecies()),
+			// reactant.getStoichiometry()));
+			// }
+			// }
+			// newNode = ASTNode.times(ASTNode.times(reacts.toArray(new ASTNode[0])), newNode);
 			for (SpeciesReference product : products) {
-				if (product.isSetStoichiometry() && product.getStoichiometry() != 1) {
-					newNode = ASTNode.times(new ASTNode(product.getStoichiometry()), newNode);
-				}
-				if (!odes.containsKey(product.getSpecies())) {
-					for (LocalParameter parameter : reaction.getKineticLaw()
-							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "_" + parameter.getId();
-						if (interestingParameters.contains(newName)) {
-							replace(parameter.getId(), newName, newNode);
-							if (parameter.isSetValue()) {
-								parameters.put(newName, parameter.getValue());
+				if (!document.getModel().getListOfSpecies().get(product.getSpecies())
+						.isBoundaryCondition()) {
+					if (product.isSetStoichiometry() && product.getStoichiometry() != 1) {
+						newNode = ASTNode.times(new ASTNode(product.getStoichiometry()), newNode);
+					}
+					if (!odes.containsKey(product.getSpecies())) {
+						for (LocalParameter parameter : reaction.getKineticLaw()
+								.getListOfLocalParameters()) {
+							String newName = reaction.getId() + "_" + parameter.getId();
+							if (interestingParameters.contains(newName)) {
+								replace(parameter.getId(), newName, newNode);
+								if (parameter.isSetValue()) {
+									parameters.put(newName, parameter.getValue());
+								}
+								else {
+									parameters.put(newName, 0.0);
+								}
 							}
 							else {
-								parameters.put(newName, 0.0);
+								replace(parameter.getId(), parameter.getValue(), newNode);
 							}
 						}
-						else {
-							replace(parameter.getId(), parameter.getValue(), newNode);
-						}
+						odes.put(product.getSpecies(), newNode);
 					}
-					odes.put(product.getSpecies(), newNode);
-				}
-				else {
-					for (LocalParameter parameter : reaction.getKineticLaw()
-							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "_" + parameter.getId();
-						if (interestingParameters.contains(newName)) {
-							replace(parameter.getId(), newName, newNode);
-							if (parameter.isSetValue()) {
-								parameters.put(newName, parameter.getValue());
+					else {
+						for (LocalParameter parameter : reaction.getKineticLaw()
+								.getListOfLocalParameters()) {
+							String newName = reaction.getId() + "_" + parameter.getId();
+							if (interestingParameters.contains(newName)) {
+								replace(parameter.getId(), newName, newNode);
+								if (parameter.isSetValue()) {
+									parameters.put(newName, parameter.getValue());
+								}
+								else {
+									parameters.put(newName, 0.0);
+								}
 							}
 							else {
-								parameters.put(newName, 0.0);
+								replace(parameter.getId(), parameter.getValue(), newNode);
 							}
 						}
-						else {
-							replace(parameter.getId(), parameter.getValue(), newNode);
-						}
+						odes.put(product.getSpecies(),
+								ASTNode.sum(odes.get(product.getSpecies()), newNode));
 					}
-					odes.put(product.getSpecies(),
-							ASTNode.sum(odes.get(product.getSpecies()), newNode));
 				}
 			}
 			for (SpeciesReference reactant : reactants) {
-				if (reactant.isSetStoichiometry() && reactant.getStoichiometry() != 1) {
-					newNode = ASTNode.times(new ASTNode(reactant.getStoichiometry()), newNode);
-				}
-				if (!odes.containsKey(reactant.getSpecies())) {
-					for (LocalParameter parameter : reaction.getKineticLaw()
-							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "_" + parameter.getId();
-						if (interestingParameters.contains(newName)) {
-							replace(parameter.getId(), newName, newNode);
-							if (parameter.isSetValue()) {
-								parameters.put(newName, parameter.getValue());
+				if (!document.getModel().getListOfSpecies().get(reactant.getSpecies())
+						.isBoundaryCondition()) {
+					if (reactant.isSetStoichiometry() && reactant.getStoichiometry() != 1) {
+						newNode = ASTNode.times(new ASTNode(reactant.getStoichiometry()), newNode);
+					}
+					if (!odes.containsKey(reactant.getSpecies())) {
+						for (LocalParameter parameter : reaction.getKineticLaw()
+								.getListOfLocalParameters()) {
+							String newName = reaction.getId() + "_" + parameter.getId();
+							if (interestingParameters.contains(newName)) {
+								replace(parameter.getId(), newName, newNode);
+								if (parameter.isSetValue()) {
+									parameters.put(newName, parameter.getValue());
+								}
+								else {
+									parameters.put(newName, 0.0);
+								}
 							}
 							else {
-								parameters.put(newName, 0.0);
+								replace(parameter.getId(), parameter.getValue(), newNode);
 							}
 						}
-						else {
-							replace(parameter.getId(), parameter.getValue(), newNode);
-						}
+						ASTNode negNode = new ASTNode('-');
+						negNode.addChild(newNode);
+						odes.put(reactant.getSpecies(), negNode);
 					}
-					ASTNode negNode = new ASTNode('-');
-					negNode.addChild(newNode);
-					odes.put(reactant.getSpecies(), negNode);
-				}
-				else {
-					for (LocalParameter parameter : reaction.getKineticLaw()
-							.getListOfLocalParameters()) {
-						String newName = reaction.getId() + "_" + parameter.getId();
-						if (interestingParameters.contains(newName)) {
-							replace(parameter.getId(), newName, newNode);
-							if (parameter.isSetValue()) {
-								parameters.put(newName, parameter.getValue());
+					else {
+						for (LocalParameter parameter : reaction.getKineticLaw()
+								.getListOfLocalParameters()) {
+							String newName = reaction.getId() + "_" + parameter.getId();
+							if (interestingParameters.contains(newName)) {
+								replace(parameter.getId(), newName, newNode);
+								if (parameter.isSetValue()) {
+									parameters.put(newName, parameter.getValue());
+								}
+								else {
+									parameters.put(newName, 0.0);
+								}
 							}
 							else {
-								parameters.put(newName, 0.0);
+								replace(parameter.getId(), parameter.getValue(), newNode);
 							}
 						}
-						else {
-							replace(parameter.getId(), parameter.getValue(), newNode);
-						}
+						odes.put(reactant.getSpecies(),
+								ASTNode.diff(odes.get(reactant.getSpecies()), newNode));
 					}
-					odes.put(reactant.getSpecies(),
-							ASTNode.diff(odes.get(reactant.getSpecies()), newNode));
 				}
 			}
 		}
@@ -224,6 +230,16 @@ public class ODEModel {
 			}
 		}
 		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
+		replaceAllAssignmentRules(document.getModel().getListOfRules());
+	}
+
+	private void replaceAllAssignmentRules(ListOf<Rule> rules) {
+		for (Rule rule : rules) {
+			if (rule.isAssignment()) {
+				AssignmentRule aRule = ((AssignmentRule) rule);
+				replaceAllWithMath(aRule.getVariable(), aRule.getMath());
+			}
+		}
 	}
 
 	private void replaceAllFunctionDefinitions(ListOf<FunctionDefinition> functions) {
@@ -256,6 +272,21 @@ public class ODEModel {
 					replace(variable, new ASTNode(replacement), equation.getChild(i)));
 		}
 		return equation;
+	}
+	
+	/**
+	 * 
+	 * Replaces a variable with the provided math in all ODE equations.
+	 * 
+	 * @param variable
+	 *            - the variable to be replaced
+	 * @param math
+	 *            - the math replacing the variable
+	 */
+	private void replaceAllWithMath(String variable, ASTNode math) {
+		for (String key : odes.keySet()) {
+			odes.put(key, replace(variable, math, odes.get(key)));
+		}
 	}
 
 	/**

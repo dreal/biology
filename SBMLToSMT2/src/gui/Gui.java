@@ -72,7 +72,7 @@ public class Gui implements ActionListener {
 		fc = new JFileChooser();
 
 		// Create the frame
-		gui = new JFrame("SBML To SMT2");
+		gui = new JFrame("ParSyn");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		sbml = new JTextField(30);
