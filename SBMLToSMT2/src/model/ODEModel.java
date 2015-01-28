@@ -183,6 +183,8 @@ public class ODEModel {
 				initialValues.put(species.getId(), 0.0);
 			}
 		}
+		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
+		replaceAllAssignmentRules(document.getModel().getListOfRules());
 		for (Compartment compartment : document.getModel().getListOfCompartments()) {
 			if (!odes.containsKey(compartment.getId())) {
 				if (compartment.isSetValue()) {
@@ -229,8 +231,6 @@ public class ODEModel {
 				}
 			}
 		}
-		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
-		replaceAllAssignmentRules(document.getModel().getListOfRules());
 	}
 
 	private void replaceAllAssignmentRules(ListOf<Rule> rules) {
