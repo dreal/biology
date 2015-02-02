@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class Gui implements ActionListener {
 		fc = new JFileChooser();
 
 		// Create the frame
-		gui = new JFrame("ParSyn");
+		gui = new JFrame("BioPSy");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		sbml = new JTextField(30);
@@ -326,6 +327,7 @@ public class Gui implements ActionListener {
 				Runtime exec = Runtime.getRuntime();
 				Process parsyn = exec.exec("ParSyn model.xml");
 				String error = "";
+				PrintWriter out = new PrintWriter("BioPSy_output.txt");
 				try {
 					InputStream par = parsyn.getInputStream();
 					InputStreamReader isr = new InputStreamReader(par);
@@ -334,6 +336,7 @@ public class Gui implements ActionListener {
 					String line;
 					while ((line = br.readLine()) != null) {
 						System.out.println(line);
+						out.println(line);
 					}
 					InputStream par2 = parsyn.getErrorStream();
 					int read = par2.read();
@@ -354,6 +357,7 @@ public class Gui implements ActionListener {
 							JOptionPane.ERROR_MESSAGE);
 					System.err.println(error);
 				}
+				out.close();
 			}
 			catch (NumberFormatException e1) {
 				// TODO Auto-generated catch block
