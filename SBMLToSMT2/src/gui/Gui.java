@@ -337,6 +337,7 @@ public class Gui implements ActionListener {
 					while ((line = br.readLine()) != null) {
 						System.out.println(line);
 						out.println(line);
+						out.flush();
 					}
 					InputStream par2 = parsyn.getErrorStream();
 					int read = par2.read();
