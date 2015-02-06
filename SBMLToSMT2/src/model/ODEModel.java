@@ -276,7 +276,7 @@ public class ODEModel {
 		}
 		return equation;
 	}
-	
+
 	/**
 	 * 
 	 * Replaces a variable with the provided math in all ODE equations.

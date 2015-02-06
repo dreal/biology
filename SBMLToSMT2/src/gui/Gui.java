@@ -134,7 +134,7 @@ public class Gui implements ActionListener {
 		bottomPanel.add(precision);
 		bottomPanel.add(deltaLabel);
 		bottomPanel.add(delta);
-		buttonsPanel.add(generateSMT2);
+		//buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
 		middlePanel.add(tabbedPane, BorderLayout.CENTER);
 		middlePanel.add(bottomPanel, BorderLayout.SOUTH);
