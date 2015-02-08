@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -327,6 +328,7 @@ public class Gui implements ActionListener {
 				Runtime exec = Runtime.getRuntime();
 				Process parsyn = exec.exec("ParSyn model.xml");
 				String error = "";
+				String output = "";
 				PrintWriter out = new PrintWriter("BioPSy_output.txt");
 				try {
 					InputStream par = parsyn.getInputStream();
@@ -338,6 +340,7 @@ public class Gui implements ActionListener {
 						System.out.println(line);
 						out.println(line);
 						out.flush();
+						output += line + "\n";
 					}
 					InputStream par2 = parsyn.getErrorStream();
 					int read = par2.read();
@@ -357,6 +360,17 @@ public class Gui implements ActionListener {
 					JOptionPane.showMessageDialog(gui, "Error in execution.", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 					System.err.println(error);
+				}
+				if (!output.equals("")) {
+					JTextArea textArea = new JTextArea(output);
+				    textArea.setEditable(false);
+				    textArea.setBounds(10, 152, 456, 255);
+				    textArea.setLineWrap(true);
+				    JScrollPane scrollPane = new JScrollPane(textArea);
+				    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				    scrollPane.add(textArea);
+					JOptionPane.showMessageDialog(gui, scrollPane, "Parameter Synthesis Results",
+							JOptionPane.PLAIN_MESSAGE);
 				}
 				out.close();
 			}
