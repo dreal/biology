@@ -377,7 +377,6 @@ public class Gui implements ActionListener {
 					textArea.setEditable(false);
 					JScrollPane scrollPane = new JScrollPane(textArea);
 					scrollPane.setPreferredSize(new Dimension(450, 110));
-					scrollPane.add(textArea);
 					JOptionPane.showMessageDialog(gui, scrollPane,
 							"Parameter Synthesis Results",
 							JOptionPane.PLAIN_MESSAGE);
