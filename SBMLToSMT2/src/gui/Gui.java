@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -63,7 +64,8 @@ public class Gui implements ActionListener {
 
 	private JScrollPane paramsScroll, speciesScroll;
 
-	private JLabel sbmlLabel, seriesLabel, noiseLabel, precisionLabel, deltaLabel;
+	private JLabel sbmlLabel, seriesLabel, noiseLabel, precisionLabel,
+			deltaLabel;
 
 	private JFileChooser fc;
 
@@ -134,7 +136,7 @@ public class Gui implements ActionListener {
 		bottomPanel.add(precision);
 		bottomPanel.add(deltaLabel);
 		bottomPanel.add(delta);
-		//buttonsPanel.add(generateSMT2);
+		// buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
 		middlePanel.add(tabbedPane, BorderLayout.CENTER);
 		middlePanel.add(bottomPanel, BorderLayout.SOUTH);
@@ -151,8 +153,7 @@ public class Gui implements ActionListener {
 		try {
 			Toolkit tk = Toolkit.getDefaultToolkit();
 			screenSize = tk.getScreenSize();
-		}
-		catch (AWTError awe) {
+		} catch (AWTError awe) {
 			screenSize = new Dimension(640, 480);
 		}
 
@@ -183,7 +184,8 @@ public class Gui implements ActionListener {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				sbml.setText(fc.getSelectedFile().getAbsolutePath());
 				try {
-					SBMLDocument document = SBMLReader.read(new File(sbml.getText()));
+					SBMLDocument document = SBMLReader.read(new File(sbml
+							.getText()));
 					List<String> assignments = new ArrayList<String>();
 					for (Rule rule : document.getModel().getListOfRules()) {
 						if (rule.isAssignment()) {
@@ -193,7 +195,8 @@ public class Gui implements ActionListener {
 					}
 					List<String> parameters = new ArrayList<String>();
 					List<String> vars = new ArrayList<String>();
-					for (Parameter param : document.getModel().getListOfParameters()) {
+					for (Parameter param : document.getModel()
+							.getListOfParameters()) {
 						if (!assignments.contains(param.getId())) {
 							parameters.add(param.getId());
 						}
@@ -209,22 +212,26 @@ public class Gui implements ActionListener {
 							if (parameters.contains(var)) {
 								parameters.remove(var);
 							}
-							if (!vars.contains(var) && !assignments.contains(var)) {
+							if (!vars.contains(var)
+									&& !assignments.contains(var)) {
 								vars.add(var);
 							}
 						}
 					}
-					for (Reaction reaction : document.getModel().getListOfReactions()) {
-						for (LocalParameter parameter : reaction.getKineticLaw()
-								.getListOfLocalParameters()) {
-							String newName = reaction.getId() + "_" + parameter.getId();
+					for (Reaction reaction : document.getModel()
+							.getListOfReactions()) {
+						for (LocalParameter parameter : reaction
+								.getKineticLaw().getListOfLocalParameters()) {
+							String newName = reaction.getId() + "_"
+									+ parameter.getId();
 							parameters.add(newName);
 						}
 					}
 					Collections.sort(parameters);
 					Collections.sort(vars);
 					paramsPanel.removeAll();
-					paramsPanel.setLayout(new GridLayout(parameters.size() + 1, 4));
+					paramsPanel.setLayout(new GridLayout(parameters.size() + 1,
+							4));
 					paramsPanel.add(new JLabel("Synthesize"));
 					paramsPanel.add(new JLabel("Name"));
 					paramsPanel.add(new JLabel("Lower Bound"));
@@ -247,49 +254,43 @@ public class Gui implements ActionListener {
 						speciesPanel.add(new JTextField("1000000000"));
 					}
 					speciesPanel.revalidate();
-				}
-				catch (XMLStreamException e1) {
+				} catch (XMLStreamException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}
-				catch (IOException e1) {
+				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
-		}
-		else if (e.getSource() == browseSeries) {
+		} else if (e.getSource() == browseSeries) {
 			int returnVal = fc.showOpenDialog(gui);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				series.setText(fc.getSelectedFile().getAbsolutePath());
 			}
-		}
-		else if (e.getSource() == generateSMT2) {
+		} else if (e.getSource() == generateSMT2) {
 			try {
 				List<String> params = new ArrayList<String>();
 				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
-						params.add(((JLabel) paramsPanel.getComponent(i + 1)).getText());
+						params.add(((JLabel) paramsPanel.getComponent(i + 1))
+								.getText());
 					}
 				}
-				System.out.println(Utility.writeSMT2ToString(new ModelSettings(sbml.getText()
-						.trim(), series.getText().trim(), params, Double.parseDouble(noise
-						.getText().trim()), Double.parseDouble(precision.getText().trim()))));
-			}
-			catch (NumberFormatException e1) {
+				System.out.println(Utility.writeSMT2ToString(new ModelSettings(
+						sbml.getText().trim(), series.getText().trim(), params,
+						Double.parseDouble(noise.getText().trim()), Double
+								.parseDouble(precision.getText().trim()))));
+			} catch (NumberFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (XMLStreamException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			catch (XMLStreamException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		else if (e.getSource() == run) {
+		} else if (e.getSource() == run) {
 			try {
 				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
 				Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
@@ -297,36 +298,48 @@ public class Gui implements ActionListener {
 				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
 						variables.put(
-								((JLabel) paramsPanel.getComponent(i + 1)).getText(),
+								((JLabel) paramsPanel.getComponent(i + 1))
+										.getText(),
 								new Tuple<Double, Double>(Double
-										.parseDouble(((JTextField) paramsPanel.getComponent(i + 2))
-												.getText().trim()), Double
-										.parseDouble(((JTextField) paramsPanel.getComponent(i + 3))
-												.getText().trim())));
-						params.add(((JLabel) paramsPanel.getComponent(i + 1)).getText());
+										.parseDouble(((JTextField) paramsPanel
+												.getComponent(i + 2)).getText()
+												.trim()), Double
+										.parseDouble(((JTextField) paramsPanel
+												.getComponent(i + 3)).getText()
+												.trim())));
+						params.add(((JLabel) paramsPanel.getComponent(i + 1))
+								.getText());
 					}
 				}
-				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml.getText().trim())),
-						params);
+				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml
+						.getText().trim())), params);
 				for (int i = 3; i < speciesPanel.getComponentCount(); i += 3) {
 					variables.put(
 							((JLabel) speciesPanel.getComponent(i)).getText(),
-							new Tuple<Double, Double>(Double.parseDouble(((JTextField) speciesPanel
-									.getComponent(i + 1)).getText().trim()), Double
-									.parseDouble(((JTextField) speciesPanel.getComponent(i + 2))
-											.getText().trim())));
-					odes.put(((JLabel) speciesPanel.getComponent(i)).getText(),
-							model.getODE(((JLabel) speciesPanel.getComponent(i)).getText()));
+							new Tuple<Double, Double>(Double
+									.parseDouble(((JTextField) speciesPanel
+											.getComponent(i + 1)).getText()
+											.trim()), Double
+									.parseDouble(((JTextField) speciesPanel
+											.getComponent(i + 2)).getText()
+											.trim())));
+					odes.put(
+							((JLabel) speciesPanel.getComponent(i)).getText(),
+							model.getODE(((JLabel) speciesPanel.getComponent(i))
+									.getText()));
 				}
 				SMT2SettingsParser.writeSettingsToFile(
 						"model.xml",
 						new SMT2Settings(variables, "t", odes, TraceParser
-								.parseCopasiOutput(new File(series.getText().trim())), Double
-								.parseDouble(precision.getText().trim()), Double.parseDouble(delta
-								.getText().trim()), Double.parseDouble(noise.getText().trim())));
+								.parseCopasiOutput(new File(series.getText()
+										.trim())), Double.parseDouble(precision
+								.getText().trim()), Double.parseDouble(delta
+								.getText().trim()), Double.parseDouble(noise
+								.getText().trim())));
 				Runtime exec = Runtime.getRuntime();
 				Process parsyn = exec.exec("ParSyn model.xml");
 				String error = "";
+				String output = "";
 				PrintWriter out = new PrintWriter("BioPSy_output.txt");
 				try {
 					InputStream par = parsyn.getInputStream();
@@ -338,6 +351,7 @@ public class Gui implements ActionListener {
 						System.out.println(line);
 						out.println(line);
 						out.flush();
+						output += line + "\n";
 					}
 					InputStream par2 = parsyn.getErrorStream();
 					int read = par2.read();
@@ -349,38 +363,42 @@ public class Gui implements ActionListener {
 					isr.close();
 					par.close();
 					par2.close();
-				}
-				catch (Exception e1) {
+				} catch (Exception e1) {
 					// e.printStackTrace();
 				}
 				if (!error.equals("")) {
-					JOptionPane.showMessageDialog(gui, "Error in execution.", "ERROR",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(gui, "Error in execution.",
+							"ERROR", JOptionPane.ERROR_MESSAGE);
 					System.err.println(error);
 				}
+				if (!output.equals("")) {
+					JTextArea textArea = new JTextArea();
+					textArea.setText(output);
+					textArea.setEditable(false);
+					JScrollPane scrollPane = new JScrollPane();
+					scrollPane.setPreferredSize(new Dimension(650, 650));
+					scrollPane.setViewportView(textArea);
+					JOptionPane.showMessageDialog(gui, scrollPane,
+							"Parameter Synthesis Results",
+							JOptionPane.PLAIN_MESSAGE);
+				}
 				out.close();
-			}
-			catch (NumberFormatException e1) {
+			} catch (NumberFormatException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-			catch (IOException e1) {
+			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-			catch (XMLStreamException e1) {
+			} catch (XMLStreamException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-			catch (ParserConfigurationException e1) {
+			} catch (ParserConfigurationException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-			catch (TransformerFactoryConfigurationError e1) {
+			} catch (TransformerFactoryConfigurationError e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-			catch (TransformerException e1) {
+			} catch (TransformerException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
