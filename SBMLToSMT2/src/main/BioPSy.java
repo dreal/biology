@@ -10,7 +10,7 @@ import gui.Gui;
  * @author Curtis Madsen
  * 
  */
-public class SBMLToSMT2 {
+public class BioPSy {
 
 	/**
 	 * 
