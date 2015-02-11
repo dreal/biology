@@ -77,17 +77,17 @@
     <!-- Deploy -->
     <target name="deploy" depends="build">
         <!-- Create the distribution directory -->        
-        <mkdir dir="${dist.dir}"/>
+    	<!-- <mkdir dir="${dist.dir}"/>
         <mkdir dir="${dist.dir}/lib"/>
-	<mkdir dir="${dist.dir}/classes"/>
+	<mkdir dir="${dist.dir}/classes"/> --> 
 
         <!-- Copy the primary program and modules -->                
-        <copy todir="${dist.dir}/lib">
+        <copy todir="${bin.dir}">
           <fileset dir="${build.lib}" includes="*.jar"/>
         </copy>
-	<copy todir="${dist.dir}/classes">
+	<!-- <copy todir="${dist.dir}/classes">
 	  <fileset dir="${build.classes}"/>
-        </copy>                
+        </copy> -->               
     </target>
 
     <!-- Deploy Documentation -->
