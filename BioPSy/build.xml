@@ -67,7 +67,7 @@
 	      </javac>
         <jar jarfile="${build.lib}/BioPSy.jar" basedir="${build.classes}">
             <manifest>
-              <attribute name="Main-Class" value="main.SBMLToSMT2"/>
+              <attribute name="Main-Class" value="main.BioPSy"/>
             </manifest>
             <fileset dir="${build.classes}" includes="**/*.class" />
             <zipgroupfileset dir="${lib.dir}" includes="**/*.jar" />
