@@ -20,7 +20,7 @@ BioPSy requires the following packages to compile from source:
 
 - [dReal](https://github.com/dreal/dreal)
 
-To compile BioPSy, browse to the BioPSy directory and execute ant:
+To compile BioPSy, change to the BioPSy directory and execute ant:
 
 ```
 cd BioPSy
@@ -28,5 +28,11 @@ ant
 ```
 
 This will compile the application and produce a jar file in `BioPSy/bin`.
+
+Before running BioPSy, add `BioPSy/bin` to your PATH:
+
+```
+export PATH=<BioPSy Directory Location>/BioPSy/bin:$PATH
+```
 
 To run BioPSy, execute `java -jar BioPSy.jar`.
