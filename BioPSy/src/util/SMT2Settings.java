@@ -25,8 +25,8 @@ public class SMT2Settings {
 		time = "";
 		odes = new HashMap<String, ASTNode>();
 		trace = null;
-		epsilon = 0.000001;
-		delta = 0.000001;
+		epsilon = 0.00005;
+		delta = 0.001;
 		noise = 0.1;
 	}
 	

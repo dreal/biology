@@ -15,8 +15,8 @@ public class ModelSettings {
 		sbmlFile = "";
 		timeSeriesFile = "";
 		params = new ArrayList<String>();
-		noise = 0.000001;
-		precision = 0.000001;
+		noise = 0.00005;
+		precision = 0.001;
 	}
 	
 	public ModelSettings(String sbmlFile, String timeSeriesFile, List<String> params, double noise, double precision) {

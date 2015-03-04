@@ -37,8 +37,8 @@ public class SMT2SettingsParser {
 		String time = "";
 		Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
 		Trace trace = null;
-		double epsilon = 0.000001;
-		double delta = 0.000001;
+		double epsilon = 0.00005;
+		double delta = 0.001;
 		double noise = 0.01;
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
