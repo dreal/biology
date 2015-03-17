@@ -1,1 +1,5 @@
 /build/
+.idea/
+out/
+*.iml
+bin/BioPSy.jar
