@@ -3,5 +3,5 @@
 out/
 *.iml
 bin/BioPSy.jar
-./model.xml
-./BioPSy_output.txt
+BioPSy/model.xml
+BioPSy/BioPSy_output.txt
