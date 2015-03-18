@@ -288,11 +288,11 @@ public class Gui implements ActionListener {
 					paramsPanel.add(new JLabel("Name"));
 					paramsPanel.add(new JLabel("Lower Bound"));
 					paramsPanel.add(new JLabel("Upper Bound"));
-					for (String p : parameters) {
-						paramsPanel.add(new JCheckBox());
+                    for (String p : parameters) {
+                        paramsPanel.add(new JCheckBox());
 						paramsPanel.add(new JLabel(p));
-						paramsPanel.add(new JTextField("0"));
-						paramsPanel.add(new JTextField("1"));
+						paramsPanel.add(new JTextField(String.valueOf(document.getModel().getParameter(p).getValue())));
+						paramsPanel.add(new JTextField(String.valueOf(document.getModel().getParameter(p).getValue())));
 					}
 					paramsPanel.revalidate();
 					speciesPanel.removeAll();
