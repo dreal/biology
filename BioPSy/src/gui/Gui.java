@@ -58,14 +58,14 @@ import util.Utility.Tuple;
 public class Gui implements ActionListener {
 	private JFrame gui;
 
-	private JTextField sbml, series, noise, precision, delta;
+	private JTextField sbml, series, noise, precision, delta, drealOptions, parsynOptions, drealBinPath, parsynBinPath;
 
-	private JButton browseSBML, browseSeries, generateSMT2, run;
+	private JButton browseSBML, browseSeries, generateSMT2, run, drealBrowse, parsynBrowse;
 
 	private JScrollPane paramsScroll, speciesScroll;
 
 	private JLabel sbmlLabel, seriesLabel, noiseLabel, precisionLabel,
-			deltaLabel;
+			deltaLabel, drealOptionsLabel, parsynOptionsLabel, drealBinLabel, parsynBinLabel;
 
 	private JFileChooser fc;
 
@@ -83,26 +83,50 @@ public class Gui implements ActionListener {
 		sbmlLabel = new JLabel("SBML File:");
 		browseSBML = new JButton("Browse");
 		browseSBML.addActionListener(this);
+
 		series = new JTextField(30);
 		seriesLabel = new JLabel("Time Series File:");
 		browseSeries = new JButton("Browse");
 		browseSeries.addActionListener(this);
+
 		paramsScroll = new JScrollPane();
 		paramsScroll.setMinimumSize(new Dimension(600, 150));
 		paramsScroll.setPreferredSize(new Dimension(600, 150));
+
 		speciesScroll = new JScrollPane();
 		speciesScroll.setMinimumSize(new Dimension(600, 150));
 		speciesScroll.setPreferredSize(new Dimension(600, 150));
+
 		noise = new JTextField("0.1", 10);
 		noiseLabel = new JLabel("Noise:");
+
 		precision = new JTextField("0.00005", 10);
 		precisionLabel = new JLabel("Precision:");
+
 		delta = new JTextField("0.001", 10);
 		deltaLabel = new JLabel("Delta:");
+
 		generateSMT2 = new JButton("Generate SMT2");
 		generateSMT2.addActionListener(this);
+
 		run = new JButton("Run");
 		run.addActionListener(this);
+
+        // Label, options and binary path textfield and browse button for dReal
+        drealOptionsLabel = new JLabel("dReal options:");
+        drealOptions = new JTextField("-precision=1e-3");
+        drealBinLabel = new JLabel("dReal binary:");
+        drealBinPath = new JTextField("/usr/bin/dReal");
+        drealBrowse = new JButton("Browse");
+        drealBrowse.addActionListener(this);
+
+        // Label, options and binary textfield and browse button for ParSyn
+        parsynOptionsLabel = new JLabel("ParSyn options:");
+        parsynOptions = new JTextField("-e 1e-3");
+        parsynBinLabel = new JLabel("ParSyn binary:");
+        parsynBinPath = new JTextField("/usr/bin/ParSyn");
+        parsynBrowse = new JButton("Browse");
+        parsynBrowse.addActionListener(this);
 
 		// Create panels for the inputs and buttons
 		JPanel topPanel = new JPanel(new GridLayout(2, 2));
@@ -114,6 +138,10 @@ public class Gui implements ActionListener {
 		JPanel buttonsPanel = new JPanel();
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
+        // Options panel
+        JPanel optionsPanel = new JPanel(new GridLayout(4, 3));
+        // Panel containing optionsPanel and bottomPanel
+        JPanel bottomBigPanel = new JPanel(new GridLayout(2, 1));
 
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
@@ -124,27 +152,51 @@ public class Gui implements ActionListener {
 
 		sbmlPanel.add(sbml);
 		sbmlPanel.add(browseSBML);
+
 		seriesPanel.add(series);
 		seriesPanel.add(browseSeries);
-		topPanel.add(sbmlLabel);
+
+        topPanel.add(sbmlLabel);
 		topPanel.add(sbmlPanel);
 		topPanel.add(seriesLabel);
 		topPanel.add(seriesPanel);
-		bottomPanel.add(noiseLabel);
+
+        bottomPanel.add(noiseLabel);
 		bottomPanel.add(noise);
 		bottomPanel.add(precisionLabel);
 		bottomPanel.add(precision);
 		bottomPanel.add(deltaLabel);
 		bottomPanel.add(delta);
+
+        // Adding components to optionsPanel
+        optionsPanel.add(drealBinLabel);
+        optionsPanel.add(drealBinPath);
+        optionsPanel.add(drealBrowse);
+        optionsPanel.add(drealOptionsLabel);
+        optionsPanel.add(drealOptions);
+        optionsPanel.add(new JLabel());
+        optionsPanel.add(parsynBinLabel);
+        optionsPanel.add(parsynBinPath);
+        optionsPanel.add(parsynBrowse);
+        optionsPanel.add(parsynOptionsLabel);
+        optionsPanel.add(parsynOptions);
+        optionsPanel.add(new JLabel());
+
+        bottomBigPanel.add(bottomPanel);
+        bottomBigPanel.add(optionsPanel);
+
 		// buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
-		middlePanel.add(tabbedPane, BorderLayout.CENTER);
-		middlePanel.add(bottomPanel, BorderLayout.SOUTH);
-		mainPanel.add(topPanel, BorderLayout.NORTH);
-		mainPanel.add(middlePanel, BorderLayout.CENTER);
-		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
-		// Add the main panel to the frame
+        middlePanel.add(tabbedPane, BorderLayout.CENTER);
+		//middlePanel.add(bottomPanel, BorderLayout.SOUTH);
+        middlePanel.add(bottomBigPanel, BorderLayout.SOUTH);
+
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+		mainPanel.add(middlePanel, BorderLayout.CENTER);
+        mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+        // Add the main panel to the frame
 		gui.setContentPane(mainPanel);
 		gui.pack();
 
@@ -267,7 +319,17 @@ public class Gui implements ActionListener {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				series.setText(fc.getSelectedFile().getAbsolutePath());
 			}
-		} else if (e.getSource() == generateSMT2) {
+		} else if (e.getSource() == drealBrowse) {
+            int returnVal = fc.showOpenDialog(gui);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                drealBinPath.setText(fc.getSelectedFile().getAbsolutePath());
+            }
+        } else if (e.getSource() == parsynBrowse) {
+            int returnVal = fc.showOpenDialog(gui);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                parsynBinPath.setText(fc.getSelectedFile().getAbsolutePath());
+            }
+        } else if (e.getSource() == generateSMT2) {
 			try {
 				List<String> params = new ArrayList<String>();
 				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
@@ -337,7 +399,12 @@ public class Gui implements ActionListener {
 								.getText().trim()), Double.parseDouble(noise
 								.getText().trim())));
 				Runtime exec = Runtime.getRuntime();
-				Process parsyn = exec.exec("ParSyn model.xml");
+                // Calling ParSyn
+                String parsynCall = parsynBinPath.getText() + " -l " +
+                                        drealBinPath.getText() + " " +
+                                            parsynOptions.getText() + " model.xml --dreal " +
+                                                drealOptions.getText();
+				Process parsyn = exec.exec(parsynCall);
 				String error = "";
 				String output = "";
 				PrintWriter out = new PrintWriter("BioPSy_output.txt");
