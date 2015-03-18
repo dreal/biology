@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<data>
+    <declare>
+        <var type="var">
+            <name>F</name>
+            <domain>
+                <left>0.01</left>
+                <right>100.0</right>
+            </domain>
+        </var>
+        <var type="var">
+            <name>M</name>
+            <domain>
+                <left>0.01</left>
+                <right>100.0</right>
+            </domain>
+        </var>
+        <var type="var">
+            <name>K</name>
+            <domain>
+                <left>0.0</left>
+                <right>100.0</right>
+            </domain>
+        </var>
+        <var type="param">
+            <name>kappa</name>
+            <domain>
+                <left>8.0</left>
+                <right>13.0</right>
+            </domain>
+        </var>
+        <var type="time">
+            <name>t</name>
+        </var>
+    </declare>
+    <odes>
+        <ode>(= d/dt[F] (* F (- (- 0.0 (/ 0.013 (+ 1.0 K))) (* (/ 1.0 7777.8) (+ (/ (+ 772.3 (* kappa 30.4)) (+ F M)) kappa)))))</ode>
+        <ode>(= d/dt[M] (* (/ (- 0.0 M) 1400.0) (+ (/ (+ 772.3 (* kappa 30.4)) (+ F M)) kappa)))</ode>
+        <ode>(= d/dt[K] (- (/ (* 0.9 (* 0.013 F)) (+ 1.0 K)) 0.075))</ode>
+    </odes>
+    <series>
+        <point time="0.0">
+            <interval var="F">
+                <left>24.99975</left>
+                <right>25.00025</right>
+            </interval>
+            <interval var="M">
+                <left>43.599564</left>
+                <right>43.600436</right>
+            </interval>
+            <interval var="K">
+                <left>0.0199998</left>
+                <right>0.0200002</right>
+            </interval>
+        </point>
+        <point time="1.0">
+            <interval var="F">
+                <left>24.528</left>
+                <right>24.728</right>
+            </interval>
+            <interval var="M">
+                <left>42.7029</left>
+                <right>42.9029</right>
+            </interval>
+            <interval var="K">
+                <left>0.10513600000000001</left>
+                <right>0.305136</right>
+            </interval>
+        </point>
+        <point time="2.0">
+            <interval var="F">
+                <left>24.197499999999998</left>
+                <right>24.3975</right>
+            </interval>
+            <interval var="M">
+                <left>41.9122</left>
+                <right>42.1122</right>
+            </interval>
+            <interval var="K">
+                <left>0.25321799999999994</left>
+                <right>0.453218</right>
+            </interval>
+        </point>
+        <point time="3.0">
+            <interval var="F">
+                <left>23.8939</left>
+                <right>24.0939</right>
+            </interval>
+            <interval var="M">
+                <left>41.1282</left>
+                <right>41.3282</right>
+            </interval>
+            <interval var="K">
+                <left>0.377232</left>
+                <right>0.577232</right>
+            </interval>
+        </point>
+        <point time="4.0">
+            <interval var="F">
+                <left>23.6097</left>
+                <right>23.809700000000003</right>
+            </interval>
+            <interval var="M">
+                <left>40.351</left>
+                <right>40.551</right>
+            </interval>
+            <interval var="K">
+                <left>0.48398399999999997</left>
+                <right>0.6839839999999999</right>
+            </interval>
+        </point>
+        <point time="5.0">
+            <interval var="F">
+                <left>23.3403</left>
+                <right>23.540300000000002</right>
+            </interval>
+            <interval var="M">
+                <left>39.5806</left>
+                <right>39.7806</right>
+            </interval>
+            <interval var="K">
+                <left>0.57757</left>
+                <right>0.77757</right>
+            </interval>
+        </point>
+        <point time="6.0">
+            <interval var="F">
+                <left>23.0825</left>
+                <right>23.282500000000002</right>
+            </interval>
+            <interval var="M">
+                <left>38.817099999999996</left>
+                <right>39.0171</right>
+            </interval>
+            <interval var="K">
+                <left>0.660682</left>
+                <right>0.860682</right>
+            </interval>
+        </point>
+        <point time="7.0">
+            <interval var="F">
+                <left>22.8344</left>
+                <right>23.0344</right>
+            </interval>
+            <interval var="M">
+                <left>38.0607</left>
+                <right>38.2607</right>
+            </interval>
+            <interval var="K">
+                <left>0.735201</left>
+                <right>0.935201</right>
+            </interval>
+        </point>
+        <point time="8.0">
+            <interval var="F">
+                <left>22.594199999999997</left>
+                <right>22.7942</right>
+            </interval>
+            <interval var="M">
+                <left>37.311299999999996</left>
+                <right>37.5113</right>
+            </interval>
+            <interval var="K">
+                <left>0.802504</left>
+                <right>1.002504</right>
+            </interval>
+        </point>
+        <point time="9.0">
+            <interval var="F">
+                <left>22.360999999999997</left>
+                <right>22.561</right>
+            </interval>
+            <interval var="M">
+                <left>36.5689</left>
+                <right>36.7689</right>
+            </interval>
+            <interval var="K">
+                <left>0.863634</left>
+                <right>1.063634</right>
+            </interval>
+        </point>
+        <point time="10.0">
+            <interval var="F">
+                <left>22.133599999999998</left>
+                <right>22.3336</right>
+            </interval>
+            <interval var="M">
+                <left>35.8336</left>
+                <right>36.0336</right>
+            </interval>
+            <interval var="K">
+                <left>0.9194000000000001</left>
+                <right>1.1194000000000002</right>
+            </interval>
+        </point>
+        <point time="11.0">
+            <interval var="F">
+                <left>21.9115</left>
+                <right>22.111500000000003</right>
+            </interval>
+            <interval var="M">
+                <left>35.1053</left>
+                <right>35.3053</right>
+            </interval>
+            <interval var="K">
+                <left>0.97046</left>
+                <right>1.17046</right>
+            </interval>
+        </point>
+        <point time="12.0">
+            <interval var="F">
+                <left>21.6939</left>
+                <right>21.893900000000002</right>
+            </interval>
+            <interval var="M">
+                <left>34.3842</left>
+                <right>34.5842</right>
+            </interval>
+            <interval var="K">
+                <left>1.0173299999999998</left>
+                <right>1.21733</right>
+            </interval>
+        </point>
+        <point time="13.0">
+            <interval var="F">
+                <left>21.4805</left>
+                <right>21.680500000000002</right>
+            </interval>
+            <interval var="M">
+                <left>33.6702</left>
+                <right>33.870200000000004</right>
+            </interval>
+            <interval var="K">
+                <left>1.06045</left>
+                <right>1.26045</right>
+            </interval>
+        </point>
+        <point time="14.0">
+            <interval var="F">
+                <left>21.270699999999998</left>
+                <right>21.4707</right>
+            </interval>
+            <interval var="M">
+                <left>32.9634</left>
+                <right>33.1634</right>
+            </interval>
+            <interval var="K">
+                <left>1.10018</left>
+                <right>1.3001800000000001</right>
+            </interval>
+        </point>
+        <point time="15.0">
+            <interval var="F">
+                <left>21.0642</left>
+                <right>21.264200000000002</right>
+            </interval>
+            <interval var="M">
+                <left>32.2636</left>
+                <right>32.4636</right>
+            </interval>
+            <interval var="K">
+                <left>1.13683</left>
+                <right>1.3368300000000002</right>
+            </interval>
+        </point>
+        <point time="16.0">
+            <interval var="F">
+                <left>20.860699999999998</left>
+                <right>21.0607</right>
+            </interval>
+            <interval var="M">
+                <left>31.571099999999998</left>
+                <right>31.7711</right>
+            </interval>
+            <interval var="K">
+                <left>1.1706699999999999</left>
+                <right>1.37067</right>
+            </interval>
+        </point>
+        <point time="17.0">
+            <interval var="F">
+                <left>20.659899999999997</left>
+                <right>20.8599</right>
+            </interval>
+            <interval var="M">
+                <left>30.8856</left>
+                <right>31.085600000000003</right>
+            </interval>
+            <interval var="K">
+                <left>1.2019099999999998</left>
+                <right>1.40191</right>
+            </interval>
+        </point>
+        <point time="18.0">
+            <interval var="F">
+                <left>20.461699999999997</left>
+                <right>20.6617</right>
+            </interval>
+            <interval var="M">
+                <left>30.2074</left>
+                <right>30.407400000000003</right>
+            </interval>
+            <interval var="K">
+                <left>1.2307599999999999</left>
+                <right>1.43076</right>
+            </interval>
+        </point>
+        <point time="19.0">
+            <interval var="F">
+                <left>20.2657</left>
+                <right>20.465700000000002</right>
+            </interval>
+            <interval var="M">
+                <left>29.536299999999997</left>
+                <right>29.7363</right>
+            </interval>
+            <interval var="K">
+                <left>1.2573999999999999</left>
+                <right>1.4574</right>
+            </interval>
+        </point>
+        <point time="20.0">
+            <interval var="F">
+                <left>20.0719</left>
+                <right>20.271900000000002</right>
+            </interval>
+            <interval var="M">
+                <left>28.8724</left>
+                <right>29.072400000000002</right>
+            </interval>
+            <interval var="K">
+                <left>1.28196</left>
+                <right>1.4819600000000002</right>
+            </interval>
+        </point>
+        <point time="21.0">
+            <interval var="F">
+                <left>19.88</left>
+                <right>20.080000000000002</right>
+            </interval>
+            <interval var="M">
+                <left>28.2156</left>
+                <right>28.4156</right>
+            </interval>
+            <interval var="K">
+                <left>1.3046</left>
+                <right>1.5046000000000002</right>
+            </interval>
+        </point>
+        <point time="22.0">
+            <interval var="F">
+                <left>19.689899999999998</left>
+                <right>19.8899</right>
+            </interval>
+            <interval var="M">
+                <left>27.5661</left>
+                <right>27.7661</right>
+            </interval>
+            <interval var="K">
+                <left>1.3254299999999999</left>
+                <right>1.52543</right>
+            </interval>
+        </point>
+        <point time="23.0">
+            <interval var="F">
+                <left>19.5014</left>
+                <right>19.701400000000003</right>
+            </interval>
+            <interval var="M">
+                <left>26.9237</left>
+                <right>27.123700000000003</right>
+            </interval>
+            <interval var="K">
+                <left>1.3445699999999998</left>
+                <right>1.54457</right>
+            </interval>
+        </point>
+        <point time="24.0">
+            <interval var="F">
+                <left>19.3146</left>
+                <right>19.5146</right>
+            </interval>
+            <interval var="M">
+                <left>26.2886</left>
+                <right>26.4886</right>
+            </interval>
+            <interval var="K">
+                <left>1.3620999999999999</left>
+                <right>1.5621</right>
+            </interval>
+        </point>
+        <point time="25.0">
+            <interval var="F">
+                <left>19.129099999999998</left>
+                <right>19.3291</right>
+            </interval>
+            <interval var="M">
+                <left>25.6606</left>
+                <right>25.8606</right>
+            </interval>
+            <interval var="K">
+                <left>1.37811</left>
+                <right>1.5781100000000001</right>
+            </interval>
+        </point>
+    </series>
+    <delta>0.001</delta>
+    <epsilon>5.0E-5</epsilon>
+    <noise>0.1</noise>
+</data>
