@@ -9,22 +9,20 @@ public class ModelSettings {
 	
 	private List<String> params;
 	
-	private double noise, precision;
-	
+	private double noise;
+
 	public ModelSettings() {
 		sbmlFile = "";
 		timeSeriesFile = "";
 		params = new ArrayList<String>();
 		noise = 0.00005;
-		precision = 0.001;
 	}
 	
-	public ModelSettings(String sbmlFile, String timeSeriesFile, List<String> params, double noise, double precision) {
+	public ModelSettings(String sbmlFile, String timeSeriesFile, List<String> params, double noise) {
 		this.sbmlFile = sbmlFile;
 		this.timeSeriesFile = timeSeriesFile;
 		this.params = params;
 		this.noise = noise;
-		this.precision = precision;
 	}
 	
 	public String getSBMLFile() {
@@ -42,11 +40,7 @@ public class ModelSettings {
 	public double getNoise() {
 		return noise;
 	}
-	
-	public double getPrecision() {
-		return precision;
-	}
-	
+
 	public void setSBMLFile(String sbmlFile) {
 		this.sbmlFile = sbmlFile;
 	}
@@ -62,11 +56,7 @@ public class ModelSettings {
 	public void setNoise(double noise) {
 		this.noise = noise;
 	}
-	
-	public void setPrecision(double precision) {
-		this.precision = precision;
-	}
-	
+
 	public void addParam(String param) {
 		params.add(param);
 	}

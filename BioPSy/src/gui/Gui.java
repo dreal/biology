@@ -13,28 +13,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import model.AdvancedOptionsModel;
 import model.ODEModel;
 
 import org.sbml.jsbml.ASTNode;
@@ -58,14 +50,13 @@ import util.Utility.Tuple;
 public class Gui implements ActionListener {
 	private JFrame gui;
 
-	private JTextField sbml, series, noise, precision, delta, drealOptions, parsynOptions, drealBinPath, parsynBinPath;
+	private JTextField sbml, series, noise;
 
-	private JButton browseSBML, browseSeries, generateSMT2, run, drealBrowse, parsynBrowse;
+	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton;
 
 	private JScrollPane paramsScroll, speciesScroll;
 
-	private JLabel sbmlLabel, seriesLabel, noiseLabel, precisionLabel,
-			deltaLabel, drealOptionsLabel, parsynOptionsLabel, drealBinLabel, parsynBinLabel;
+	private JLabel sbmlLabel, seriesLabel, noiseLabel;
 
 	private JFileChooser fc;
 
@@ -100,33 +91,16 @@ public class Gui implements ActionListener {
 		noise = new JTextField("0.1", 10);
 		noiseLabel = new JLabel("Noise:");
 
-		precision = new JTextField("0.00005", 10);
-		precisionLabel = new JLabel("Precision:");
-
-		delta = new JTextField("0.001", 10);
-		deltaLabel = new JLabel("Delta:");
-
 		generateSMT2 = new JButton("Generate SMT2");
 		generateSMT2.addActionListener(this);
 
 		run = new JButton("Run");
 		run.addActionListener(this);
+        gui.getRootPane().setDefaultButton(run);
+        run.requestFocus();
 
-        // Label, options and binary path textfield and browse button for dReal
-        drealOptionsLabel = new JLabel("dReal options:");
-        drealOptions = new JTextField("-precision=1e-3");
-        drealBinLabel = new JLabel("dReal binary:");
-        drealBinPath = new JTextField("/usr/bin/dReal");
-        drealBrowse = new JButton("Browse");
-        drealBrowse.addActionListener(this);
-
-        // Label, options and binary textfield and browse button for ParSyn
-        parsynOptionsLabel = new JLabel("ParSyn options:");
-        parsynOptions = new JTextField("-e 1e-3");
-        parsynBinLabel = new JLabel("ParSyn binary:");
-        parsynBinPath = new JTextField("/usr/bin/ParSyn");
-        parsynBrowse = new JButton("Browse");
-        parsynBrowse.addActionListener(this);
+        advancedOptionsButton = new JButton("Advanced Options");
+        advancedOptionsButton.addActionListener(this);
 
 		// Create panels for the inputs and buttons
 		JPanel topPanel = new JPanel(new GridLayout(2, 2));
@@ -134,14 +108,12 @@ public class Gui implements ActionListener {
 		JPanel seriesPanel = new JPanel();
 		paramsPanel = new JPanel();
 		speciesPanel = new JPanel();
-		JPanel bottomPanel = new JPanel(new GridLayout(3, 2));
+		JPanel bottomPanel = new JPanel(new GridLayout(1, 2));
 		JPanel buttonsPanel = new JPanel();
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
         // Options panel
         JPanel optionsPanel = new JPanel(new GridLayout(4, 3));
-        // Panel containing optionsPanel and bottomPanel
-        JPanel bottomBigPanel = new JPanel(new GridLayout(2, 1));
 
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
@@ -163,34 +135,13 @@ public class Gui implements ActionListener {
 
         bottomPanel.add(noiseLabel);
 		bottomPanel.add(noise);
-		bottomPanel.add(precisionLabel);
-		bottomPanel.add(precision);
-		bottomPanel.add(deltaLabel);
-		bottomPanel.add(delta);
-
-        // Adding components to optionsPanel
-        optionsPanel.add(drealBinLabel);
-        optionsPanel.add(drealBinPath);
-        optionsPanel.add(drealBrowse);
-        optionsPanel.add(drealOptionsLabel);
-        optionsPanel.add(drealOptions);
-        optionsPanel.add(new JLabel());
-        optionsPanel.add(parsynBinLabel);
-        optionsPanel.add(parsynBinPath);
-        optionsPanel.add(parsynBrowse);
-        optionsPanel.add(parsynOptionsLabel);
-        optionsPanel.add(parsynOptions);
-        optionsPanel.add(new JLabel());
-
-        bottomBigPanel.add(bottomPanel);
-        bottomBigPanel.add(optionsPanel);
 
 		// buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
+        buttonsPanel.add(advancedOptionsButton);
 
         middlePanel.add(tabbedPane, BorderLayout.CENTER);
-		//middlePanel.add(bottomPanel, BorderLayout.SOUTH);
-        middlePanel.add(bottomBigPanel, BorderLayout.SOUTH);
+        middlePanel.add(bottomPanel, BorderLayout.SOUTH);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 		mainPanel.add(middlePanel, BorderLayout.CENTER);
@@ -319,17 +270,7 @@ public class Gui implements ActionListener {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				series.setText(fc.getSelectedFile().getAbsolutePath());
 			}
-		} else if (e.getSource() == drealBrowse) {
-            int returnVal = fc.showOpenDialog(gui);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                drealBinPath.setText(fc.getSelectedFile().getAbsolutePath());
-            }
-        } else if (e.getSource() == parsynBrowse) {
-            int returnVal = fc.showOpenDialog(gui);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                parsynBinPath.setText(fc.getSelectedFile().getAbsolutePath());
-            }
-        } else if (e.getSource() == generateSMT2) {
+		} else if (e.getSource() == generateSMT2) {
 			try {
 				List<String> params = new ArrayList<String>();
 				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
@@ -340,8 +281,7 @@ public class Gui implements ActionListener {
 				}
 				System.out.println(Utility.writeSMT2ToString(new ModelSettings(
 						sbml.getText().trim(), series.getText().trim(), params,
-						Double.parseDouble(noise.getText().trim()), Double
-								.parseDouble(precision.getText().trim()))));
+						Double.parseDouble(noise.getText().trim()))));
 			} catch (NumberFormatException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -352,7 +292,9 @@ public class Gui implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		} else if (e.getSource() == run) {
+		} else if (e.getSource() == advancedOptionsButton) {
+            new AdvancedOptionsDialog(gui, "Advanced Oprions");
+        } else if (e.getSource() == run) {
 			try {
 				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
 				Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
@@ -394,18 +336,26 @@ public class Gui implements ActionListener {
 						"model.xml",
 						new SMT2Settings(variables, "t", odes, TraceParser
 								.parseCopasiOutput(new File(series.getText()
-										.trim())), Double.parseDouble(precision
-								.getText().trim()), Double.parseDouble(delta
-								.getText().trim()), Double.parseDouble(noise
+										.trim())), Double.parseDouble(noise
 								.getText().trim())));
 				Runtime exec = Runtime.getRuntime();
                 // Calling ParSyn
-                String parsynCall = parsynBinPath.getText() + " -l " +
-                                        drealBinPath.getText() + " " +
-                                            parsynOptions.getText() + " model.xml --dreal " +
-                                                drealOptions.getText();
-				Process parsyn = exec.exec(parsynCall);
-				String error = "";
+                String parsynCall = AdvancedOptionsModel.getParsynBinPath() + " -l " +
+                                        AdvancedOptionsModel.getDrealBinPath() + " " +
+                                            AdvancedOptionsModel.getParsynOptions() + " model.xml --dreal " +
+                                                AdvancedOptionsModel.getDrealOptions();
+
+                Process parsyn = exec.exec(parsynCall);
+                // getting ParSyn PID on unix/linux systems
+                if(parsyn.getClass().getName().equals("java.lang.UNIXProcess")) {
+                    try {
+                        Field f = parsyn.getClass().getDeclaredField("pid");
+                        f.setAccessible(true);
+                        int pid = f.getInt(parsyn);
+                    } catch (Throwable ex) {
+                    }
+                }
+                String error = "";
 				String output = "";
 				PrintWriter out = new PrintWriter("BioPSy_output.txt");
 				try {
