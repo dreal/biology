@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
@@ -42,6 +43,7 @@ import org.sbml.jsbml.Species;
 
 import parser.SMT2SettingsParser;
 import parser.TraceParser;
+import util.BackgroundWorker;
 import util.ModelSettings;
 import util.SMT2Settings;
 import util.Utility;
@@ -50,15 +52,19 @@ import util.Utility.Tuple;
 public class Gui implements ActionListener {
 	private JFrame gui;
 
+    private JTextArea outTextArea;
+
 	private JTextField sbml, series, noise;
 
-	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton;
+	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton;
 
-	private JScrollPane paramsScroll, speciesScroll;
+	private JScrollPane paramsScroll, speciesScroll, outputScroll;
 
 	private JLabel sbmlLabel, seriesLabel, noiseLabel;
 
 	private JFileChooser fc;
+
+    private JTabbedPane tabbedPane;
 
 	private JPanel paramsPanel, speciesPanel;
 
@@ -81,12 +87,12 @@ public class Gui implements ActionListener {
 		browseSeries.addActionListener(this);
 
 		paramsScroll = new JScrollPane();
-		paramsScroll.setMinimumSize(new Dimension(600, 150));
-		paramsScroll.setPreferredSize(new Dimension(600, 150));
+		paramsScroll.setMinimumSize(new Dimension(600, 400));
+		paramsScroll.setPreferredSize(new Dimension(600, 400));
 
 		speciesScroll = new JScrollPane();
-		speciesScroll.setMinimumSize(new Dimension(600, 150));
-		speciesScroll.setPreferredSize(new Dimension(600, 150));
+		speciesScroll.setMinimumSize(new Dimension(600, 400));
+		speciesScroll.setPreferredSize(new Dimension(600, 400));
 
 		noise = new JTextField("0.1", 10);
 		noiseLabel = new JLabel("Noise:");
@@ -102,43 +108,49 @@ public class Gui implements ActionListener {
         advancedOptionsButton = new JButton("Advanced Options");
         advancedOptionsButton.addActionListener(this);
 
+        stopButton = new JButton("Stop");
+        stopButton.addActionListener(this);
+        stopButton.setEnabled(false);
+
 		// Create panels for the inputs and buttons
-		JPanel topPanel = new JPanel(new GridLayout(2, 2));
-		JPanel sbmlPanel = new JPanel();
-		JPanel seriesPanel = new JPanel();
+		JPanel topPanel = new JPanel(new GridLayout(3, 3));
 		paramsPanel = new JPanel();
 		speciesPanel = new JPanel();
 		JPanel bottomPanel = new JPanel(new GridLayout(1, 2));
 		JPanel buttonsPanel = new JPanel();
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
-        // Options panel
-        JPanel optionsPanel = new JPanel(new GridLayout(4, 3));
 
+        outTextArea = new JTextArea();
+        outTextArea.setText("Program output will be displayed here");
+        outTextArea.setEditable(false);
+        DefaultCaret caret = (DefaultCaret) outTextArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        outputScroll = new JScrollPane();
+        outputScroll.setPreferredSize(new Dimension(600, 400));
+
+        outputScroll.setViewportView(outTextArea);
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Parameters", paramsScroll);
 		tabbedPane.addTab("Variables", speciesScroll);
-
-		sbmlPanel.add(sbml);
-		sbmlPanel.add(browseSBML);
-
-		seriesPanel.add(series);
-		seriesPanel.add(browseSeries);
+        tabbedPane.addTab("Output", outputScroll);
 
         topPanel.add(sbmlLabel);
-		topPanel.add(sbmlPanel);
-		topPanel.add(seriesLabel);
-		topPanel.add(seriesPanel);
+        topPanel.add(sbml);
+        topPanel.add(browseSBML);
+        topPanel.add(seriesLabel);
+        topPanel.add(series);
+        topPanel.add(browseSeries);
+        topPanel.add(noiseLabel);
+        topPanel.add(noise);
+        topPanel.add(new JLabel());
 
-        bottomPanel.add(noiseLabel);
-		bottomPanel.add(noise);
-
-		// buttonsPanel.add(generateSMT2);
 		buttonsPanel.add(run);
         buttonsPanel.add(advancedOptionsButton);
+        buttonsPanel.add(stopButton);
 
         middlePanel.add(tabbedPane, BorderLayout.CENTER);
         middlePanel.add(bottomPanel, BorderLayout.SOUTH);
@@ -293,7 +305,21 @@ public class Gui implements ActionListener {
 				e1.printStackTrace();
 			}
 		} else if (e.getSource() == advancedOptionsButton) {
-            new AdvancedOptionsDialog(gui, "Advanced Oprions");
+            new AdvancedOptionsDialog(gui, "Advanced Options");
+        } else if (e.getSource() == stopButton) {
+
+            try {
+                Runtime exec = Runtime.getRuntime();
+                String killCall = "pkill -9 -P " + AdvancedOptionsModel.getParsynPID();
+                Process kill = exec.exec(killCall);
+                run.setEnabled(true);
+                advancedOptionsButton.setEnabled(true);
+                stopButton.setEnabled(false);
+
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
         } else if (e.getSource() == run) {
 			try {
 				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
@@ -338,69 +364,16 @@ public class Gui implements ActionListener {
 								.parseCopasiOutput(new File(series.getText()
 										.trim())), Double.parseDouble(noise
 								.getText().trim())));
-				Runtime exec = Runtime.getRuntime();
-                // Calling ParSyn
-                String parsynCall = AdvancedOptionsModel.getParsynBinPath() + " -l " +
-                                        AdvancedOptionsModel.getDrealBinPath() + " " +
-                                            AdvancedOptionsModel.getParsynOptions() + " model.xml --dreal " +
-                                                AdvancedOptionsModel.getDrealOptions();
 
-                Process parsyn = exec.exec(parsynCall);
-                // getting ParSyn PID on unix/linux systems
-                if(parsyn.getClass().getName().equals("java.lang.UNIXProcess")) {
-                    try {
-                        Field f = parsyn.getClass().getDeclaredField("pid");
-                        f.setAccessible(true);
-                        int pid = f.getInt(parsyn);
-                    } catch (Throwable ex) {
-                    }
-                }
-                String error = "";
-				String output = "";
-				PrintWriter out = new PrintWriter("BioPSy_output.txt");
-				try {
-					InputStream par = parsyn.getInputStream();
-					InputStreamReader isr = new InputStreamReader(par);
-					BufferedReader br = new BufferedReader(isr);
-					// int count = 0;
-					String line;
-					while ((line = br.readLine()) != null) {
-						System.out.println(line);
-						out.println(line);
-						out.flush();
-						output += line + "\n";
-					}
-					InputStream par2 = parsyn.getErrorStream();
-					int read = par2.read();
-					while (read != -1) {
-						error += (char) read;
-						read = par2.read();
-					}
-					br.close();
-					isr.close();
-					par.close();
-					par2.close();
-				} catch (Exception e1) {
-					// e.printStackTrace();
-				}
-				if (!error.equals("")) {
-					JOptionPane.showMessageDialog(gui, "Error in execution.",
-							"ERROR", JOptionPane.ERROR_MESSAGE);
-					System.err.println(error);
-				}
-				if (!output.equals("")) {
-					JTextArea textArea = new JTextArea();
-					textArea.setText(output);
-					textArea.setEditable(false);
-					JScrollPane scrollPane = new JScrollPane();
-					scrollPane.setPreferredSize(new Dimension(650, 650));
-					scrollPane.setViewportView(textArea);
-					JOptionPane.showMessageDialog(gui, scrollPane,
-							"Parameter Synthesis Results",
-							JOptionPane.PLAIN_MESSAGE);
-				}
-				out.close();
-			} catch (NumberFormatException e1) {
+                tabbedPane.setSelectedIndex(2);
+                run.setEnabled(false);
+                advancedOptionsButton.setEnabled(false);
+                stopButton.setEnabled(true);
+
+                BackgroundWorker bg = new BackgroundWorker(outTextArea);
+                bg.execute();
+
+    		} catch (NumberFormatException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {

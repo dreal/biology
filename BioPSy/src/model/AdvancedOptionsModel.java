@@ -13,6 +13,16 @@ public class AdvancedOptionsModel {
 
     private static String parsynOptions = "-e 1e-3";
 
+    private static int parsynPID = -1;
+
+    public static int getParsynPID() {
+        return parsynPID;
+    }
+
+    public static void setParsynPID(int parsynPID) {
+        AdvancedOptionsModel.parsynPID = parsynPID;
+    }
+
     public static String getDrealBinPath() {
         return drealBinPath;
     }
