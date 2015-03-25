@@ -18,25 +18,21 @@ public class SMT2Settings {
 	
 	private Trace trace; // The time series data
 	
-	private double epsilon, delta, noise; // Parameters
+	private double noise; // Parameters
 	
 	public SMT2Settings() {
 		variables = new HashMap<String, Tuple<Double, Double>>();
 		time = "";
 		odes = new HashMap<String, ASTNode>();
 		trace = null;
-		epsilon = 0.00005;
-		delta = 0.001;
 		noise = 0.1;
 	}
 	
-	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, double epsilon, double delta, double noise) {
+	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, double noise) {
 		this.variables = variables;
 		this.time = time;
 		this.odes = odes;
 		this.trace = trace;
-		this.epsilon = epsilon;
-		this.delta = delta;
 		this.noise = noise;
 	}
 		
@@ -76,27 +72,11 @@ public class SMT2Settings {
 	public void setTimeVariable(String time) {
 		this.time = time;
 	}
-	
-	public double getEpsilon() {
-		return epsilon;
-	}
-	
-	public double getDelta() {
-		return delta;
-	}
-	
+
 	public Trace getTrace() {
 		return trace;
 	}
-	
-	public void setEpsilon(double epsilon) {
-		this.epsilon = epsilon;
-	}
-	
-	public void setDelta(double delta) {
-		this.delta = delta;
-	}
-	
+
 	public void setTrace(Trace trace) {
 		this.trace = trace;
 	}

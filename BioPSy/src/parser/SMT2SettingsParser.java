@@ -124,7 +124,7 @@ public class SMT2SettingsParser {
 		}
 		catch (Exception e) {
 		}
-		return new SMT2Settings(variables, time, odes, trace, epsilon, delta, noise);
+		return new SMT2Settings(variables, time, odes, trace, noise);
 	}
 
 	public static void writeSettingsToFile(String filename, SMT2Settings settings)
@@ -233,10 +233,10 @@ public class SMT2SettingsParser {
 		}
 		topLevelElement.appendChild(series);
 		Element delta = doc.createElement("delta");
-		delta.setTextContent("" + settings.getDelta());
+		delta.setTextContent("" + 0.001);
 		topLevelElement.appendChild(delta);
 		Element epsilon = doc.createElement("epsilon");
-		epsilon.setTextContent("" + settings.getEpsilon());
+		epsilon.setTextContent("" + 0.001);
 		topLevelElement.appendChild(epsilon);
 		Element noise = doc.createElement("noise");
 		noise.setTextContent("" + settings.getNoise());
