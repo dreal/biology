@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.util.EventListener;
 
 /**
  * Created by fedor on 23/03/15.
@@ -32,6 +33,7 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
                                         AdvancedOptionsModel.getDrealOptions();
 
         Process parsyn = exec.exec(parsynCall);
+
         // getting ParSyn PID on unix/linux systems
         if(parsyn.getClass().getName().equals("java.lang.UNIXProcess")) {
             try {
@@ -68,14 +70,9 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
             par.close();
             par2.close();
         } catch (Exception e1) {
-            // e.printStackTrace();
+            e1.printStackTrace();
         }
 
         return new Integer(0);
-    }
-
-    @Override
-    public void done() {
-
     }
 }

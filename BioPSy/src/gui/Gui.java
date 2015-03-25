@@ -1,12 +1,10 @@
 package gui;
 
-import java.awt.AWTError;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +66,9 @@ public class Gui implements ActionListener {
 
 	private JPanel paramsPanel, speciesPanel;
 
-	public Gui() {
+    private BackgroundWorker bgWorker;
+
+	public Gui(){
 
 		fc = new JFileChooser();
 
@@ -86,28 +86,23 @@ public class Gui implements ActionListener {
 		browseSeries = new JButton("Browse");
 		browseSeries.addActionListener(this);
 
-		paramsScroll = new JScrollPane();
-		paramsScroll.setMinimumSize(new Dimension(600, 400));
-		paramsScroll.setPreferredSize(new Dimension(600, 400));
-
-		speciesScroll = new JScrollPane();
-		speciesScroll.setMinimumSize(new Dimension(600, 400));
-		speciesScroll.setPreferredSize(new Dimension(600, 400));
-
 		noise = new JTextField("0.1", 10);
 		noiseLabel = new JLabel("Noise:");
 
-		generateSMT2 = new JButton("Generate SMT2");
-		generateSMT2.addActionListener(this);
+		//generateSMT2 = new JButton("Generate SMT2");
+		//generateSMT2.addActionListener(this);
 
+        // Run button
 		run = new JButton("Run");
 		run.addActionListener(this);
         gui.getRootPane().setDefaultButton(run);
         run.requestFocus();
 
+        // Advanced Options button
         advancedOptionsButton = new JButton("Advanced Options");
         advancedOptionsButton.addActionListener(this);
 
+        // Stop button
         stopButton = new JButton("Stop");
         stopButton.addActionListener(this);
         stopButton.setEnabled(false);
@@ -121,11 +116,22 @@ public class Gui implements ActionListener {
 		JPanel middlePanel = new JPanel(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
+        // Create text area for program output
         outTextArea = new JTextArea();
         outTextArea.setText("Program output will be displayed here");
         outTextArea.setEditable(false);
+        // Updating the text area
         DefaultCaret caret = (DefaultCaret) outTextArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+        paramsScroll = new JScrollPane();
+        paramsScroll.setMinimumSize(new Dimension(600, 400));
+        paramsScroll.setPreferredSize(new Dimension(600, 400));
+
+        speciesScroll = new JScrollPane();
+        speciesScroll.setMinimumSize(new Dimension(600, 400));
+        speciesScroll.setPreferredSize(new Dimension(600, 400));
+
         outputScroll = new JScrollPane();
         outputScroll.setPreferredSize(new Dimension(600, 400));
 
@@ -190,10 +196,12 @@ public class Gui implements ActionListener {
 
 		// Display the frame
 		gui.setVisible(true);
+
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+        //System.out.println("Action event: " + e.getActionCommand() + " " + e.getSource());
 		if (e.getSource() == browseSBML) {
 			int returnVal = fc.showOpenDialog(gui);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -307,15 +315,11 @@ public class Gui implements ActionListener {
 		} else if (e.getSource() == advancedOptionsButton) {
             new AdvancedOptionsDialog(gui, "Advanced Options");
         } else if (e.getSource() == stopButton) {
-
+            // Kill ParSyn process
             try {
                 Runtime exec = Runtime.getRuntime();
                 String killCall = "pkill -9 -P " + AdvancedOptionsModel.getParsynPID();
                 Process kill = exec.exec(killCall);
-                run.setEnabled(true);
-                advancedOptionsButton.setEnabled(true);
-                stopButton.setEnabled(false);
-
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -365,13 +369,32 @@ public class Gui implements ActionListener {
 										.trim())), Double.parseDouble(noise
 								.getText().trim())));
 
-                tabbedPane.setSelectedIndex(2);
-                run.setEnabled(false);
-                advancedOptionsButton.setEnabled(false);
-                stopButton.setEnabled(true);
+                // Creating a background worker
+                bgWorker = new BackgroundWorker(outTextArea);
 
-                BackgroundWorker bg = new BackgroundWorker(outTextArea);
-                bg.execute();
+                // Adding a listener checking the status of background worker
+                bgWorker.addPropertyChangeListener(
+                        new PropertyChangeListener() {
+                            public  void propertyChange(PropertyChangeEvent evt) {
+                                if (evt.getNewValue() == SwingWorker.StateValue.STARTED) {
+                                    tabbedPane.setSelectedIndex(2);
+                                    run.setEnabled(false);
+                                    advancedOptionsButton.setEnabled(false);
+                                    stopButton.setEnabled(true);
+                                    browseSBML.setEnabled(false);
+                                    browseSeries.setEnabled(false);
+                                } else if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                                    run.setEnabled(true);
+                                    advancedOptionsButton.setEnabled(true);
+                                    stopButton.setEnabled(false);
+                                    browseSBML.setEnabled(true);
+                                    browseSeries.setEnabled(true);
+                                }
+                            }
+                        });
+
+                // Executing background worker
+                bgWorker.execute();
 
     		} catch (NumberFormatException e1) {
 				// TODO Auto-generated catch block
