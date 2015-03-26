@@ -16,19 +16,23 @@ public class TraceParser {
 		List<Double> timePoints = new ArrayList<Double>();
 		List<List<Double>> data = new ArrayList<List<Double>>();
 		if (scanner.hasNextLine()) {
-			String[] vars = scanner.nextLine().split("\t");
-			for (int i = 1; i < vars.length; i++) {
-				variables.add(vars[i]);
+			String[] vars = scanner.nextLine().split(",");
+            for (int i = 1; i < vars.length; i++) {
+                variables.add(vars[i]);
 			}
 		}
 		for (int i = 0; i < variables.size(); i++) {
 			data.add(new ArrayList<Double>());
 		}
 		while (scanner.hasNextLine()) {
-			String[] dataLine = scanner.nextLine().split("\t");
+			String[] dataLine = scanner.nextLine().split(",");
 			timePoints.add(Double.parseDouble(dataLine[0]));
 			for (int i = 1; i < dataLine.length; i++) {
-				data.get(i - 1).add(Double.parseDouble(dataLine[i]));
+                if(!dataLine[i].isEmpty()) {
+                    data.get(i - 1).add(Double.parseDouble(dataLine[i]));
+                } else {
+                    data.get(i - 1).add(new Double(Double.NaN));
+                }
 			}
 		}
 		scanner.close();

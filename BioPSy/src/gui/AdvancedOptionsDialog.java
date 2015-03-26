@@ -79,7 +79,7 @@ public class AdvancedOptionsDialog extends JDialog implements ActionListener {
         drealOptionsPanel.add(new JLabel());
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("ParSyn", parsynOptionsPanel);
+        tabbedPane.addTab("ParSyn", new ImageIcon("parsyn.png"), parsynOptionsPanel);
         tabbedPane.addTab("dReal", drealOptionsPanel);
 
         okButton = new JButton("OK");
@@ -95,10 +95,12 @@ public class AdvancedOptionsDialog extends JDialog implements ActionListener {
         buttonPanel.add(cancelButton);
 
         mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setPreferredSize(new Dimension(420, 120));
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         setContentPane(mainPanel);
+        setResizable(false);
         pack();
 
         refresh();

@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultCaret;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -203,8 +205,11 @@ public class Gui implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
         //System.out.println("Action event: " + e.getActionCommand() + " " + e.getSource());
 		if (e.getSource() == browseSBML) {
+            FileFilter xmlFilter = new FileNameExtensionFilter("XML File","xml");
+            fc.resetChoosableFileFilters();
+            fc.setFileFilter(xmlFilter);
 			int returnVal = fc.showOpenDialog(gui);
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
 				sbml.setText(fc.getSelectedFile().getAbsolutePath());
 				try {
 					SBMLDocument document = SBMLReader.read(new File(sbml
@@ -286,7 +291,10 @@ public class Gui implements ActionListener {
 				}
 			}
 		} else if (e.getSource() == browseSeries) {
-			int returnVal = fc.showOpenDialog(gui);
+            FileFilter csvFilter = new FileNameExtensionFilter("CSV File","csv");
+            fc.resetChoosableFileFilters();
+            fc.setFileFilter(csvFilter);
+            int returnVal = fc.showOpenDialog(gui);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				series.setText(fc.getSelectedFile().getAbsolutePath());
 			}

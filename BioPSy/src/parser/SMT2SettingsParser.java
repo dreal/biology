@@ -198,32 +198,32 @@ public class SMT2SettingsParser {
 				for (String traceVariable : settings.getTrace().getVariables()) {
 					if (variable.equals(traceVariable)) {
 						if (settings.getODEVariables().contains(traceVariable)) {
-							Element interval = doc.createElement("interval");
-							interval.setAttribute("var", traceVariable);
-							double leftValue = settings.getTrace().getValue(traceVariable,
-									timePoint);
-							double rightValue = leftValue;
-							if (i == 0) {
-								if (leftValue == 0) {
-									leftValue -= 0.0001;
-									rightValue += 0.0001;
-								}
-								else {
-									leftValue -= (leftValue * 0.00001);
-									rightValue += (rightValue * 0.00001);
-								}
-							}
-							else {
-								leftValue -= settings.getNoise();
-								rightValue += settings.getNoise();
-							}
-							Element left = doc.createElement("left");
-							left.setTextContent("" + leftValue);
-							Element right = doc.createElement("right");
-							right.setTextContent("" + rightValue);
-							interval.appendChild(left);
-							interval.appendChild(right);
-							point.appendChild(interval);
+                            if(!Double.isNaN(settings.getTrace().getValue(traceVariable, timePoint))) {
+                                Element interval = doc.createElement("interval");
+                                interval.setAttribute("var", traceVariable);
+                                double leftValue = settings.getTrace().getValue(traceVariable,
+                                        timePoint);
+                                double rightValue = leftValue;
+                                if (i == 0) {
+                                    if (leftValue == 0) {
+                                        leftValue -= 0.0001;
+                                        rightValue += 0.0001;
+                                    } else {
+                                        leftValue -= (leftValue * 0.00001);
+                                        rightValue += (rightValue * 0.00001);
+                                    }
+                                } else {
+                                    leftValue -= settings.getNoise();
+                                    rightValue += settings.getNoise();
+                                }
+                                Element left = doc.createElement("left");
+                                left.setTextContent("" + leftValue);
+                                Element right = doc.createElement("right");
+                                right.setTextContent("" + rightValue);
+                                interval.appendChild(left);
+                                interval.appendChild(right);
+                                point.appendChild(interval);
+                            }
 						}
 						break;
 					}
