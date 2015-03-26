@@ -79,7 +79,7 @@ public class AdvancedOptionsDialog extends JDialog implements ActionListener {
         drealOptionsPanel.add(new JLabel());
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("ParSyn", new ImageIcon("parsyn.png"), parsynOptionsPanel);
+        tabbedPane.addTab("ParSyn", parsynOptionsPanel);
         tabbedPane.addTab("dReal", drealOptionsPanel);
 
         okButton = new JButton("OK");
