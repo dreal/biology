@@ -95,10 +95,12 @@ public class AdvancedOptionsDialog extends JDialog implements ActionListener {
         buttonPanel.add(cancelButton);
 
         mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setPreferredSize(new Dimension(420, 120));
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         setContentPane(mainPanel);
+        setResizable(false);
         pack();
 
         refresh();
