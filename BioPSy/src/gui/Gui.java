@@ -221,12 +221,12 @@ public class Gui implements ActionListener {
 							assignments.add(aRule.getVariable());
 						}
 					}
-					List<String> parameters = new ArrayList<String>();
+					Map<String,String> parameters = new HashMap<String,String>();
 					List<String> vars = new ArrayList<String>();
 					for (Parameter param : document.getModel()
 							.getListOfParameters()) {
 						if (!assignments.contains(param.getId())) {
-							parameters.add(param.getId());
+							parameters.put(param.getId(), String.valueOf(param.getValue()));
 						}
 					}
 					for (Species s : document.getModel().getListOfSpecies()) {
@@ -237,7 +237,7 @@ public class Gui implements ActionListener {
 					for (Rule r : document.getModel().getListOfRules()) {
 						if (r.isRate()) {
 							String var = ((RateRule) r).getVariable();
-							if (parameters.contains(var)) {
+							if (parameters.containsKey(var)) {
 								parameters.remove(var);
 							}
 							if (!vars.contains(var)
@@ -252,23 +252,24 @@ public class Gui implements ActionListener {
 								.getKineticLaw().getListOfLocalParameters()) {
 							String newName = reaction.getId() + "_"
 									+ parameter.getId();
-							parameters.add(newName);
+							parameters.put(newName, String.valueOf(parameter.getValue()));
 						}
 					}
-					Collections.sort(parameters);
+					List<String> params = new ArrayList<String>(parameters.keySet());
+					Collections.sort(params);
 					Collections.sort(vars);
 					paramsPanel.removeAll();
-					paramsPanel.setLayout(new GridLayout(parameters.size() + 1,
+					paramsPanel.setLayout(new GridLayout(params.size() + 1,
 							4));
 					paramsPanel.add(new JLabel("Synthesize"));
 					paramsPanel.add(new JLabel("Name"));
 					paramsPanel.add(new JLabel("Lower Bound"));
 					paramsPanel.add(new JLabel("Upper Bound"));
-                    for (String p : parameters) {
+                    for (String p : params) {
                         paramsPanel.add(new JCheckBox());
 						paramsPanel.add(new JLabel(p));
-						paramsPanel.add(new JTextField(String.valueOf(document.getModel().getParameter(p).getValue())));
-						paramsPanel.add(new JTextField(String.valueOf(document.getModel().getParameter(p).getValue())));
+						paramsPanel.add(new JTextField(parameters.get(p)));
+						paramsPanel.add(new JTextField(parameters.get(p)));
 					}
 					paramsPanel.revalidate();
 					speciesPanel.removeAll();
