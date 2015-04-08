@@ -4,10 +4,7 @@ import model.AdvancedOptionsModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.EventListener;
 
@@ -45,6 +42,8 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
         }
 
         try {
+
+            /*
             InputStream par = parsyn.getInputStream();
             InputStreamReader isr = new InputStreamReader(par);
             BufferedReader br = new BufferedReader(isr);
@@ -54,6 +53,12 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
             while ((line = br.readLine()) != null) {
                 outTextArea.append(line + "\n");
             }
+
+            File outputFile = new File("model.xml.output");
+            if(outputFile.exists()) {
+                outTextArea.read(new FileReader(outputFile), null);
+            }
+            */
 
             String error = "";
             InputStream par2 = parsyn.getErrorStream();
@@ -65,9 +70,9 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
             if (error != "") {
                 outTextArea.append("Error message: " + error + "\n");
             }
-            br.close();
-            isr.close();
-            par.close();
+            //br.close();
+            //isr.close();
+            //par.close();
             par2.close();
         } catch (Exception e1) {
             e1.printStackTrace();

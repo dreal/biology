@@ -11,7 +11,7 @@ public class AdvancedOptionsModel {
 
     private static String parsynBinPath = "/usr/bin/ParSyn";
 
-    private static String parsynOptions = "-e 1e-3";
+    private static String parsynOptions = "-e 1e-3 --output";
 
     private static int parsynPID = -1;
 
