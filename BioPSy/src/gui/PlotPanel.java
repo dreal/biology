@@ -17,8 +17,8 @@ public class PlotPanel extends JPanel {
 
     private double xScale = 1;
     private double yScale = 1;
-    private int panelWidth = 800;
-    private int panelHeight = 800;
+    private int panelWidth = 400;
+    private int panelHeight = 400;
     private int panelLeft = 200;
     private int panelTop = 50;
     private int xGrid = 5;
@@ -104,7 +104,7 @@ public class PlotPanel extends JPanel {
     }
 
     public void drawNet(Graphics2D g2) {
-        g2.setFont(new Font(g2.getFont().getFontName(), Font.PLAIN, 36));
+        g2.setFont(new Font(g2.getFont().getFontName(), Font.PLAIN, 18));
         g2.setColor(new Color(0, 0, 0));
         DecimalFormat df = new DecimalFormat();
         // vertical lines and labels
@@ -121,7 +121,7 @@ public class PlotPanel extends JPanel {
 
     public void drawLabels(Graphics2D g2) {
 
-        g2.setFont(new Font(g2.getFont().getFontName(), Font.ITALIC, 64));
+        g2.setFont(new Font(g2.getFont().getFontName(), Font.ITALIC, 36));
         AffineTransform at = new AffineTransform();
         g2.drawString(domain.getIntervals().get(0).getName(), panelLeft + panelWidth / 2, panelTop + panelHeight + 100);
         at.rotate(-Math.PI / 2);
