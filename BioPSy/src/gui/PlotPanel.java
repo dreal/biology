@@ -1,5 +1,6 @@
 package gui;
 
+import model.TimeSeriesModel;
 import util.*;
 import util.Box;
 
@@ -32,6 +33,7 @@ public class PlotPanel extends JPanel {
     private List<String> params;
     private Box domain;
 
+    private Color finalSatColor = new Color(255, 222, 6);
     private Color satColor = new Color(0,0,0);
     private Color unsatColor = new Color(255,255,255);
     private Color undetColor = new Color(180,180,180);
@@ -77,7 +79,12 @@ public class PlotPanel extends JPanel {
     public void drawBoxes(Graphics2D g2) {
         for(int i = 0; i < boxes.size(); i++) {
             if(boxes.get(i).getType() == Box.BoxType.SAT) {
-                g2.setColor(satColor);
+                if(boxes.get(i).getTime() == TimeSeriesModel.getTimePoints().get(TimeSeriesModel.getTimePoints().size() - 1))
+                {
+                    g2.setColor(finalSatColor);
+                } else {
+                    g2.setColor(satColor);
+                }
             }
             if(boxes.get(i).getType() == Box.BoxType.UNSAT) {
                 g2.setColor(unsatColor);

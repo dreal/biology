@@ -1,6 +1,7 @@
 package main;
 
 import gui.Gui;
+import model.AdvancedOptionsModel;
 
 /**
  * 

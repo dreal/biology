@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import model.TimeSeriesModel;
 import util.Trace;
 
 public class TraceParser {
@@ -31,6 +32,7 @@ public class TraceParser {
                 return null;
             }
             timePoints.add(Double.parseDouble(dataLine[0]));
+            TimeSeriesModel.addTimePoint(Double.parseDouble(dataLine[0]));
 			for (int i = 1; i < dataLine.length; i++) {
                 if(!dataLine[i].isEmpty()) {
                     data.get(i - 1).add(Double.parseDouble(dataLine[i]));
