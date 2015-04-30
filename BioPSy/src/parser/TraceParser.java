@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import model.TimeSeriesModel;
 import util.Trace;
 
 public class TraceParser {
@@ -26,7 +27,12 @@ public class TraceParser {
 		}
 		while (scanner.hasNextLine()) {
 			String[] dataLine = scanner.nextLine().split(",");
-			timePoints.add(Double.parseDouble(dataLine[0]));
+            if(dataLine.length > variables.size() + 1) {
+                System.err.println("The size of data vector is greater than the size of variable vector " + dataLine.length + " " + variables.size());
+                return null;
+            }
+            timePoints.add(Double.parseDouble(dataLine[0]));
+            TimeSeriesModel.addTimePoint(Double.parseDouble(dataLine[0]));
 			for (int i = 1; i < dataLine.length; i++) {
                 if(!dataLine[i].isEmpty()) {
                     data.get(i - 1).add(Double.parseDouble(dataLine[i]));
@@ -34,6 +40,12 @@ public class TraceParser {
                     data.get(i - 1).add(new Double(Double.NaN));
                 }
 			}
+            if(dataLine.length < variables.size() + 1) {
+                for (int i = dataLine.length; i < variables.size() + 1; i++) {
+                    data.get(i - 1).add(new Double(Double.NaN));
+                }
+            }
+
 		}
 		scanner.close();
 		return new Trace(variables, timePoints, data);

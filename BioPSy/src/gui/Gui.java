@@ -44,12 +44,11 @@ import org.sbml.jsbml.Species;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import parser.OutputParser;
 import parser.SMT2SettingsParser;
 import parser.TraceParser;
-import util.BackgroundWorker;
-import util.ModelSettings;
-import util.SMT2Settings;
-import util.Utility;
+import util.*;
+import util.Box;
 import util.Utility.Tuple;
 
 public class Gui implements ActionListener {
@@ -57,11 +56,17 @@ public class Gui implements ActionListener {
 
     private JTextArea outTextArea, timeSeriesTextArea, sbmlTextArea;
 
+    private BoxTable boxTable;
+
+    private Box domain;
+
 	private JTextField sbml, series, noise;
 
 	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton, okButton;
 
-	private JScrollPane paramsScroll, speciesScroll, outputScroll, timeSeriesScroll, sbmlScroll;
+	private JScrollPane paramsScroll, speciesScroll, outputScroll, timeSeriesScroll, sbmlScroll, problemScroll, graphOutputScroll;
+
+    private PlotPanel plotPanel2D;
 
 	private JLabel sbmlLabel, seriesLabel, noiseLabel;
 
@@ -134,7 +139,7 @@ public class Gui implements ActionListener {
 
         // Create text area for program output
         outTextArea = new JTextArea();
-        outTextArea.setText("Program output will be displayed here");
+        outTextArea.setText("Execution problems will be displayed here");
         outTextArea.setEditable(false);
         // Updating the text area
         DefaultCaret caret = (DefaultCaret) outTextArea.getCaret();
@@ -156,6 +161,10 @@ public class Gui implements ActionListener {
         speciesScroll.setMinimumSize(new Dimension(600, 400));
         speciesScroll.setPreferredSize(new Dimension(600, 400));
 
+        problemScroll = new JScrollPane();
+        problemScroll.setMinimumSize(new Dimension(600, 400));
+        problemScroll.setPreferredSize(new Dimension(600, 400));
+
         outputScroll = new JScrollPane();
         outputScroll.setMinimumSize(new Dimension(600, 400));
         outputScroll.setPreferredSize(new Dimension(600, 400));
@@ -168,18 +177,28 @@ public class Gui implements ActionListener {
         timeSeriesScroll.setMinimumSize(new Dimension(600, 400));
         timeSeriesScroll.setPreferredSize(new Dimension(600, 400));
 
-        outputScroll.setViewportView(outTextArea);
+        graphOutputScroll = new JScrollPane();
+        graphOutputScroll.setMinimumSize(new Dimension(600, 400));
+        graphOutputScroll.setPreferredSize(new Dimension(600, 400));
+
+
+        problemScroll.setViewportView(outTextArea);
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
         sbmlScroll.setViewportView(sbmlTextArea);
         timeSeriesScroll.setViewportView(timeSeriesTextArea);
+        boxTable = new BoxTable();
+        outputScroll.setViewportView(boxTable);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("SBML", sbmlScroll);
         tabbedPane.addTab("Time series", timeSeriesScroll);
         tabbedPane.addTab("Parameters", paramsScroll);
 		tabbedPane.addTab("Variables", speciesScroll);
+        tabbedPane.addTab("Problems", problemScroll);
         tabbedPane.addTab("Output", outputScroll);
+        tabbedPane.addTab("Plot(2D only)", graphOutputScroll);
+        tabbedPane.setEnabledAt(6, false);
 
         topPanel.add(sbmlLabel);
         topPanel.add(sbml);
@@ -403,18 +422,17 @@ public class Gui implements ActionListener {
 				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
 				Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
 				List<String> params = new ArrayList<String>();
+                domain = new Box(Box.BoxType.DOMAIN);
 				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
-						variables.put(
-								((JLabel) paramsPanel.getComponent(i + 1))
-										.getText(),
-								new Tuple<Double, Double>(Double
-										.parseDouble(((JTextField) paramsPanel
-												.getComponent(i + 2)).getText()
-												.trim()), Double
-										.parseDouble(((JTextField) paramsPanel
-												.getComponent(i + 3)).getText()
-												.trim())));
+
+                        String paramName = ((JLabel) paramsPanel.getComponent(i + 1)).getText();
+                        double paramLeft = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 2)).getText().trim());
+                        double paramRight = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 3)).getText().trim());
+
+                        domain.addInterval(new Interval(paramLeft, paramRight, paramName));
+
+                        variables.put(paramName, new Tuple<Double, Double>(paramLeft, paramRight));
 						params.add(((JLabel) paramsPanel.getComponent(i + 1))
 								.getText());
 					}
@@ -423,14 +441,14 @@ public class Gui implements ActionListener {
 						.getText().trim())), params);
 				for (int i = 3; i < speciesPanel.getComponentCount(); i += 3) {
 					variables.put(
-							((JLabel) speciesPanel.getComponent(i)).getText(),
-							new Tuple<Double, Double>(Double
-									.parseDouble(((JTextField) speciesPanel
-											.getComponent(i + 1)).getText()
-											.trim()), Double
-									.parseDouble(((JTextField) speciesPanel
-											.getComponent(i + 2)).getText()
-											.trim())));
+                            ((JLabel) speciesPanel.getComponent(i)).getText(),
+                            new Tuple<Double, Double>(Double
+                                    .parseDouble(((JTextField) speciesPanel
+                                            .getComponent(i + 1)).getText()
+                                            .trim()), Double
+                                    .parseDouble(((JTextField) speciesPanel
+                                            .getComponent(i + 2)).getText()
+                                            .trim())));
 					odes.put(
 							((JLabel) speciesPanel.getComponent(i)).getText(),
 							model.getODE(((JLabel) speciesPanel.getComponent(i))
@@ -443,6 +461,18 @@ public class Gui implements ActionListener {
 										.trim())), Double.parseDouble(noise
 								.getText().trim())));
 
+                // creating a table
+                boxTable.setDomain(domain);
+
+                if(domain.getIntervals().size() == 2) {
+
+                    tabbedPane.setEnabledAt(6, true);
+                    plotPanel2D = new PlotPanel(domain);
+                    graphOutputScroll.setViewportView(plotPanel2D);
+                } else {
+                    tabbedPane.setEnabledAt(6, false);
+                }
+
                 // Creating a background worker
                 bgWorker = new BackgroundWorker(outTextArea);
 
@@ -451,7 +481,7 @@ public class Gui implements ActionListener {
                         new PropertyChangeListener() {
                             public  void propertyChange(PropertyChangeEvent evt) {
                                 if (evt.getNewValue() == SwingWorker.StateValue.STARTED) {
-                                    tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+                                    tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
                                     run.setEnabled(false);
                                     advancedOptionsButton.setEnabled(false);
                                     stopButton.setEnabled(true);
@@ -484,12 +514,22 @@ public class Gui implements ActionListener {
 
                 outputListener = new Thread() {
 
-                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder db = dbf.newDocumentBuilder();
-
                     @Override
                     public void run() {
                         while(!bgWorker.isDone()) {
+                            try {
+                                Thread.sleep(1000);
+                                OutputParser.parse("model.xml.output");
+                                boxTable.updateRows(OutputParser.getBoxes());
+                                if(domain.getIntervals().size() == 2) {
+                                    plotPanel2D.updateBoxes(OutputParser.getBoxes());
+                                }
+                                progressBar.setValue((int) (OutputParser.getProgress() * 100));
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+
+                            /*
                             File outputFile = new File("model.xml.output");
                             if(outputFile.exists()) {
                                 try {
@@ -510,6 +550,7 @@ public class Gui implements ActionListener {
                                     e1.printStackTrace();
                                 }
                             }
+                            */
                         }
                         if (isStopped) {
                             outTextArea.append("\nComputation was stopped by the user\n");
@@ -537,7 +578,9 @@ public class Gui implements ActionListener {
 			} catch (TransformerException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-		}
+			} catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
 	}
 }

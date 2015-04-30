@@ -1,6 +1,7 @@
 package main;
 
 import gui.Gui;
+import model.AdvancedOptionsModel;
 
 /**
  * 
@@ -20,7 +21,7 @@ public class BioPSy {
 	 *            - the program arguments
 	 */
 	public static void main(String[] args) {
-		new Gui();
+        new Gui();
 //		if (args.length > 2) {
 //			try {
 //				String prop = args[2];

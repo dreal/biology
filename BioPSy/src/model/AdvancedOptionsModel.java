@@ -1,17 +1,19 @@
 package model;
 
+import main.BioPSy;
+
 /**
  * Created by Fedor Shmarov on 23/03/15.
  */
 public class AdvancedOptionsModel {
 
-    private static String drealBinPath = "/usr/bin/dReal";
+    private static String drealBinPath = "./dReal";
 
     private static String drealOptions = "-precision=1e-3";
 
-    private static String parsynBinPath = "/usr/bin/ParSyn";
+    private static String parsynBinPath = "./ParSyn";
 
-    private static String parsynOptions = "-e 1e-3 --output";
+    private static String parsynOptions = "-e 1e-3";
 
     private static int parsynPID = -1;
 
