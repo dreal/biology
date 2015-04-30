@@ -7,11 +7,11 @@ import main.BioPSy;
  */
 public class AdvancedOptionsModel {
 
-    private static String drealBinPath = "bin/dReal";
+    private static String drealBinPath = "./dReal";
 
     private static String drealOptions = "-precision=1e-3";
 
-    private static String parsynBinPath = "bin/ParSyn";
+    private static String parsynBinPath = "./ParSyn";
 
     private static String parsynOptions = "-e 1e-3";
 
