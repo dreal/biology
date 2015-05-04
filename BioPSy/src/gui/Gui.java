@@ -7,6 +7,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -408,12 +409,46 @@ public class Gui implements ActionListener {
         } else if (e.getSource() == stopButton) {
             // Kill ParSyn process
             try {
+
+                String termCode = "#!/bin/bash\n" +
+                        "function get_children {\n" +
+                        "\tclist=`pgrep -P $1`\n" +
+                        "\tplist+=($1)\n" +
+                        "\tif [ -n \"$clist\" ]\n" +
+                        "\tthen\n" +
+                        "\t\tfor p in $clist\n" +
+                        "\t\tdo\n" +
+                        "\t\t\tget_children $p\t\t\t\t\n" +
+                        "\t\tdone\t\n" +
+                        "\tfi\t\n" +
+                        "}\n" +
+                        "\n" +
+                        "get_children $1\n" +
+                        "\n" +
+                        "for ((i=${#plist[@]}-1;i>=0;i--));\n" +
+                        "do\n" +
+                        "\tkill -9 ${plist[i]}\n" +
+                        "done";
+
+                String termFilename = "terminate.sh";
+
+                PrintWriter termWriter = new PrintWriter(termFilename, "UTF-8");
+                termWriter.print(termCode);
+                termWriter.close();
+
                 Runtime exec = Runtime.getRuntime();
-                String killCall = "pkill -9 -P " + AdvancedOptionsModel.getParsynPID();
+                String killCall = "/bin/bash " + termFilename + " " + AdvancedOptionsModel.getParsynPID();
                 Process kill = exec.exec(killCall);
+
+                Thread.sleep(1000);
+
+                (new File (termFilename)).delete();
+
                 isStopped = true;
                 stopButton.setEnabled(false);
             } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
 
