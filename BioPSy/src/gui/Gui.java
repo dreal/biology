@@ -6,28 +6,18 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultCaret;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import com.sun.org.apache.xerces.internal.parsers.XMLParser;
 import model.AdvancedOptionsModel;
 import model.ODEModel;
 
@@ -42,9 +32,6 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.Species;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 import parser.OutputParser;
 import parser.SMT2SettingsParser;
 import parser.TraceParser;
@@ -55,7 +42,7 @@ import util.Utility.Tuple;
 public class Gui implements ActionListener {
 	private JFrame gui;
 
-    private JTextArea outTextArea, timeSeriesTextArea, sbmlTextArea;
+    private JTextArea logTextArea, timeSeriesTextArea, sbmlTextArea;
 
     private BoxTable boxTable;
 
@@ -65,7 +52,7 @@ public class Gui implements ActionListener {
 
 	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton, okButton;
 
-	private JScrollPane paramsScroll, speciesScroll, outputScroll, timeSeriesScroll, sbmlScroll, problemScroll, graphOutputScroll;
+	private JScrollPane paramsScroll, speciesScroll, outputScroll, timeSeriesScroll, sbmlScroll, logScroll, graphOutputScroll;
 
     private PlotPanel plotPanel2D;
 
@@ -139,11 +126,11 @@ public class Gui implements ActionListener {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
         // Create text area for program output
-        outTextArea = new JTextArea();
-        outTextArea.setText("Execution problems will be displayed here");
-        outTextArea.setEditable(false);
+        logTextArea = new JTextArea();
+        logTextArea.setText("Application: started " + new Date() + "\n");
+        logTextArea.setEditable(false);
         // Updating the text area
-        DefaultCaret caret = (DefaultCaret) outTextArea.getCaret();
+        DefaultCaret caret = (DefaultCaret) logTextArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // Create text area for SBML file
@@ -162,9 +149,9 @@ public class Gui implements ActionListener {
         speciesScroll.setMinimumSize(new Dimension(600, 400));
         speciesScroll.setPreferredSize(new Dimension(600, 400));
 
-        problemScroll = new JScrollPane();
-        problemScroll.setMinimumSize(new Dimension(600, 400));
-        problemScroll.setPreferredSize(new Dimension(600, 400));
+        logScroll = new JScrollPane();
+        logScroll.setMinimumSize(new Dimension(600, 400));
+        logScroll.setPreferredSize(new Dimension(600, 400));
 
         outputScroll = new JScrollPane();
         outputScroll.setMinimumSize(new Dimension(600, 400));
@@ -182,8 +169,7 @@ public class Gui implements ActionListener {
         graphOutputScroll.setMinimumSize(new Dimension(600, 400));
         graphOutputScroll.setPreferredSize(new Dimension(600, 400));
 
-
-        problemScroll.setViewportView(outTextArea);
+        logScroll.setViewportView(logTextArea);
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
         sbmlScroll.setViewportView(sbmlTextArea);
@@ -196,7 +182,7 @@ public class Gui implements ActionListener {
         tabbedPane.addTab("Time series", timeSeriesScroll);
         tabbedPane.addTab("Parameters", paramsScroll);
 		tabbedPane.addTab("Variables", speciesScroll);
-        tabbedPane.addTab("Problems", problemScroll);
+        tabbedPane.addTab("Log", logScroll);
         tabbedPane.addTab("Output", outputScroll);
         tabbedPane.addTab("Plot(2D only)", graphOutputScroll);
         tabbedPane.setEnabledAt(6, false);
@@ -351,6 +337,7 @@ public class Gui implements ActionListener {
                     // Output sbml to text area
                     tabbedPane.setSelectedIndex(0);
                     sbmlTextArea.read(new FileReader(sbml.getText()), null);
+                    logTextArea.append("Application: loaded SBML model " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
 				} catch (XMLStreamException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -370,6 +357,7 @@ public class Gui implements ActionListener {
                 try {
                     tabbedPane.setSelectedIndex(1);
                     timeSeriesTextArea.read(new FileReader(series.getText()), null);
+                    logTextArea.append("Application: loaded time series " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -407,7 +395,7 @@ public class Gui implements ActionListener {
             browseSBML.setEnabled(true);
             browseSeries.setEnabled(true);
         } else if (e.getSource() == stopButton) {
-            // Kill ParSyn process
+            // Kill ParSyn process and children
             try {
 
                 String termCode = "#!/bin/bash\n" +
@@ -509,7 +497,7 @@ public class Gui implements ActionListener {
                 }
 
                 // Creating a background worker
-                bgWorker = new BackgroundWorker(outTextArea);
+                bgWorker = new BackgroundWorker(logTextArea);
 
                 // Adding a listener checking the status of background worker
                 bgWorker.addPropertyChangeListener(
@@ -527,6 +515,8 @@ public class Gui implements ActionListener {
                                     advancedOptionsButton.setVisible(false);
                                     stopButton.setVisible(true);
                                     progressBar.setVisible(true);
+                                    logTextArea.append("Execution: started " + new Date() + "\n");
+                                    logTextArea.append("Execution: " + AdvancedOptionsModel.getString() + "\n");
                                 } else if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
                                     run.setEnabled(true);
                                     advancedOptionsButton.setEnabled(true);
@@ -540,6 +530,11 @@ public class Gui implements ActionListener {
                                     okButton.setVisible(true);
                                     stopButton.setVisible(false);
                                     //progressBar.setVisible(false);
+                                    if (isStopped) {
+                                        logTextArea.append("Execution: terminated by the user " + new Date() + "\n");
+                                    } else {
+                                        logTextArea.append("Execution: terminated " + new Date() + "\n");
+                                    }
                                 }
                             }
                         });
@@ -563,32 +558,6 @@ public class Gui implements ActionListener {
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
-
-                            /*
-                            File outputFile = new File("model.xml.output");
-                            if(outputFile.exists()) {
-                                try {
-                                    Thread.sleep(100);
-                                    Document dom = db.parse(outputFile);
-                                    Element root = dom.getDocumentElement();
-                                    double progress = Double.parseDouble(root.getAttribute("progress"));
-                                    progressBar.setValue((int) (progress * 100));
-                                    //System.out.println("Progress: " + (progress * 100));
-                                    FileReader reader = new FileReader(outputFile);
-                                    outTextArea.read(reader, null);
-                                    reader.close();
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                } catch (InterruptedException e1) {
-                                    e1.printStackTrace();
-                                } catch (SAXException e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
-                            */
-                        }
-                        if (isStopped) {
-                            outTextArea.append("\nComputation was stopped by the user\n");
                         }
                     }
 
