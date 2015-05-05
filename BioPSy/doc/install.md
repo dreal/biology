@@ -19,4 +19,8 @@ ant
 
 This will compile the application and produce a jar file in `BioPSy/bin`.
 
-To run BioPSy, execute `java -jar BioPSy.jar`.
+To run BioPSy, execute:
+
+```
+java -jar BioPSy.jar
+```
