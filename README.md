@@ -9,4 +9,4 @@ BioPSy is a tool that performs parameter synthesis on biological models specifie
 
 The latest version of BioPSy including all required binaries can be downloaded from the [releases page](https://github.com/dreal/biology/releases).  BioPSy is a Java application and requires [Java JRE 6 or higher](https://www.java.com) to run.
 
-### [Compiling from Source](https://github.com/dreal/biology/blob/master/BioPSy/doc/usage.md)
+### [Compiling from Source](https://github.com/dreal/biology/blob/master/BioPSy/doc/install.md)
