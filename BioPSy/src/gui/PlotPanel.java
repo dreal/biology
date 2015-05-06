@@ -19,8 +19,12 @@ public class PlotPanel extends JPanel {
     private double yScale = 1;
     private int panelWidth = 400;
     private int panelHeight = 400;
-    private int panelLeft = 200;
+    private int panelLeft = 170;
     private int panelTop = 50;
+    private int legendWidth = 400;
+    private int legendHeight = 400;
+    private int legendLeft = panelLeft + panelWidth + 50;
+    private int legendTop = panelTop;
     private int xGrid = 5;
     private int yGrid = 5;
     //private List<Box2D> boxes;
@@ -36,6 +40,7 @@ public class PlotPanel extends JPanel {
     private Color satColor = new Color(0,0,0);
     private Color unsatColor = new Color(255,255,255);
     private Color undetColor = new Color(180,180,180);
+    private Color domainColor = new Color(200, 234, 255);
 
     public PlotPanel(Box domain) {
         super();
@@ -59,7 +64,7 @@ public class PlotPanel extends JPanel {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(new Color(200, 234, 255));
+        g2.setColor(domainColor);
         g2.fillRect(panelLeft, panelTop, panelWidth, panelHeight);
         g2.setColor(new Color(0, 0, 0));
         g2.drawRect(panelLeft, panelTop, panelWidth, panelHeight);
@@ -67,6 +72,7 @@ public class PlotPanel extends JPanel {
         drawBoxes(g2);
         drawNet(g2);
         drawLabels(g2);
+        drawLegend(g2);
         //repaint();
     }
 
@@ -121,7 +127,7 @@ public class PlotPanel extends JPanel {
         // horizontal lines and labels
         for(int i = 0; i <= yGrid; i++) {
             g2.drawLine(panelLeft, panelTop + i * (panelHeight / yGrid), panelLeft + panelWidth, panelTop + i * (panelHeight / yGrid));
-            g2.drawString(df.format(domain.getIntervals().get(1).getLeft() + i * domain.getIntervals().get(1).getWidth() / yGrid), panelLeft - 130, panelTop + panelHeight - i * (panelHeight / yGrid) + 10);
+            g2.drawString(df.format(domain.getIntervals().get(1).getLeft() + i * domain.getIntervals().get(1).getWidth() / yGrid), panelLeft - 80, panelTop + panelHeight - i * (panelHeight / yGrid) + 10);
         }
     }
 
@@ -135,6 +141,47 @@ public class PlotPanel extends JPanel {
         g2.drawString(domain.getIntervals().get(1).getName(), -(panelTop + panelHeight / 2), 60);
         at.rotate(Math.PI / 2);
         g2.setTransform(at);
+    }
+
+    public void drawLegend(Graphics2D g2) {
+
+        //g2.setColor(new Color(0,0,0));
+        //g2.drawRect(legendLeft, legendTop, legendWidth, legendHeight);
+        //g2.setFont(new Font(g2.getFont().getFontName(), Font.ITALIC, 36));
+        //g2.drawString("Legend:", legendLeft + legendWidth / 2, legendTop + 30);
+
+        g2.setFont(new Font(g2.getFont().getFontName(), Font.PLAIN, 18));
+
+        g2.setColor(domainColor);
+        g2.fillRect(legendLeft + 30, legendTop + 50, 50, 50);
+        g2.setColor(new Color(0,0,0));
+        g2.drawRect(legendLeft + 30, legendTop + 50, 50, 50);
+        g2.drawString("Unexplored boxes", legendLeft + 90, legendTop + 85);
+
+        g2.setColor(currentColor);
+        g2.fillRect(legendLeft + 30, legendTop + 100, 50, 50);
+        g2.setColor(new Color(0,0,0));
+        g2.drawRect(legendLeft + 30, legendTop + 100, 50, 50);
+        g2.drawString("Currently explored boxes", legendLeft + 90, legendTop + 135);
+
+        g2.setColor(satColor);
+        g2.fillRect(legendLeft + 30, legendTop + 150, 50, 50);
+        g2.setColor(new Color(0,0,0));
+        g2.drawRect(legendLeft + 30, legendTop + 150, 50, 50);
+        g2.drawString("SAT boxes", legendLeft + 90, legendTop + 185);
+
+        g2.setColor(undetColor);
+        g2.fillRect(legendLeft + 30, legendTop + 200, 50, 50);
+        g2.setColor(new Color(0,0,0));
+        g2.drawRect(legendLeft + 30, legendTop + 200, 50, 50);
+        g2.drawString("Undetermined boxes", legendLeft + 90, legendTop + 235);
+
+        g2.setColor(unsatColor);
+        g2.fillRect(legendLeft + 30, legendTop + 250, 50, 50);
+        g2.setColor(new Color(0,0,0));
+        g2.drawRect(legendLeft + 30, legendTop + 250, 50, 50);
+        g2.drawString("UNSAT boxes", legendLeft + 90, legendTop + 285);
+
     }
 
 }

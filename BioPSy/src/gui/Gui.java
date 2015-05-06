@@ -3,6 +3,8 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -79,6 +81,16 @@ public class Gui implements ActionListener {
 		// Create the frame
 		gui = new JFrame("BioPSy");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gui.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
+                int pid = AdvancedOptionsModel.getParsynPID();
+                if((pid != -1) && (!isStopped)) {
+                    killParSyn(pid);
+                }
+            }
+        });
 
 		sbml = new JTextField(30);
 		sbmlLabel = new JLabel("SBML File:");
@@ -396,50 +408,9 @@ public class Gui implements ActionListener {
             browseSeries.setEnabled(true);
         } else if (e.getSource() == stopButton) {
             // Kill ParSyn process and children
-            try {
-
-                String termCode = "#!/bin/bash\n" +
-                        "function get_children {\n" +
-                        "\tclist=`pgrep -P $1`\n" +
-                        "\tplist+=($1)\n" +
-                        "\tif [ -n \"$clist\" ]\n" +
-                        "\tthen\n" +
-                        "\t\tfor p in $clist\n" +
-                        "\t\tdo\n" +
-                        "\t\t\tget_children $p\t\t\t\t\n" +
-                        "\t\tdone\t\n" +
-                        "\tfi\t\n" +
-                        "}\n" +
-                        "\n" +
-                        "get_children $1\n" +
-                        "\n" +
-                        "for ((i=${#plist[@]}-1;i>=0;i--));\n" +
-                        "do\n" +
-                        "\tkill -9 ${plist[i]}\n" +
-                        "done";
-
-                String termFilename = "terminate.sh";
-
-                PrintWriter termWriter = new PrintWriter(termFilename, "UTF-8");
-                termWriter.print(termCode);
-                termWriter.close();
-
-                Runtime exec = Runtime.getRuntime();
-                String killCall = "/bin/bash " + termFilename + " " + AdvancedOptionsModel.getParsynPID();
-                Process kill = exec.exec(killCall);
-
-                Thread.sleep(1000);
-
-                (new File (termFilename)).delete();
-
-                isStopped = true;
-                stopButton.setEnabled(false);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-
+            killParSyn(AdvancedOptionsModel.getParsynPID());
+            isStopped = true;
+            stopButton.setEnabled(false);
         } else if (e.getSource() == run) {
 			try {
 				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
@@ -587,4 +558,46 @@ public class Gui implements ActionListener {
             }
         }
 	}
+
+    public void killParSyn(int pid) {
+
+        try {
+        String termCode = "#!/bin/bash\n" +
+                "function get_children {\n" +
+                "\tclist=`pgrep -P $1`\n" +
+                "\tplist+=($1)\n" +
+                "\tif [ -n \"$clist\" ]\n" +
+                "\tthen\n" +
+                "\t\tfor p in $clist\n" +
+                "\t\tdo\n" +
+                "\t\t\tget_children $p\t\t\t\t\n" +
+                "\t\tdone\t\n" +
+                "\tfi\t\n" +
+                "}\n" +
+                "\n" +
+                "get_children $1\n" +
+                "\n" +
+                "for ((i=${#plist[@]}-1;i>=0;i--));\n" +
+                "do\n" +
+                "\tkill -9 ${plist[i]}\n" +
+                "done";
+
+            String termFilename = "terminate.sh";
+
+            PrintWriter termWriter = null;
+            termWriter = new PrintWriter(termFilename, "UTF-8");
+            termWriter.print(termCode);
+            termWriter.close();
+
+            Runtime exec = Runtime.getRuntime();
+            String killCall = "/bin/bash " + termFilename + " " + pid;
+            Process kill = exec.exec(killCall);
+            Thread.sleep(1000);
+            (new File (termFilename)).delete();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

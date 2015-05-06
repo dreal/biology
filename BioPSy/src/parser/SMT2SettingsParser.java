@@ -204,6 +204,7 @@ public class SMT2SettingsParser {
                                 double leftValue = settings.getTrace().getValue(traceVariable,
                                         timePoint);
                                 double rightValue = leftValue;
+                                /*
                                 if (i == 0) {
                                     if (leftValue == 0) {
                                         leftValue -= 0.0001;
@@ -213,6 +214,11 @@ public class SMT2SettingsParser {
                                         rightValue += (rightValue * 0.00001);
                                     }
                                 } else {
+                                    leftValue -= settings.getNoise();
+                                    rightValue += settings.getNoise();
+                                }
+                                */
+                                if (i != 0) {
                                     leftValue -= settings.getNoise();
                                     rightValue += settings.getNoise();
                                 }
