@@ -42,23 +42,26 @@ import util.Box;
 import util.Utility.Tuple;
 
 public class Gui implements ActionListener {
-	private JFrame gui;
 
-    private JTextArea logTextArea, timeSeriesTextArea, sbmlTextArea;
+    private TimeSeriesPanel timeSeriesPanel;
+
+    private JFrame gui;
+
+    private JTextArea logTextArea, sbmlTextArea;
 
     private BoxTable boxTable;
 
     private Box domain;
 
-	private JTextField sbml, series, noise;
+	private JTextField sbml, series;
 
 	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton, okButton;
 
-	private JScrollPane paramsScroll, speciesScroll, outputScroll, timeSeriesScroll, sbmlScroll, logScroll, graphOutputScroll;
+	private JScrollPane paramsScroll, speciesScroll, outputScroll, sbmlScroll, logScroll, graphOutputScroll;
 
     private PlotPanel plotPanel2D;
 
-	private JLabel sbmlLabel, seriesLabel, noiseLabel;
+	private JLabel sbmlLabel, seriesLabel;
 
 	private JFileChooser fc;
 
@@ -102,9 +105,6 @@ public class Gui implements ActionListener {
 		browseSeries = new JButton("Browse");
 		browseSeries.addActionListener(this);
 
-		noise = new JTextField("0.1", 10);
-		noiseLabel = new JLabel("Noise:");
-
 		//generateSMT2 = new JButton("Generate SMT2");
 		//generateSMT2.addActionListener(this);
 
@@ -129,7 +129,7 @@ public class Gui implements ActionListener {
         stopButton.setVisible(false);
 
 		// Create panels for the inputs and buttons
-		JPanel topPanel = new JPanel(new GridLayout(3, 3));
+		JPanel topPanel = new JPanel(new GridLayout(2, 3));
 		paramsPanel = new JPanel();
 		speciesPanel = new JPanel();
 		JPanel bottomPanel = new JPanel(new GridLayout(1, 2));
@@ -150,48 +150,44 @@ public class Gui implements ActionListener {
         sbmlTextArea.setEditable(false);
 
         // Create text area for time series
-        timeSeriesTextArea = new JTextArea();
-        timeSeriesTextArea.setEditable(false);
+        //timeSeriesTextArea = new JTextArea();
+        //timeSeriesTextArea.setEditable(false);
+        timeSeriesPanel = new TimeSeriesPanel();
 
         paramsScroll = new JScrollPane();
-        paramsScroll.setMinimumSize(new Dimension(600, 400));
-        paramsScroll.setPreferredSize(new Dimension(600, 400));
+        paramsScroll.setMinimumSize(new Dimension(600, 600));
+        paramsScroll.setPreferredSize(new Dimension(600, 600));
 
         speciesScroll = new JScrollPane();
-        speciesScroll.setMinimumSize(new Dimension(600, 400));
-        speciesScroll.setPreferredSize(new Dimension(600, 400));
+        speciesScroll.setMinimumSize(new Dimension(600, 600));
+        speciesScroll.setPreferredSize(new Dimension(600, 600));
 
         logScroll = new JScrollPane();
-        logScroll.setMinimumSize(new Dimension(600, 400));
-        logScroll.setPreferredSize(new Dimension(600, 400));
+        logScroll.setMinimumSize(new Dimension(600, 600));
+        logScroll.setPreferredSize(new Dimension(600, 600));
 
         outputScroll = new JScrollPane();
-        outputScroll.setMinimumSize(new Dimension(600, 400));
-        outputScroll.setPreferredSize(new Dimension(600, 400));
+        outputScroll.setMinimumSize(new Dimension(600, 600));
+        outputScroll.setPreferredSize(new Dimension(600, 600));
 
         sbmlScroll = new JScrollPane();
-        sbmlScroll.setMinimumSize(new Dimension(600, 400));
-        sbmlScroll.setPreferredSize(new Dimension(600, 400));
-
-        timeSeriesScroll = new JScrollPane();
-        timeSeriesScroll.setMinimumSize(new Dimension(600, 400));
-        timeSeriesScroll.setPreferredSize(new Dimension(600, 400));
+        sbmlScroll.setMinimumSize(new Dimension(600, 600));
+        sbmlScroll.setPreferredSize(new Dimension(600, 600));
 
         graphOutputScroll = new JScrollPane();
-        graphOutputScroll.setMinimumSize(new Dimension(600, 400));
-        graphOutputScroll.setPreferredSize(new Dimension(600, 400));
+        graphOutputScroll.setMinimumSize(new Dimension(600, 600));
+        graphOutputScroll.setPreferredSize(new Dimension(600, 600));
 
         logScroll.setViewportView(logTextArea);
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
         sbmlScroll.setViewportView(sbmlTextArea);
-        timeSeriesScroll.setViewportView(timeSeriesTextArea);
         boxTable = new BoxTable();
         outputScroll.setViewportView(boxTable);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("SBML", sbmlScroll);
-        tabbedPane.addTab("Time series", timeSeriesScroll);
+        tabbedPane.addTab("Time series", timeSeriesPanel);
         tabbedPane.addTab("Parameters", paramsScroll);
 		tabbedPane.addTab("Variables", speciesScroll);
         tabbedPane.addTab("Log", logScroll);
@@ -199,15 +195,13 @@ public class Gui implements ActionListener {
         tabbedPane.addTab("Plot(2D only)", graphOutputScroll);
         tabbedPane.setEnabledAt(6, false);
 
+
         topPanel.add(sbmlLabel);
         topPanel.add(sbml);
         topPanel.add(browseSBML);
         topPanel.add(seriesLabel);
         topPanel.add(series);
         topPanel.add(browseSeries);
-        topPanel.add(noiseLabel);
-        topPanel.add(noise);
-        topPanel.add(new JLabel());
 
         progressBar = new JProgressBar();
         progressBar.setMaximum(100);
@@ -335,14 +329,16 @@ public class Gui implements ActionListener {
 					}
 					paramsPanel.revalidate();
 					speciesPanel.removeAll();
-					speciesPanel.setLayout(new GridLayout(vars.size() + 1, 3));
+					speciesPanel.setLayout(new GridLayout(vars.size() + 1, 4));
 					speciesPanel.add(new JLabel("Name"));
 					speciesPanel.add(new JLabel("Lower Bound"));
 					speciesPanel.add(new JLabel("Upper Bound"));
+                    speciesPanel.add(new JLabel("Noise"));
 					for (String s : vars) {
 						speciesPanel.add(new JLabel(s));
 						speciesPanel.add(new JTextField("0"));
 						speciesPanel.add(new JTextField("1"));
+                        speciesPanel.add(new JTextField("0.1"));
 					}
 					speciesPanel.revalidate();
 
@@ -352,8 +348,16 @@ public class Gui implements ActionListener {
                     logTextArea.append("Application: loaded SBML model " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
 				} catch (XMLStreamException e1) {
 					// TODO Auto-generated catch block
+                    JOptionPane.showMessageDialog(gui,
+                            "Error occurred while parsing the model file.",
+                                "SBML parser",
+                                    JOptionPane.ERROR_MESSAGE);
 					e1.printStackTrace();
 				} catch (IOException e1) {
+                    JOptionPane.showMessageDialog(gui,
+                            "Error occurred while parsing the model file.",
+                                "SBML parser",
+                                    JOptionPane.ERROR_MESSAGE);
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -367,14 +371,39 @@ public class Gui implements ActionListener {
 				series.setText(fc.getSelectedFile().getAbsolutePath());
                 // Output time series to text area
                 try {
-                    tabbedPane.setSelectedIndex(1);
-                    timeSeriesTextArea.read(new FileReader(series.getText()), null);
-                    logTextArea.append("Application: loaded time series " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
+                    Trace trace = TraceParser.parseCopasiOutput(new File(series.getText().trim()));
+                    timeSeriesPanel.updateTimeSeriesTable(trace);
+                    if (trace == null) {
+                        JOptionPane.showMessageDialog(gui,
+                                "Error occurred while parsing time series data.",
+                                "Time series parser",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
+                            double varMin = trace.getMinForVar(((JLabel) speciesPanel.getComponent(i)).getText());
+                            double varMax = trace.getMaxForVar(((JLabel) speciesPanel.getComponent(i)).getText());
+                            double interval = varMax - varMin;
+                            if (interval != 0) {
+                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(varMin - 0.5 * interval));
+                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(varMax + 0.5 * interval));
+                            } else {
+                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(0.5 * varMin));
+                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(1.5 * varMax));
+                            }
+                        }
+                        tabbedPane.setSelectedIndex(1);
+                        //timeSeriesTextArea.read(new FileReader(series.getText()), null);
+                        logTextArea.append("Application: loaded time series " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
+                    }
                 } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(gui,
+                            "Error occurred while parsing time series data.",
+                            "Time series parser",
+                            JOptionPane.ERROR_MESSAGE);
                     e1.printStackTrace();
                 }
             }
-		} else if (e.getSource() == generateSMT2) {
+        }/* else if (e.getSource() == generateSMT2) {
 			try {
 				List<String> params = new ArrayList<String>();
 				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
@@ -396,7 +425,7 @@ public class Gui implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		} else if (e.getSource() == advancedOptionsButton) {
+		}*/ else if (e.getSource() == advancedOptionsButton) {
             new AdvancedOptionsDialog(gui, "Advanced Options");
         } else if (e.getSource() == okButton) {
             isStopped = false;
@@ -433,7 +462,8 @@ public class Gui implements ActionListener {
 				}
 				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml
 						.getText().trim())), params);
-				for (int i = 3; i < speciesPanel.getComponentCount(); i += 3) {
+                List<Double> noise = new ArrayList<Double>();
+				for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
 					variables.put(
                             ((JLabel) speciesPanel.getComponent(i)).getText(),
                             new Tuple<Double, Double>(Double
@@ -447,19 +477,19 @@ public class Gui implements ActionListener {
 							((JLabel) speciesPanel.getComponent(i)).getText(),
 							model.getODE(((JLabel) speciesPanel.getComponent(i))
 									.getText()));
+                    noise.add(Double.parseDouble(((JTextField) speciesPanel
+                                .getComponent(i + 3)).getText().trim()));
 				}
 				SMT2SettingsParser.writeSettingsToFile(
 						"model.xml",
 						new SMT2Settings(variables, "t", odes, TraceParser
 								.parseCopasiOutput(new File(series.getText()
-										.trim())), Double.parseDouble(noise
-								.getText().trim())));
+										.trim())), noise));
 
                 // creating a table
                 boxTable.setDomain(domain);
 
                 if(domain.getIntervals().size() == 2) {
-
                     tabbedPane.setEnabledAt(6, true);
                     plotPanel2D = new PlotPanel(domain);
                     graphOutputScroll.setViewportView(plotPanel2D);

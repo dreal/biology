@@ -51,6 +51,4 @@ public class BoxTable extends JTable {
         }
         setModel(new DefaultTableModel(data, colNames));
     }
-
-
 }

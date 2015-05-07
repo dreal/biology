@@ -1,5 +1,6 @@
 package util;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Trace {
@@ -39,7 +40,7 @@ public class Trace {
 	}
 	
 	public double getValue(String variable, double timePoint) {
-		for (int i = 0; i < timePoints.length; i ++) {
+		for (int i = 0; i < timePoints.length; i++) {
 			if (timePoints[i] == timePoint) {
 				for (int j = 0; j < variables.length; j ++) {
 					if (variables[j].equals(variable)) {
@@ -53,18 +54,59 @@ public class Trace {
 
 	public double[] getValues(String variable) {
 		int var = -1;
-		for (int i = 0; i < variables.length; i ++) {
+		for (int i = 0; i < variables.length; i++) {
 			if (variables[i].equals(variable)) {
 				var = i;
 				break;
 			}
 		}
 		double[] values = new double[data[var].length];
-		for (int i = 0; i < data[var].length; i ++) {
+		for (int i = 0; i < data[var].length; i++) {
 			values[i] = data[var][i];
 		}
 		return values;
 	}
+
+    private int getIndexOf(String var) {
+        int index = -1;
+        for(int i = 0; i < variables.length; i++) {
+            //System.out.println("In Trace: " + variables[i] + " comparing to " + var);
+            if(variables[i].equals(var)) {
+                //System.out.println("Equal: " + var);
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public Double getMaxForVar(String var) {
+        int index = getIndexOf(var);
+        if(index == -1) {
+            return null;
+        }
+        double max = data[index][0];
+        for(int i = 1; i < data[index].length; i++) {
+            if(!Double.isNaN(data[index][i])) {
+                if(data[index][i] > max) max = data[index][i];
+            }
+        }
+        return max;
+    }
+
+    public Double getMinForVar(String var) {
+        int index = getIndexOf(var);
+        if(index == -1) {
+            return null;
+        }
+        double min = data[index][0];
+        for(int i = 1; i < data[index].length; i++) {
+            if(!Double.isNaN(data[index][i])) {
+                if(data[index][i] < min) min = data[index][i];
+            }
+        }
+        return min;
+    }
 	
 	public String toString() {
 		String trace = "((\"time\"";
@@ -82,4 +124,8 @@ public class Trace {
 		trace += ")";
 		return trace;
 	}
+
+    public double[][] getData() {
+        return data;
+    }
 }
