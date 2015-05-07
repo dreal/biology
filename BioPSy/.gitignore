@@ -2,7 +2,7 @@
 .idea/
 out/
 *.iml
-bin/BioPSy.jar
+bin/
 model.xml
 model.xml.output
 BioPSy_output.txt

@@ -3,30 +3,23 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultCaret;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import com.sun.org.apache.xerces.internal.parsers.XMLParser;
 import model.AdvancedOptionsModel;
 import model.ODEModel;
 
@@ -41,9 +34,6 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLReader;
 import org.sbml.jsbml.Species;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 import parser.OutputParser;
 import parser.SMT2SettingsParser;
 import parser.TraceParser;
@@ -52,23 +42,26 @@ import util.Box;
 import util.Utility.Tuple;
 
 public class Gui implements ActionListener {
-	private JFrame gui;
 
-    private JTextArea outTextArea, timeSeriesTextArea, sbmlTextArea;
+    private TimeSeriesPanel timeSeriesPanel;
+
+    private JFrame gui;
+
+    private JTextArea logTextArea, sbmlTextArea;
 
     private BoxTable boxTable;
 
     private Box domain;
 
-	private JTextField sbml, series, noise;
+	private JTextField sbml, series;
 
 	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton, okButton;
 
-	private JScrollPane paramsScroll, speciesScroll, outputScroll, timeSeriesScroll, sbmlScroll, problemScroll, graphOutputScroll;
+	private JScrollPane paramsScroll, speciesScroll, outputScroll, sbmlScroll, logScroll, graphOutputScroll;
 
     private PlotPanel plotPanel2D;
 
-	private JLabel sbmlLabel, seriesLabel, noiseLabel;
+	private JLabel sbmlLabel, seriesLabel;
 
 	private JFileChooser fc;
 
@@ -91,6 +84,16 @@ public class Gui implements ActionListener {
 		// Create the frame
 		gui = new JFrame("BioPSy");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gui.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
+                int pid = AdvancedOptionsModel.getParsynPID();
+                if((pid != -1) && (!isStopped)) {
+                    killParSyn(pid);
+                }
+            }
+        });
 
 		sbml = new JTextField(30);
 		sbmlLabel = new JLabel("SBML File:");
@@ -101,9 +104,6 @@ public class Gui implements ActionListener {
 		seriesLabel = new JLabel("Time Series File:");
 		browseSeries = new JButton("Browse");
 		browseSeries.addActionListener(this);
-
-		noise = new JTextField("0.1", 10);
-		noiseLabel = new JLabel("Noise:");
 
 		//generateSMT2 = new JButton("Generate SMT2");
 		//generateSMT2.addActionListener(this);
@@ -129,7 +129,7 @@ public class Gui implements ActionListener {
         stopButton.setVisible(false);
 
 		// Create panels for the inputs and buttons
-		JPanel topPanel = new JPanel(new GridLayout(3, 3));
+		JPanel topPanel = new JPanel(new GridLayout(2, 3));
 		paramsPanel = new JPanel();
 		speciesPanel = new JPanel();
 		JPanel bottomPanel = new JPanel(new GridLayout(1, 2));
@@ -138,11 +138,11 @@ public class Gui implements ActionListener {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
         // Create text area for program output
-        outTextArea = new JTextArea();
-        outTextArea.setText("Execution problems will be displayed here");
-        outTextArea.setEditable(false);
+        logTextArea = new JTextArea();
+        logTextArea.setText("Application: started " + new Date() + "\n");
+        logTextArea.setEditable(false);
         // Updating the text area
-        DefaultCaret caret = (DefaultCaret) outTextArea.getCaret();
+        DefaultCaret caret = (DefaultCaret) logTextArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // Create text area for SBML file
@@ -150,55 +150,51 @@ public class Gui implements ActionListener {
         sbmlTextArea.setEditable(false);
 
         // Create text area for time series
-        timeSeriesTextArea = new JTextArea();
-        timeSeriesTextArea.setEditable(false);
+        //timeSeriesTextArea = new JTextArea();
+        //timeSeriesTextArea.setEditable(false);
+        timeSeriesPanel = new TimeSeriesPanel();
 
         paramsScroll = new JScrollPane();
-        paramsScroll.setMinimumSize(new Dimension(600, 400));
-        paramsScroll.setPreferredSize(new Dimension(600, 400));
+        paramsScroll.setMinimumSize(new Dimension(600, 600));
+        paramsScroll.setPreferredSize(new Dimension(600, 600));
 
         speciesScroll = new JScrollPane();
-        speciesScroll.setMinimumSize(new Dimension(600, 400));
-        speciesScroll.setPreferredSize(new Dimension(600, 400));
+        speciesScroll.setMinimumSize(new Dimension(600, 600));
+        speciesScroll.setPreferredSize(new Dimension(600, 600));
 
-        problemScroll = new JScrollPane();
-        problemScroll.setMinimumSize(new Dimension(600, 400));
-        problemScroll.setPreferredSize(new Dimension(600, 400));
+        logScroll = new JScrollPane();
+        logScroll.setMinimumSize(new Dimension(600, 600));
+        logScroll.setPreferredSize(new Dimension(600, 600));
 
         outputScroll = new JScrollPane();
-        outputScroll.setMinimumSize(new Dimension(600, 400));
-        outputScroll.setPreferredSize(new Dimension(600, 400));
+        outputScroll.setMinimumSize(new Dimension(600, 600));
+        outputScroll.setPreferredSize(new Dimension(600, 600));
 
         sbmlScroll = new JScrollPane();
-        sbmlScroll.setMinimumSize(new Dimension(600, 400));
-        sbmlScroll.setPreferredSize(new Dimension(600, 400));
-
-        timeSeriesScroll = new JScrollPane();
-        timeSeriesScroll.setMinimumSize(new Dimension(600, 400));
-        timeSeriesScroll.setPreferredSize(new Dimension(600, 400));
+        sbmlScroll.setMinimumSize(new Dimension(600, 600));
+        sbmlScroll.setPreferredSize(new Dimension(600, 600));
 
         graphOutputScroll = new JScrollPane();
-        graphOutputScroll.setMinimumSize(new Dimension(600, 400));
-        graphOutputScroll.setPreferredSize(new Dimension(600, 400));
+        graphOutputScroll.setMinimumSize(new Dimension(600, 600));
+        graphOutputScroll.setPreferredSize(new Dimension(600, 600));
 
-
-        problemScroll.setViewportView(outTextArea);
+        logScroll.setViewportView(logTextArea);
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
         sbmlScroll.setViewportView(sbmlTextArea);
-        timeSeriesScroll.setViewportView(timeSeriesTextArea);
         boxTable = new BoxTable();
         outputScroll.setViewportView(boxTable);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addTab("SBML", sbmlScroll);
-        tabbedPane.addTab("Time series", timeSeriesScroll);
+        tabbedPane.addTab("Time series", timeSeriesPanel);
         tabbedPane.addTab("Parameters", paramsScroll);
 		tabbedPane.addTab("Variables", speciesScroll);
-        tabbedPane.addTab("Problems", problemScroll);
+        tabbedPane.addTab("Log", logScroll);
         tabbedPane.addTab("Output", outputScroll);
         tabbedPane.addTab("Plot(2D only)", graphOutputScroll);
         tabbedPane.setEnabledAt(6, false);
+
 
         topPanel.add(sbmlLabel);
         topPanel.add(sbml);
@@ -206,9 +202,6 @@ public class Gui implements ActionListener {
         topPanel.add(seriesLabel);
         topPanel.add(series);
         topPanel.add(browseSeries);
-        topPanel.add(noiseLabel);
-        topPanel.add(noise);
-        topPanel.add(new JLabel());
 
         progressBar = new JProgressBar();
         progressBar.setMaximum(100);
@@ -336,24 +329,35 @@ public class Gui implements ActionListener {
 					}
 					paramsPanel.revalidate();
 					speciesPanel.removeAll();
-					speciesPanel.setLayout(new GridLayout(vars.size() + 1, 3));
+					speciesPanel.setLayout(new GridLayout(vars.size() + 1, 4));
 					speciesPanel.add(new JLabel("Name"));
 					speciesPanel.add(new JLabel("Lower Bound"));
 					speciesPanel.add(new JLabel("Upper Bound"));
+                    speciesPanel.add(new JLabel("Noise"));
 					for (String s : vars) {
 						speciesPanel.add(new JLabel(s));
 						speciesPanel.add(new JTextField("0"));
 						speciesPanel.add(new JTextField("1"));
+                        speciesPanel.add(new JTextField("0.1"));
 					}
 					speciesPanel.revalidate();
 
                     // Output sbml to text area
                     tabbedPane.setSelectedIndex(0);
                     sbmlTextArea.read(new FileReader(sbml.getText()), null);
+                    logTextArea.append("Application: loaded SBML model " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
 				} catch (XMLStreamException e1) {
 					// TODO Auto-generated catch block
+                    JOptionPane.showMessageDialog(gui,
+                            "Error occurred while parsing the model file.",
+                                "SBML parser",
+                                    JOptionPane.ERROR_MESSAGE);
 					e1.printStackTrace();
 				} catch (IOException e1) {
+                    JOptionPane.showMessageDialog(gui,
+                            "Error occurred while parsing the model file.",
+                                "SBML parser",
+                                    JOptionPane.ERROR_MESSAGE);
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -367,13 +371,39 @@ public class Gui implements ActionListener {
 				series.setText(fc.getSelectedFile().getAbsolutePath());
                 // Output time series to text area
                 try {
-                    tabbedPane.setSelectedIndex(1);
-                    timeSeriesTextArea.read(new FileReader(series.getText()), null);
+                    Trace trace = TraceParser.parseCopasiOutput(new File(series.getText().trim()));
+                    timeSeriesPanel.updateTimeSeriesTable(trace);
+                    if (trace == null) {
+                        JOptionPane.showMessageDialog(gui,
+                                "Error occurred while parsing time series data.",
+                                "Time series parser",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
+                            double varMin = trace.getMinForVar(((JLabel) speciesPanel.getComponent(i)).getText());
+                            double varMax = trace.getMaxForVar(((JLabel) speciesPanel.getComponent(i)).getText());
+                            double interval = varMax - varMin;
+                            if (interval != 0) {
+                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(varMin - 0.5 * interval));
+                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(varMax + 0.5 * interval));
+                            } else {
+                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(0.5 * varMin));
+                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(1.5 * varMax));
+                            }
+                        }
+                        tabbedPane.setSelectedIndex(1);
+                        //timeSeriesTextArea.read(new FileReader(series.getText()), null);
+                        logTextArea.append("Application: loaded time series " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
+                    }
                 } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(gui,
+                            "Error occurred while parsing time series data.",
+                            "Time series parser",
+                            JOptionPane.ERROR_MESSAGE);
                     e1.printStackTrace();
                 }
             }
-		} else if (e.getSource() == generateSMT2) {
+        }/* else if (e.getSource() == generateSMT2) {
 			try {
 				List<String> params = new ArrayList<String>();
 				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
@@ -395,7 +425,7 @@ public class Gui implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		} else if (e.getSource() == advancedOptionsButton) {
+		}*/ else if (e.getSource() == advancedOptionsButton) {
             new AdvancedOptionsDialog(gui, "Advanced Options");
         } else if (e.getSource() == okButton) {
             isStopped = false;
@@ -406,17 +436,10 @@ public class Gui implements ActionListener {
             browseSBML.setEnabled(true);
             browseSeries.setEnabled(true);
         } else if (e.getSource() == stopButton) {
-            // Kill ParSyn process
-            try {
-                Runtime exec = Runtime.getRuntime();
-                String killCall = "pkill -9 -P " + AdvancedOptionsModel.getParsynPID();
-                Process kill = exec.exec(killCall);
-                isStopped = true;
-                stopButton.setEnabled(false);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
+            // Kill ParSyn process and children
+            killParSyn(AdvancedOptionsModel.getParsynPID());
+            isStopped = true;
+            stopButton.setEnabled(false);
         } else if (e.getSource() == run) {
 			try {
 				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
@@ -439,7 +462,8 @@ public class Gui implements ActionListener {
 				}
 				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml
 						.getText().trim())), params);
-				for (int i = 3; i < speciesPanel.getComponentCount(); i += 3) {
+                List<Double> noise = new ArrayList<Double>();
+				for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
 					variables.put(
                             ((JLabel) speciesPanel.getComponent(i)).getText(),
                             new Tuple<Double, Double>(Double
@@ -453,19 +477,19 @@ public class Gui implements ActionListener {
 							((JLabel) speciesPanel.getComponent(i)).getText(),
 							model.getODE(((JLabel) speciesPanel.getComponent(i))
 									.getText()));
+                    noise.add(Double.parseDouble(((JTextField) speciesPanel
+                                .getComponent(i + 3)).getText().trim()));
 				}
 				SMT2SettingsParser.writeSettingsToFile(
 						"model.xml",
 						new SMT2Settings(variables, "t", odes, TraceParser
 								.parseCopasiOutput(new File(series.getText()
-										.trim())), Double.parseDouble(noise
-								.getText().trim())));
+										.trim())), noise));
 
                 // creating a table
                 boxTable.setDomain(domain);
 
                 if(domain.getIntervals().size() == 2) {
-
                     tabbedPane.setEnabledAt(6, true);
                     plotPanel2D = new PlotPanel(domain);
                     graphOutputScroll.setViewportView(plotPanel2D);
@@ -474,7 +498,7 @@ public class Gui implements ActionListener {
                 }
 
                 // Creating a background worker
-                bgWorker = new BackgroundWorker(outTextArea);
+                bgWorker = new BackgroundWorker(logTextArea);
 
                 // Adding a listener checking the status of background worker
                 bgWorker.addPropertyChangeListener(
@@ -492,6 +516,8 @@ public class Gui implements ActionListener {
                                     advancedOptionsButton.setVisible(false);
                                     stopButton.setVisible(true);
                                     progressBar.setVisible(true);
+                                    logTextArea.append("Execution: started " + new Date() + "\n");
+                                    logTextArea.append("Execution: " + AdvancedOptionsModel.getString() + "\n");
                                 } else if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
                                     run.setEnabled(true);
                                     advancedOptionsButton.setEnabled(true);
@@ -505,6 +531,11 @@ public class Gui implements ActionListener {
                                     okButton.setVisible(true);
                                     stopButton.setVisible(false);
                                     //progressBar.setVisible(false);
+                                    if (isStopped) {
+                                        logTextArea.append("Execution: terminated by the user " + new Date() + "\n");
+                                    } else {
+                                        logTextArea.append("Execution: terminated " + new Date() + "\n");
+                                    }
                                 }
                             }
                         });
@@ -528,32 +559,6 @@ public class Gui implements ActionListener {
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
-
-                            /*
-                            File outputFile = new File("model.xml.output");
-                            if(outputFile.exists()) {
-                                try {
-                                    Thread.sleep(100);
-                                    Document dom = db.parse(outputFile);
-                                    Element root = dom.getDocumentElement();
-                                    double progress = Double.parseDouble(root.getAttribute("progress"));
-                                    progressBar.setValue((int) (progress * 100));
-                                    //System.out.println("Progress: " + (progress * 100));
-                                    FileReader reader = new FileReader(outputFile);
-                                    outTextArea.read(reader, null);
-                                    reader.close();
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                } catch (InterruptedException e1) {
-                                    e1.printStackTrace();
-                                } catch (SAXException e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
-                            */
-                        }
-                        if (isStopped) {
-                            outTextArea.append("\nComputation was stopped by the user\n");
                         }
                     }
 
@@ -583,4 +588,46 @@ public class Gui implements ActionListener {
             }
         }
 	}
+
+    public void killParSyn(int pid) {
+
+        try {
+        String termCode = "#!/bin/bash\n" +
+                "function get_children {\n" +
+                "\tclist=`pgrep -P $1`\n" +
+                "\tplist+=($1)\n" +
+                "\tif [ -n \"$clist\" ]\n" +
+                "\tthen\n" +
+                "\t\tfor p in $clist\n" +
+                "\t\tdo\n" +
+                "\t\t\tget_children $p\t\t\t\t\n" +
+                "\t\tdone\t\n" +
+                "\tfi\t\n" +
+                "}\n" +
+                "\n" +
+                "get_children $1\n" +
+                "\n" +
+                "for ((i=${#plist[@]}-1;i>=0;i--));\n" +
+                "do\n" +
+                "\tkill -9 ${plist[i]}\n" +
+                "done";
+
+            String termFilename = "terminate.sh";
+
+            PrintWriter termWriter = null;
+            termWriter = new PrintWriter(termFilename, "UTF-8");
+            termWriter.print(termCode);
+            termWriter.close();
+
+            Runtime exec = Runtime.getRuntime();
+            String killCall = "/bin/bash " + termFilename + " " + pid;
+            Process kill = exec.exec(killCall);
+            Thread.sleep(1000);
+            (new File (termFilename)).delete();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

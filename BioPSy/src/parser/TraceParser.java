@@ -9,6 +9,8 @@ import java.util.Scanner;
 import model.TimeSeriesModel;
 import util.Trace;
 
+import javax.swing.*;
+
 public class TraceParser {
 	
 	public static Trace parseCopasiOutput(File file) throws IOException {
@@ -45,7 +47,6 @@ public class TraceParser {
                     data.get(i - 1).add(new Double(Double.NaN));
                 }
             }
-
 		}
 		scanner.close();
 		return new Trace(variables, timePoints, data);

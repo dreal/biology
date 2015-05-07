@@ -3,20 +3,18 @@ package util;
 import model.AdvancedOptionsModel;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.EventListener;
 
 /**
  * Created by fedor on 23/03/15.
  */
 public class BackgroundWorker extends SwingWorker<Integer, Void> {
 
-    private static JTextArea outTextArea;
+    private static JTextArea logTextArea;
 
-    public BackgroundWorker(JTextArea outTextArea) {
-        this.outTextArea = outTextArea;
+    public BackgroundWorker(JTextArea logTextArea) {
+        this.logTextArea = logTextArea;
     }
 
     @Override
@@ -43,37 +41,34 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
 
         try {
 
-            /*
-            InputStream par = parsyn.getInputStream();
-            InputStreamReader isr = new InputStreamReader(par);
-            BufferedReader br = new BufferedReader(isr);
+            InputStream cout = parsyn.getInputStream();
+            BufferedReader coutReader = new BufferedReader(new InputStreamReader(cout));
 
             String line;
-            outTextArea.setText("");
-            while ((line = br.readLine()) != null) {
-                outTextArea.append(line + "\n");
+            String message = "";
+            while ((line = coutReader.readLine()) != null) {
+                message += line + "\n";
+            }
+            if(!message.isEmpty()) {
+                logTextArea.append("Message: " + message);
             }
 
-            File outputFile = new File("model.xml.output");
-            if(outputFile.exists()) {
-                outTextArea.read(new FileReader(outputFile), null);
+            InputStream cerr = parsyn.getErrorStream();
+            BufferedReader cerrReader = new BufferedReader(new InputStreamReader(cout));
+            line = "";
+            message = "";
+            while ((line = coutReader.readLine()) != null) {
+                message += line + "\n";
             }
-            */
+            if(!message.isEmpty()) {
+                logTextArea.append("Message: " + message);
+            }
 
-            String error = "";
-            InputStream par2 = parsyn.getErrorStream();
-            int read = par2.read();
-            while (read != -1) {
-                error += (char) read;
-                read = par2.read();
-            }
-            if (error != "") {
-                outTextArea.append("Error message: " + error + "\n");
-            }
-            //br.close();
-            //isr.close();
-            //par.close();
-            par2.close();
+            cout.close();
+            coutReader.close();
+            cerr.close();
+            cerrReader.close();
+
         } catch (Exception e1) {
             e1.printStackTrace();
         }

@@ -32,6 +32,7 @@ import util.Utility.Tuple;
 
 public class SMT2SettingsParser {
 
+    /*
 	public static SMT2Settings parseSettingsFile(String filename) throws DOMException, Exception {
 		Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
 		String time = "";
@@ -40,7 +41,7 @@ public class SMT2SettingsParser {
 		double epsilon = 0.00005;
 		double delta = 0.001;
 		double noise = 0.01;
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document doc = db.parse(new File(filename));
 		Element settings = (Element) doc.getElementsByTagName("data").item(0);
@@ -126,6 +127,7 @@ public class SMT2SettingsParser {
 		}
 		return new SMT2Settings(variables, time, odes, trace, noise);
 	}
+	*/
 
 	public static void writeSettingsToFile(String filename, SMT2Settings settings)
 			throws ParserConfigurationException, TransformerFactoryConfigurationError,
@@ -195,7 +197,10 @@ public class SMT2SettingsParser {
 			Element point = doc.createElement("point");
 			point.setAttribute("time", "" + timePoint);
 			for (String variable : variables) {
+                int j = 0;
 				for (String traceVariable : settings.getTrace().getVariables()) {
+                    double noise = settings.getNoise().get(j);
+                    j++;
 					if (variable.equals(traceVariable)) {
 						if (settings.getODEVariables().contains(traceVariable)) {
                             if(!Double.isNaN(settings.getTrace().getValue(traceVariable, timePoint))) {
@@ -204,6 +209,7 @@ public class SMT2SettingsParser {
                                 double leftValue = settings.getTrace().getValue(traceVariable,
                                         timePoint);
                                 double rightValue = leftValue;
+                                /*
                                 if (i == 0) {
                                     if (leftValue == 0) {
                                         leftValue -= 0.0001;
@@ -215,6 +221,11 @@ public class SMT2SettingsParser {
                                 } else {
                                     leftValue -= settings.getNoise();
                                     rightValue += settings.getNoise();
+                                }
+                                */
+                                if (i != 0) {
+                                    leftValue -= noise;
+                                    rightValue += noise;
                                 }
                                 Element left = doc.createElement("left");
                                 left.setTextContent("" + leftValue);

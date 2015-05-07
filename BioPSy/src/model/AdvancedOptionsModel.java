@@ -56,4 +56,8 @@ public class AdvancedOptionsModel {
     public static void setParsynOptions(String parsynOptions) {
         AdvancedOptionsModel.parsynOptions = parsynOptions;
     }
+
+    public static String getString() {
+        return "bin: " + drealBinPath + " arg: " + drealOptions + " bin: " + parsynBinPath + " arg: " + parsynOptions;
+    }
 }

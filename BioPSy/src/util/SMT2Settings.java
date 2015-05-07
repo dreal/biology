@@ -1,8 +1,6 @@
 package util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.sbml.jsbml.ASTNode;
 
@@ -18,17 +16,20 @@ public class SMT2Settings {
 	
 	private Trace trace; // The time series data
 	
-	private double noise; // Parameters
+	private List<Double> noise; // Parameters
 	
 	public SMT2Settings() {
 		variables = new HashMap<String, Tuple<Double, Double>>();
 		time = "";
 		odes = new HashMap<String, ASTNode>();
 		trace = null;
-		noise = 0.1;
+        noise = new ArrayList<Double>();
+        for(int i = 0; i < variables.size(); i++) {
+            noise.add(0.1);
+        }
 	}
 	
-	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, double noise) {
+	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, List<Double> noise) {
 		this.variables = variables;
 		this.time = time;
 		this.odes = odes;
@@ -81,11 +82,11 @@ public class SMT2Settings {
 		this.trace = trace;
 	}
 	
-	public double getNoise() {
+	public List<Double> getNoise() {
 		return noise;
 	}
 	
-	public void setNoise(double noise) {
+	public void setNoise(List<Double> noise) {
 		this.noise = noise;
 	}
 }
