@@ -508,16 +508,17 @@ public class Gui implements ActionListener {
                                     tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
                                     run.setEnabled(false);
                                     advancedOptionsButton.setEnabled(false);
-                                    stopButton.setEnabled(true);
+                                    //stopButton.setEnabled(true);
                                     browseSBML.setEnabled(false);
                                     browseSeries.setEnabled(false);
                                     // Setting visibility
                                     run.setVisible(false);
                                     advancedOptionsButton.setVisible(false);
-                                    stopButton.setVisible(true);
                                     progressBar.setVisible(true);
+                                    stopButton.setVisible(true);
                                     logTextArea.append("Execution: started " + new Date() + "\n");
                                     logTextArea.append("Execution: " + AdvancedOptionsModel.getString() + "\n");
+                                    stopButton.setEnabled(true);
                                 } else if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
                                     run.setEnabled(true);
                                     advancedOptionsButton.setEnabled(true);
@@ -592,7 +593,8 @@ public class Gui implements ActionListener {
     public void killParSyn(int pid) {
 
         try {
-        String termCode = "#!/bin/bash\n" +
+        /*
+            String termCode = "#!/bin/bash\n" +
                 "function get_children {\n" +
                 "\tclist=`pgrep -P $1`\n" +
                 "\tplist+=($1)\n" +
@@ -611,6 +613,33 @@ public class Gui implements ActionListener {
                 "do\n" +
                 "\tkill -9 ${plist[i]}\n" +
                 "done";
+            */
+
+            String termCode = "#!/bin/bash\n" +
+                    "function get_children {\n" +
+                    "clist=`pgrep -P $1`\n" +
+                    "plist=\"$plist $1\"\n" +
+                    "if [ -n \"$clist\" ]\n" +
+                    "then\n" +
+                    "    for c in $clist\n" +
+                    "    do\n" +
+                    "        get_children $c\n" +
+                    "    done\n" +
+                    "fi\n" +
+                    "}\n" +
+                    "\n" +
+                    "fclist=`pgrep -P $1`\n" +
+                    "plist=\"$plist $fclist\"\n" +
+                    "kill -9 $1\n" +
+                    "for fc in $fclist\n" +
+                    "do\n" +
+                    "    get_children $fc\n" +
+                    "done\n" +
+                    "\n" +
+                    "for p in $plist\n" +
+                    "do\n" +
+                    "    kill -9 $p\n" +
+                    "done\n";
 
             String termFilename = "terminate.sh";
 
@@ -624,9 +653,9 @@ public class Gui implements ActionListener {
             Process kill = exec.exec(killCall);
             Thread.sleep(1000);
             (new File (termFilename)).delete();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
