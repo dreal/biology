@@ -15,23 +15,23 @@ public class SMT2Settings {
 	private Map<String, ASTNode> odes; // A mapping of variables to differential equations
 	
 	private Trace trace; // The time series data
-	
-	private List<Double> noise; // Parameters
 
-    private List<Double> epsilon;
+    private Map<String, Double> noise; // Parameters
+
+    private Map<String,Double> epsilon;
 	
 	public SMT2Settings() {
 		variables = new HashMap<String, Tuple<Double, Double>>();
 		time = "";
 		odes = new HashMap<String, ASTNode>();
 		trace = null;
-        noise = new ArrayList<Double>();
-        for(int i = 0; i < variables.size(); i++) {
-            noise.add(0.1);
-        }
+        //noise = new ArrayList<Double>();
+        //for(int i = 0; i < variables.size(); i++) {
+        //    noise.add(0.1);
+        //}
 	}
 	
-	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, List<Double> noise, List<Double> epsilon) {
+	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, Map<String,Double> noise, Map<String,Double> epsilon) {
 		this.variables = variables;
 		this.time = time;
 		this.odes = odes;
@@ -84,20 +84,21 @@ public class SMT2Settings {
 	public void setTrace(Trace trace) {
 		this.trace = trace;
 	}
-	
-	public List<Double> getNoise() {
-		return noise;
-	}
-	
-	public void setNoise(List<Double> noise) {
-		this.noise = noise;
-	}
 
-    public List<Double> getEpsilon() {
+    public Map<String, Double> getNoise() {
+        return noise;
+    }
+
+    public void setNoise(Map<String, Double> noise) {
+        this.noise = noise;
+    }
+
+    public Map<String, Double> getEpsilon() {
         return epsilon;
     }
 
-    public void setEpsilon(List<Double> epsilon) {
+    public void setEpsilon(Map<String, Double> epsilon) {
         this.epsilon = epsilon;
     }
+
 }
