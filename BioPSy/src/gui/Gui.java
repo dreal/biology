@@ -316,16 +316,18 @@ public class Gui implements ActionListener {
 					Collections.sort(vars);
 					paramsPanel.removeAll();
 					paramsPanel.setLayout(new GridLayout(params.size() + 1,
-							4));
+							5));
 					paramsPanel.add(new JLabel("Synthesize"));
 					paramsPanel.add(new JLabel("Name"));
 					paramsPanel.add(new JLabel("Lower Bound"));
 					paramsPanel.add(new JLabel("Upper Bound"));
+                    paramsPanel.add(new JLabel("Precision"));
                     for (String p : params) {
                         paramsPanel.add(new JCheckBox());
 						paramsPanel.add(new JLabel(p));
 						paramsPanel.add(new JTextField(parameters.get(p)));
 						paramsPanel.add(new JTextField(parameters.get(p)));
+                        paramsPanel.add(new JTextField("1e-3"));
 					}
 					paramsPanel.revalidate();
 					speciesPanel.removeAll();
@@ -369,6 +371,7 @@ public class Gui implements ActionListener {
             int returnVal = fc.showOpenDialog(gui);
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				series.setText(fc.getSelectedFile().getAbsolutePath());
+                timeSeriesPanel.setFilename(fc.getSelectedFile().getAbsolutePath());
                 // Output time series to text area
                 try {
                     Trace trace = TraceParser.parseCopasiOutput(new File(series.getText().trim()));
@@ -446,12 +449,14 @@ public class Gui implements ActionListener {
 				Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
 				List<String> params = new ArrayList<String>();
                 domain = new Box(Box.BoxType.DOMAIN);
-				for (int i = 4; i < paramsPanel.getComponentCount(); i += 4) {
+                List<Double> epsilon = new ArrayList<Double>();
+				for (int i = 5; i < paramsPanel.getComponentCount(); i += 5) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
 
                         String paramName = ((JLabel) paramsPanel.getComponent(i + 1)).getText();
                         double paramLeft = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 2)).getText().trim());
                         double paramRight = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 3)).getText().trim());
+                        epsilon.add(Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 4)).getText().trim()));
 
                         domain.addInterval(new Interval(paramLeft, paramRight, paramName));
 
@@ -484,7 +489,7 @@ public class Gui implements ActionListener {
 						"model.xml",
 						new SMT2Settings(variables, "t", odes, TraceParser
 								.parseCopasiOutput(new File(series.getText()
-										.trim())), noise));
+										.trim())), noise, epsilon));
 
                 // creating a table
                 boxTable.setDomain(domain);

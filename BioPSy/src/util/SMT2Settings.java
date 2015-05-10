@@ -17,6 +17,8 @@ public class SMT2Settings {
 	private Trace trace; // The time series data
 	
 	private List<Double> noise; // Parameters
+
+    private List<Double> epsilon;
 	
 	public SMT2Settings() {
 		variables = new HashMap<String, Tuple<Double, Double>>();
@@ -29,12 +31,13 @@ public class SMT2Settings {
         }
 	}
 	
-	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, List<Double> noise) {
+	public SMT2Settings(Map<String, Tuple<Double, Double>> variables, String time, Map<String, ASTNode> odes, Trace trace, List<Double> noise, List<Double> epsilon) {
 		this.variables = variables;
 		this.time = time;
 		this.odes = odes;
 		this.trace = trace;
 		this.noise = noise;
+        this.epsilon = epsilon;
 	}
 		
 	public Set<String> getAllVariables() {
@@ -89,4 +92,12 @@ public class SMT2Settings {
 	public void setNoise(List<Double> noise) {
 		this.noise = noise;
 	}
+
+    public List<Double> getEpsilon() {
+        return epsilon;
+    }
+
+    public void setEpsilon(List<Double> epsilon) {
+        this.epsilon = epsilon;
+    }
 }

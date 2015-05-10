@@ -153,6 +153,7 @@ public class SMT2SettingsParser {
 		Document doc = db.newDocument();
 		Element topLevelElement = doc.createElement("data");
 		Element declaration = doc.createElement("declare");
+        int count = 0;
 		for (String variable : variables) {
 			Element var = doc.createElement("var");
 			if (settings.getODEVariables().contains(variable)) {
@@ -160,6 +161,8 @@ public class SMT2SettingsParser {
 			}
 			else {
 				var.setAttribute("type", "param");
+                var.setAttribute("epsilon", Double.toString(settings.getEpsilon().get(count)));
+                count++;
 			}
 			Element name = doc.createElement("name");
 			name.setTextContent(variable);
