@@ -449,14 +449,14 @@ public class Gui implements ActionListener {
 				Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
 				List<String> params = new ArrayList<String>();
                 domain = new Box(Box.BoxType.DOMAIN);
-                List<Double> epsilon = new ArrayList<Double>();
+                Map<String, Double> epsilon = new HashMap<String, Double>();
 				for (int i = 5; i < paramsPanel.getComponentCount(); i += 5) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
 
                         String paramName = ((JLabel) paramsPanel.getComponent(i + 1)).getText();
                         double paramLeft = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 2)).getText().trim());
                         double paramRight = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 3)).getText().trim());
-                        epsilon.add(Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 4)).getText().trim()));
+                        epsilon.put(paramName, Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 4)).getText().trim()));
 
                         domain.addInterval(new Interval(paramLeft, paramRight, paramName));
 
@@ -467,7 +467,7 @@ public class Gui implements ActionListener {
 				}
 				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml
 						.getText().trim())), params);
-                List<Double> noise = new ArrayList<Double>();
+                Map<String, Double> noise = new HashMap<String, Double>();
 				for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
 					variables.put(
                             ((JLabel) speciesPanel.getComponent(i)).getText(),
@@ -482,8 +482,9 @@ public class Gui implements ActionListener {
 							((JLabel) speciesPanel.getComponent(i)).getText(),
 							model.getODE(((JLabel) speciesPanel.getComponent(i))
 									.getText()));
-                    noise.add(Double.parseDouble(((JTextField) speciesPanel
-                                .getComponent(i + 3)).getText().trim()));
+                    noise.put(((JLabel) speciesPanel.getComponent(i)).getText(),
+                                Double.parseDouble(((JTextField) speciesPanel
+                                    .getComponent(i + 3)).getText().trim()));
 				}
 				SMT2SettingsParser.writeSettingsToFile(
 						"model.xml",

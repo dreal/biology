@@ -153,7 +153,6 @@ public class SMT2SettingsParser {
 		Document doc = db.newDocument();
 		Element topLevelElement = doc.createElement("data");
 		Element declaration = doc.createElement("declare");
-        int count = 0;
 		for (String variable : variables) {
 			Element var = doc.createElement("var");
 			if (settings.getODEVariables().contains(variable)) {
@@ -161,8 +160,7 @@ public class SMT2SettingsParser {
 			}
 			else {
 				var.setAttribute("type", "param");
-                var.setAttribute("epsilon", Double.toString(settings.getEpsilon().get(count)));
-                count++;
+                var.setAttribute("epsilon", Double.toString(settings.getEpsilon().get(variable)));
 			}
 			Element name = doc.createElement("name");
 			name.setTextContent(variable);
@@ -200,13 +198,11 @@ public class SMT2SettingsParser {
 			Element point = doc.createElement("point");
 			point.setAttribute("time", "" + timePoint);
 			for (String variable : variables) {
-                int j = 0;
 				for (String traceVariable : settings.getTrace().getVariables()) {
-                    double noise = settings.getNoise().get(j);
-                    j++;
-					if (variable.equals(traceVariable)) {
+                    if (variable.equals(traceVariable)) {
 						if (settings.getODEVariables().contains(traceVariable)) {
                             if(!Double.isNaN(settings.getTrace().getValue(traceVariable, timePoint))) {
+                                double noise = settings.getNoise().get(traceVariable);
                                 Element interval = doc.createElement("interval");
                                 interval.setAttribute("var", traceVariable);
                                 double leftValue = settings.getTrace().getValue(traceVariable,
