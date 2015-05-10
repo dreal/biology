@@ -13,7 +13,7 @@ public class AdvancedOptionsModel {
 
     private static String parsynBinPath = "./ParSyn";
 
-    private static String parsynOptions = "-e 1e-3";
+    private static String parsynOptions = "";
 
     private static int parsynPID = -1;
 

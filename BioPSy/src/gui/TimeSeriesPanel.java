@@ -4,15 +4,17 @@ import parser.TraceParser;
 import util.Trace;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
 import java.util.Date;
 
 /**
@@ -21,29 +23,37 @@ import java.util.Date;
 public class TimeSeriesPanel extends JPanel implements ActionListener {
 
     private JTable table;
-    private JButton saveButton, loadButton;
-    private JTextField series;
+    private JButton saveButton, saveAsButton;
     private boolean isLoaded = false;
     private boolean isEdited = false;
+    private String filename;
 
     public TimeSeriesPanel() {
         super();
         setLayout(new BorderLayout());
         table = new JTable(new DefaultTableModel());
         add(new JScrollPane(table), BorderLayout.CENTER);
-        /*
         JPanel bottomPanel = new JPanel();
-        loadButton = new JButton("Load");
-        loadButton.addActionListener(this);
         saveButton = new JButton("Save");
         saveButton.addActionListener(this);
+        saveButton.setVisible(false);
         saveButton.setEnabled(false);
-        series = new JTextField(20);
-        bottomPanel.add(loadButton);
-        bottomPanel.add(series);
+        saveAsButton = new JButton("Save As");
+        saveAsButton.addActionListener(this);
+        saveAsButton.setVisible(false);
         bottomPanel.add(saveButton);
+        bottomPanel.add(saveAsButton);
         add(bottomPanel, BorderLayout.SOUTH);
-        */
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+        saveButton.setVisible(true);
+        saveAsButton.setVisible(true);
     }
 
     public void updateTimeSeriesTable(Trace trace) {
@@ -70,73 +80,63 @@ public class TimeSeriesPanel extends JPanel implements ActionListener {
             }
 
             table.setModel(new DefaultTableModel(rowData, colNames));
+            table.getModel().addTableModelListener(new TableModelListener() {
+                @Override
+                public void tableChanged(TableModelEvent tableModelEvent) {
+                    if(tableModelEvent.getType() == tableModelEvent.UPDATE) {
+                        saveButton.setEnabled(true);
+                    }
+                }
+            });
+        }
+    }
+
+    public void saveSeriesToFile(String filename) {
+        try {
+            PrintWriter file = new PrintWriter(filename, "UTF-8");
+            String line = "";
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            for(int i = 0; i < model.getColumnCount() - 1; i++) {
+                line += model.getColumnName(i) + ",";
+            }
+            line += model.getColumnName(model.getColumnCount() - 1);
+            file.println(line);
+            for(int i = 0; i < model.getRowCount(); i++) {
+                line = "";
+                for(int j = 0; j < model.getColumnCount() - 1; j++) {
+                    line += model.getValueAt(i,j) + ",";
+                }
+                line += model.getValueAt(i,model.getColumnCount() - 1);
+                file.println(line);
+            }
+            file.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == loadButton) {
+        if (e.getSource() == saveAsButton) {
             JFileChooser fc = new JFileChooser();
             FileFilter csvFilter = new FileNameExtensionFilter("CSV File","csv");
             fc.resetChoosableFileFilters();
             fc.setFileFilter(csvFilter);
-            int returnVal = fc.showOpenDialog(this);
+            int returnVal = fc.showSaveDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                series.setText(fc.getSelectedFile().getAbsolutePath());
-                // Output time series to text area
-                try {
-                    Trace trace = TraceParser.parseCopasiOutput(new File(series.getText().trim()));
-                    if (trace == null) {
-                        JOptionPane.showMessageDialog(this,
-                                "Error occurred while parsing time series data.",
-                                "Time series parser",
-                                JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        saveButton.setEnabled(true);
-                        String[][] data = new String[trace.getData().length][];
-                        for(int i = 0; i < trace.getData().length; i++) {
-                            data[i] = new String[trace.getData()[i].length];
-                            for(int j = 0; j < trace.getData()[i].length; j++) {
-                                data[i][j] = Double.toString(trace.getData()[i][j]);
-                            }
-                        }
-                        table.setModel(new DefaultTableModel(data, trace.getVariables()));
-                        /*
-                        for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
-                            double varMin = trace.getMinForVar(((JLabel) speciesPanel.getComponent(i)).getText());
-                            double varMax = trace.getMaxForVar(((JLabel) speciesPanel.getComponent(i)).getText());
-                            double interval = varMax - varMin;
-                            if (interval != 0) {
-                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(varMin - 0.1 * interval));
-                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(varMax + 0.1 * interval));
-                            } else {
-                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(0.9 * varMin));
-                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(1.1 * varMax));
-                            }
-                        }
-                        tabbedPane.setSelectedIndex(1);
-                        timeSeriesTextArea.read(new FileReader(series.getText()), null);
-                        logTextArea.append("Application: loaded time series " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
-                        */
-                    }
-                } catch (IOException e1) {
-                    JOptionPane.showMessageDialog(this,
-                            "Error occurred while parsing time series data.",
-                            "Time series parser",
-                            JOptionPane.ERROR_MESSAGE);
-                    e1.printStackTrace();
-                }
+                saveSeriesToFile(fc.getSelectedFile().getAbsolutePath() + ".csv");
             }
-        } else {
-            if (e.getSource() == saveButton) {
-                JFileChooser fc = new JFileChooser();
-                FileFilter csvFilter = new FileNameExtensionFilter("CSV File","csv");
-                fc.resetChoosableFileFilters();
-                fc.setFileFilter(csvFilter);
-                int returnVal = fc.showSaveDialog(this);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-
-                }
+        } else if (e.getSource() == saveButton){
+            int res = JOptionPane.showConfirmDialog(this,
+                    "Do you want to overwrite " + filename,
+                    "Time series",
+                    JOptionPane.YES_NO_OPTION);
+            if(res == JOptionPane.YES_OPTION)
+            {
+                saveSeriesToFile(filename);
+                saveButton.setEnabled(false);
             }
         }
     }
