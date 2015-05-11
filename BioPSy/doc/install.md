@@ -8,7 +8,7 @@ BioPSy requires the following packages to compile from source:
 
 **Note:** BioPSy calls another tool, dReal, to perform parameter synthesis.  A binary for this tool is included in the `BioPSy/bin` directory; however, if you would like to compile it yourself, you can find its source code using the following link:
 
-- [dReal](https://github.com/dreal/dreal)
+- [dReal](https://github.com/dreal/dreal3)
 
 To compile BioPSy, change to the BioPSy directory and execute ant:
 
