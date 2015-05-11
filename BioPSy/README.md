@@ -6,9 +6,9 @@ BioPSy is a tool that performs **parameter set synthesis** on biological models 
 Download
 ---------
 
-The latest version of BioPSy including all required binaries can be downloaded from the [releases page](https://github.com/dreal/biology/releases).  BioPSy is a Java application and requires [Java JRE 6 or higher](https://www.java.com) to run.
+The latest version of BioPSy including all required binaries can be downloaded from the [releases page](https://github.com/dreal/biology/releases).  BioPSy is a Java application and requires [Java JRE 6 or higher](https://www.java.com) to run. It also needs g++-4.9.2 to be installed (we are currently working towards waiving this requirement - apologies for the inconvenience).
 
-[BioPSy v1.2](https://github.com/dreal/biology/releases/tag/v1.2) is the stable release, it introduces several features and fixes many bugs. You will need g++-4.9.2 to be installed (we are currently working towards waiving this requirement - apologies for the inconvenience). 
+[BioPSy v1.2](https://github.com/dreal/biology/releases/tag/v1.2) is the stable release, it introduces several features and fixes many bugs. 
 
 [How to Use BioPSy](https://github.com/dreal/biology/blob/master/BioPSy/doc/usage.md)
 ---------
