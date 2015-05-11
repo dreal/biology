@@ -10,8 +10,8 @@ The latest version of BioPSy including all required binaries can be downloaded f
 
 [BioPSy v1.2](https://github.com/dreal/biology/releases/tag/v1.2) is the stable release, it introduces several features and fixed many bugs.
 
-[Compiling from Source](https://github.com/dreal/biology/blob/master/BioPSy/doc/install.md)
+[How to Use BioPSy](https://github.com/dreal/biology/blob/master/BioPSy/doc/usage.md)
 ---------
 
-[How to Use BioPSy](https://github.com/dreal/biology/blob/master/BioPSy/doc/usage.md)
+[Compiling from Source](https://github.com/dreal/biology/blob/master/BioPSy/doc/install.md)
 ---------
