@@ -10,7 +10,7 @@ java -jar BioPSy.jar
 
 The user can browse for a model file which should be in `SBML` (System Biology Markup Language) format. Once the file is selected it will be displayed in the ***SBML*** tab. If there are errors parsing the model file they will be displayed.
 
-###Time series
+####Time series
 Time-series data file should contain experimental data in `CSV` (Comma Separated Values) format. All species defined in the `SBML` model must be present in the time series file.
 
 **Important:**
