@@ -43,11 +43,13 @@ import util.Utility.Tuple;
 
 public class Gui implements ActionListener {
 
+    private LogTable logTable;
+
     private TimeSeriesPanel timeSeriesPanel;
 
     private JFrame gui;
 
-    private JTextArea logTextArea, sbmlTextArea;
+    private JTextArea sbmlTextArea;
 
     private BoxTable boxTable;
 
@@ -55,7 +57,7 @@ public class Gui implements ActionListener {
 
 	private JTextField sbml, series;
 
-	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton, okButton;
+	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton;
 
 	private JScrollPane paramsScroll, speciesScroll, outputScroll, sbmlScroll, logScroll, graphOutputScroll;
 
@@ -103,6 +105,7 @@ public class Gui implements ActionListener {
 		series = new JTextField(30);
 		seriesLabel = new JLabel("Time Series File:");
 		browseSeries = new JButton("Browse");
+        browseSeries.setEnabled(false);
 		browseSeries.addActionListener(this);
 
 		//generateSMT2 = new JButton("Generate SMT2");
@@ -117,10 +120,6 @@ public class Gui implements ActionListener {
         // Advanced Options button
         advancedOptionsButton = new JButton("Advanced Options");
         advancedOptionsButton.addActionListener(this);
-
-        okButton = new JButton("OK");
-        okButton.addActionListener(this);
-        okButton.setVisible(false);
 
         // Stop button
         stopButton = new JButton("Stop");
@@ -138,12 +137,12 @@ public class Gui implements ActionListener {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
         // Create text area for program output
-        logTextArea = new JTextArea();
-        logTextArea.setText("Application: started " + new Date() + "\n");
-        logTextArea.setEditable(false);
+        //logTextArea = new JTextArea();
+        //logTextArea.setText("Application: started " + new Date() + "\n");
+        //logTextArea.setEditable(false);
         // Updating the text area
-        DefaultCaret caret = (DefaultCaret) logTextArea.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        //DefaultCaret caret = (DefaultCaret) logTextArea.getCaret();
+        //caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // Create text area for SBML file
         sbmlTextArea = new JTextArea();
@@ -153,6 +152,9 @@ public class Gui implements ActionListener {
         //timeSeriesTextArea = new JTextArea();
         //timeSeriesTextArea.setEditable(false);
         timeSeriesPanel = new TimeSeriesPanel();
+
+        logTable = new LogTable();
+        logTable.addEntry("Application", "started");
 
         paramsScroll = new JScrollPane();
         paramsScroll.setMinimumSize(new Dimension(600, 600));
@@ -178,7 +180,8 @@ public class Gui implements ActionListener {
         graphOutputScroll.setMinimumSize(new Dimension(600, 600));
         graphOutputScroll.setPreferredSize(new Dimension(600, 600));
 
-        logScroll.setViewportView(logTextArea);
+        //logScroll.setViewportView(logTextArea);
+        logScroll.setViewportView(logTable);
 		paramsScroll.setViewportView(paramsPanel);
 		speciesScroll.setViewportView(speciesPanel);
         sbmlScroll.setViewportView(sbmlTextArea);
@@ -214,7 +217,6 @@ public class Gui implements ActionListener {
         buttonsPanel.add(advancedOptionsButton);
         buttonsPanel.add(progressBar);
         buttonsPanel.add(stopButton);
-        buttonsPanel.add(okButton);
 
         middlePanel.add(tabbedPane, BorderLayout.CENTER);
         middlePanel.add(bottomPanel, BorderLayout.SOUTH);
@@ -267,6 +269,7 @@ public class Gui implements ActionListener {
 			int returnVal = fc.showOpenDialog(gui);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
 				sbml.setText(fc.getSelectedFile().getAbsolutePath());
+                browseSeries.setEnabled(true);
                 try {
 					SBMLDocument document = SBMLReader.read(new File(sbml
 							.getText()));
@@ -347,7 +350,7 @@ public class Gui implements ActionListener {
                     // Output sbml to text area
                     tabbedPane.setSelectedIndex(0);
                     sbmlTextArea.read(new FileReader(sbml.getText()), null);
-                    logTextArea.append("Application: loaded SBML model " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
+                    logTable.addEntry("Application", "loaded SBML model " + fc.getSelectedFile().getAbsolutePath());
 				} catch (XMLStreamException e1) {
 					// TODO Auto-generated catch block
                     JOptionPane.showMessageDialog(gui,
@@ -396,7 +399,7 @@ public class Gui implements ActionListener {
                         }
                         tabbedPane.setSelectedIndex(1);
                         //timeSeriesTextArea.read(new FileReader(series.getText()), null);
-                        logTextArea.append("Application: loaded time series " + fc.getSelectedFile().getAbsolutePath() + " " + new Date() + "\n");
+                        logTable.addEntry("Application", "loaded time series " + fc.getSelectedFile().getAbsolutePath());
                     }
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(gui,
@@ -430,14 +433,6 @@ public class Gui implements ActionListener {
 			}
 		}*/ else if (e.getSource() == advancedOptionsButton) {
             new AdvancedOptionsDialog(gui, "Advanced Options");
-        } else if (e.getSource() == okButton) {
-            isStopped = false;
-            run.setVisible(true);
-            advancedOptionsButton.setVisible(true);
-            progressBar.setVisible(false);
-            okButton.setVisible(false);
-            browseSBML.setEnabled(true);
-            browseSeries.setEnabled(true);
         } else if (e.getSource() == stopButton) {
             // Kill ParSyn process and children
             killParSyn(AdvancedOptionsModel.getParsynPID());
@@ -450,12 +445,33 @@ public class Gui implements ActionListener {
 				List<String> params = new ArrayList<String>();
                 domain = new Box(Box.BoxType.DOMAIN);
                 Map<String, Double> epsilon = new HashMap<String, Double>();
+                boolean paramSelected = false;
+                boolean inputValidation = true;
 				for (int i = 5; i < paramsPanel.getComponentCount(); i += 5) {
 					if (((JCheckBox) paramsPanel.getComponent(i)).isSelected()) {
 
+                        paramSelected = true;
                         String paramName = ((JLabel) paramsPanel.getComponent(i + 1)).getText();
                         double paramLeft = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 2)).getText().trim());
                         double paramRight = Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 3)).getText().trim());
+                        if(paramRight < paramLeft) {
+                            inputValidation = false;
+                            JOptionPane.showMessageDialog(gui,
+                                    "Invalid range [" + paramLeft + ", " + paramRight + "] for parameter " + ((JLabel) paramsPanel.getComponent(i + 1)).getText(),
+                                    "Input Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            break;
+                        }
+
+                        if(Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 4)).getText().trim()) <= 0) {
+                            inputValidation = false;
+                            JOptionPane.showMessageDialog(gui,
+                                    "Invalid precision value " + Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 4)).getText().trim()) + " for parameter " + ((JLabel) paramsPanel.getComponent(i + 1)).getText(),
+                                    "Input Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            break;
+                        }
+
                         epsilon.put(paramName, Double.parseDouble(((JTextField) paramsPanel.getComponent(i + 4)).getText().trim()));
 
                         domain.addInterval(new Interval(paramLeft, paramRight, paramName));
@@ -465,113 +481,192 @@ public class Gui implements ActionListener {
 								.getText());
 					}
 				}
+                if (!paramSelected) {
+                    JOptionPane.showMessageDialog(gui,
+                            "At least one of the parameters should be selected",
+                            "Input Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
 				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml
 						.getText().trim())), params);
                 Map<String, Double> noise = new HashMap<String, Double>();
 				for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
+
+                    double varLeft = Double
+                            .parseDouble(((JTextField) speciesPanel
+                                    .getComponent(i + 1)).getText()
+                                    .trim());
+
+                    double varRight = Double
+                            .parseDouble(((JTextField) speciesPanel
+                                    .getComponent(i + 2)).getText()
+                                    .trim());
+
+
+                    if(varRight < varLeft) {
+                        inputValidation = false;
+                        JOptionPane.showMessageDialog(gui,
+                                "Invalid range [" + varLeft + ", " + varRight + "] for variable " + ((JLabel) speciesPanel.getComponent(i)).getText(),
+                                "Input Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        break;
+                    }
+
 					variables.put(
                             ((JLabel) speciesPanel.getComponent(i)).getText(),
-                            new Tuple<Double, Double>(Double
-                                    .parseDouble(((JTextField) speciesPanel
-                                            .getComponent(i + 1)).getText()
-                                            .trim()), Double
-                                    .parseDouble(((JTextField) speciesPanel
-                                            .getComponent(i + 2)).getText()
-                                            .trim())));
+                            new Tuple<Double, Double>(varLeft, varRight));
+
 					odes.put(
 							((JLabel) speciesPanel.getComponent(i)).getText(),
 							model.getODE(((JLabel) speciesPanel.getComponent(i))
 									.getText()));
+
+                    if(Double.parseDouble(((JTextField) speciesPanel.getComponent(i + 3)).getText().trim()) <= 0) {
+                        inputValidation = false;
+                        JOptionPane.showMessageDialog(gui,
+                                "Invalid noise value " + Double.parseDouble(((JTextField) speciesPanel.getComponent(i + 3)).getText().trim()) + " for variable " + ((JLabel) speciesPanel.getComponent(i)).getText(),
+                                "Input Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        break;
+                    }
+
                     noise.put(((JLabel) speciesPanel.getComponent(i)).getText(),
                                 Double.parseDouble(((JTextField) speciesPanel
                                     .getComponent(i + 3)).getText().trim()));
 				}
-				SMT2SettingsParser.writeSettingsToFile(
-						"model.xml",
-						new SMT2Settings(variables, "t", odes, TraceParser
-								.parseCopasiOutput(new File(series.getText()
-										.trim())), noise, epsilon));
 
-                // creating a table
-                boxTable.setDomain(domain);
+                if(inputValidation) {
+                    SMT2SettingsParser.writeSettingsToFile(
+                            "model.xml",
+                            new SMT2Settings(variables, "t", odes, TraceParser
+                                    .parseCopasiOutput(new File(series.getText()
+                                            .trim())), noise, epsilon));
 
-                if(domain.getIntervals().size() == 2) {
-                    tabbedPane.setEnabledAt(6, true);
-                    plotPanel2D = new PlotPanel(domain);
-                    graphOutputScroll.setViewportView(plotPanel2D);
-                } else {
-                    tabbedPane.setEnabledAt(6, false);
-                }
+                    // creating a table
+                    boxTable.setDomain(domain);
 
-                // Creating a background worker
-                bgWorker = new BackgroundWorker(logTextArea);
-
-                // Adding a listener checking the status of background worker
-                bgWorker.addPropertyChangeListener(
-                        new PropertyChangeListener() {
-                            public  void propertyChange(PropertyChangeEvent evt) {
-                                if (evt.getNewValue() == SwingWorker.StateValue.STARTED) {
-                                    tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
-                                    run.setEnabled(false);
-                                    advancedOptionsButton.setEnabled(false);
-                                    //stopButton.setEnabled(true);
-                                    browseSBML.setEnabled(false);
-                                    browseSeries.setEnabled(false);
-                                    // Setting visibility
-                                    run.setVisible(false);
-                                    advancedOptionsButton.setVisible(false);
-                                    progressBar.setVisible(true);
-                                    stopButton.setVisible(true);
-                                    logTextArea.append("Execution: started " + new Date() + "\n");
-                                    logTextArea.append("Execution: " + AdvancedOptionsModel.getString() + "\n");
-                                    stopButton.setEnabled(true);
-                                } else if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                    run.setEnabled(true);
-                                    advancedOptionsButton.setEnabled(true);
-                                    stopButton.setEnabled(false);
-                                    progressBar.setValue(100);
-                                    //browseSBML.setEnabled(true);
-                                    //browseSeries.setEnabled(true);
-                                    // Setting visibility
-                                    //run.setVisible(true);
-                                    //advancedOptionsButton.setVisible(true);
-                                    okButton.setVisible(true);
-                                    stopButton.setVisible(false);
-                                    //progressBar.setVisible(false);
-                                    if (isStopped) {
-                                        logTextArea.append("Execution: terminated by the user " + new Date() + "\n");
-                                    } else {
-                                        logTextArea.append("Execution: terminated " + new Date() + "\n");
-                                    }
-                                }
-                            }
-                        });
-
-                // Executing background worker
-                bgWorker.execute();
-
-                outputListener = new Thread() {
-
-                    @Override
-                    public void run() {
-                        while(!bgWorker.isDone()) {
-                            try {
-                                Thread.sleep(1000);
-                                OutputParser.parse("model.xml.output");
-                                boxTable.updateRows(OutputParser.getBoxes());
-                                if(domain.getIntervals().size() == 2) {
-                                    plotPanel2D.updateBoxes(OutputParser.getBoxes());
-                                }
-                                progressBar.setValue((int) (OutputParser.getProgress() * 100));
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
-                        }
+                    if(domain.getIntervals().size() == 2) {
+                        tabbedPane.setEnabledAt(6, true);
+                        plotPanel2D = new PlotPanel(domain);
+                        graphOutputScroll.setViewportView(plotPanel2D);
+                    } else {
+                        tabbedPane.setEnabledAt(6, false);
                     }
 
-                };
-                outputListener.start();
+                    // Creating a background worker
+                    bgWorker = new BackgroundWorker(logTable);
 
+                    logTable.addEntry("Execution", "started");
+                    logTable.addEntry("Execution", AdvancedOptionsModel.getString());
+
+                    // Adding a listener checking the status of background worker
+                    bgWorker.addPropertyChangeListener(
+                            new PropertyChangeListener() {
+                                public  void propertyChange(PropertyChangeEvent evt) {
+                                    if (evt.getNewValue() == SwingWorker.StateValue.STARTED) {
+                                        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
+                                        run.setEnabled(false);
+                                        advancedOptionsButton.setEnabled(false);
+                                        //stopButton.setEnabled(true);
+                                        browseSBML.setEnabled(false);
+                                        browseSeries.setEnabled(false);
+                                        // Setting visibility
+                                        run.setVisible(false);
+                                        advancedOptionsButton.setVisible(false);
+                                        progressBar.setVisible(true);
+                                        stopButton.setVisible(true);
+                                        stopButton.setEnabled(true);
+                                    } else if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                                        run.setEnabled(true);
+                                        advancedOptionsButton.setEnabled(true);
+                                        stopButton.setEnabled(false);
+                                        progressBar.setValue(100);
+                                        //browseSBML.setEnabled(true);
+                                        //browseSeries.setEnabled(true);
+                                        // Setting visibility
+                                        //run.setVisible(true);
+                                        //advancedOptionsButton.setVisible(true);
+                                        stopButton.setVisible(false);
+
+                                        isStopped = false;
+                                        run.setVisible(true);
+                                        advancedOptionsButton.setVisible(true);
+                                        progressBar.setVisible(false);
+                                        browseSBML.setEnabled(true);
+                                        browseSeries.setEnabled(true);
+
+                                        //progressBar.setVisible(false);
+                                        if(bgWorker.getParsyn() == null) {
+                                            JOptionPane.showMessageDialog(gui,
+                                                    "ParSyn not found",
+                                                    "Parameter Synthesis",
+                                                    JOptionPane.ERROR_MESSAGE);
+                                            logTable.addEntry("Execution", "ParSyn not found");
+                                        } else {
+                                            switch(bgWorker.getParsyn().exitValue()) {
+                                                case 0:
+                                                    JOptionPane.showMessageDialog(gui,
+                                                            "Parameter synthesis terminated successfully",
+                                                            "Parameter Synthesis",
+                                                            JOptionPane.INFORMATION_MESSAGE);
+                                                    logTable.addEntry("Execution", "successful termination");
+                                                    break;
+
+                                                case 1:
+                                                    JOptionPane.showMessageDialog(gui,
+                                                            "Failure during execution. See the log for more information.",
+                                                            "Parameter Synthesis",
+                                                            JOptionPane.ERROR_MESSAGE);
+                                                    logTable.addEntry("Execution", "abnormal termination");
+                                                    break;
+
+                                                case 137:
+                                                    JOptionPane.showMessageDialog(gui,
+                                                            "Parameter synthesis was terminated by the user",
+                                                            "Parameter Synthesis",
+                                                            JOptionPane.INFORMATION_MESSAGE);
+                                                    logTable.addEntry("Execution", "terminated by the user");
+                                                    break;
+
+                                                case 134:
+                                                    JOptionPane.showMessageDialog(gui,
+                                                            "Parameter synthesis terminated with minor issues",
+                                                            "Parameter Synthesis",
+                                                            JOptionPane.WARNING_MESSAGE);
+                                                    logTable.addEntry("Execution", "terminated with minor issues");
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                    // Executing background worker
+                    bgWorker.execute();
+
+                    outputListener = new Thread() {
+
+                        @Override
+                        public void run() {
+                            while(!bgWorker.isDone()) {
+                                try {
+                                    Thread.sleep(1000);
+                                    OutputParser.parse("model.xml.output");
+                                    boxTable.updateRows(OutputParser.getBoxes());
+                                    if(domain.getIntervals().size() == 2) {
+                                        plotPanel2D.updateBoxes(OutputParser.getBoxes());
+                                    }
+                                    progressBar.setValue((int) (OutputParser.getProgress() * 100));
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        }
+
+                    };
+                    outputListener.start();
+                }
     		} catch (NumberFormatException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -599,27 +694,6 @@ public class Gui implements ActionListener {
     public void killParSyn(int pid) {
 
         try {
-        /*
-            String termCode = "#!/bin/bash\n" +
-                "function get_children {\n" +
-                "\tclist=`pgrep -P $1`\n" +
-                "\tplist+=($1)\n" +
-                "\tif [ -n \"$clist\" ]\n" +
-                "\tthen\n" +
-                "\t\tfor p in $clist\n" +
-                "\t\tdo\n" +
-                "\t\t\tget_children $p\t\t\t\t\n" +
-                "\t\tdone\t\n" +
-                "\tfi\t\n" +
-                "}\n" +
-                "\n" +
-                "get_children $1\n" +
-                "\n" +
-                "for ((i=${#plist[@]}-1;i>=0;i--));\n" +
-                "do\n" +
-                "\tkill -9 ${plist[i]}\n" +
-                "done";
-            */
 
             String termCode = "#!/bin/bash\n" +
                     "function get_children {\n" +

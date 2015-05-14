@@ -11,10 +11,12 @@ import java.lang.reflect.Field;
  */
 public class BackgroundWorker extends SwingWorker<Integer, Void> {
 
-    private static JTextArea logTextArea;
+    private static LogTable logTable;
 
-    public BackgroundWorker(JTextArea logTextArea) {
-        this.logTextArea = logTextArea;
+    private Process parsyn;
+
+    public BackgroundWorker(LogTable logTable) {
+        this.logTable = logTable;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
                                     AdvancedOptionsModel.getParsynOptions() + " model.xml --dreal " +
                                         AdvancedOptionsModel.getDrealOptions();
 
-        Process parsyn = exec.exec(parsynCall);
+        parsyn = exec.exec(parsynCall);
 
         // getting ParSyn PID on unix/linux systems
         if(parsyn.getClass().getName().equals("java.lang.UNIXProcess")) {
@@ -50,18 +52,18 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
                 message += line + "\n";
             }
             if(!message.isEmpty()) {
-                logTextArea.append("Message: " + message);
+                logTable.addEntry("ParSyn", message);
             }
 
             InputStream cerr = parsyn.getErrorStream();
-            BufferedReader cerrReader = new BufferedReader(new InputStreamReader(cout));
+            BufferedReader cerrReader = new BufferedReader(new InputStreamReader(cerr));
             line = "";
             message = "";
-            while ((line = coutReader.readLine()) != null) {
+            while ((line = cerrReader.readLine()) != null) {
                 message += line + "\n";
             }
             if(!message.isEmpty()) {
-                logTextArea.append("Message: " + message);
+                logTable.addEntry("ParSyn", message);
             }
 
             cout.close();
@@ -75,4 +77,9 @@ public class BackgroundWorker extends SwingWorker<Integer, Void> {
 
         return new Integer(0);
     }
+
+    public Process getParsyn() {
+        return parsyn;
+    }
+
 }
