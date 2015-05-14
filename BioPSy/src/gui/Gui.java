@@ -636,7 +636,6 @@ public class Gui implements ActionListener {
                                                             JOptionPane.WARNING_MESSAGE);
                                                     logTable.addEntry("Execution", "terminated with minor issues");
                                                     break;
-
                                             }
                                         }
                                     }
