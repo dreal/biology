@@ -8,6 +8,8 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.List;
 
@@ -83,8 +85,16 @@ public class Gui implements ActionListener {
 
 		fc = new JFileChooser();
 
-		// Create the frame
-		gui = new JFrame("BioPSy");
+        String computerName = "";
+
+        try {
+            computerName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        // Create the frame
+		gui = new JFrame("BioPSy(" + computerName + ")");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.addWindowListener(new WindowAdapter()
         {
