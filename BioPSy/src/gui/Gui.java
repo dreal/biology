@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.DefaultCaret;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
@@ -63,7 +62,7 @@ public class Gui implements ActionListener {
 
 	private JScrollPane paramsScroll, speciesScroll, outputScroll, sbmlScroll, logScroll, graphOutputScroll;
 
-    private PlotPanel plotPanel2D;
+    private PlotArea plotPanel2D;
 
 	private JLabel sbmlLabel, seriesLabel;
 
@@ -228,6 +227,7 @@ public class Gui implements ActionListener {
         buttonsPanel.add(progressBar);
         buttonsPanel.add(stopButton);
 
+
         middlePanel.add(tabbedPane, BorderLayout.CENTER);
         middlePanel.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -259,7 +259,11 @@ public class Gui implements ActionListener {
 			gui.setSize(frameSize);
 		}
 
-		// Position the frame
+        stopButton.setPreferredSize(new Dimension((gui.getWidth() / 8) - 20, 50));
+        progressBar.setPreferredSize(new Dimension((7 * gui.getWidth() / 8) - 20, 50));
+
+
+        // Position the frame
 		int x = screenSize.width / 2 - frameSize.width / 2;
 		int y = screenSize.height / 2 - frameSize.height / 2;
 		gui.setLocation(x, y);
@@ -558,7 +562,7 @@ public class Gui implements ActionListener {
 
                     if(domain.getIntervals().size() == 2) {
                         tabbedPane.setEnabledAt(6, true);
-                        plotPanel2D = new PlotPanel(domain);
+                        plotPanel2D = new PlotArea(domain);
                         graphOutputScroll.setViewportView(plotPanel2D);
                     } else {
                         tabbedPane.setEnabledAt(6, false);

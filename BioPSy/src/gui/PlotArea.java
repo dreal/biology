@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by fedor on 24/04/15.
  */
-public class PlotPanel extends JPanel {
+public class PlotArea extends JPanel {
 
     private double xScale = 1;
     private double yScale = 1;
@@ -42,14 +42,16 @@ public class PlotPanel extends JPanel {
     private Color undetColor = new Color(180,180,180);
     private Color domainColor = new Color(200, 234, 255);
 
-    public PlotPanel(Box domain) {
+    private JComboBox timeComboBox;
+
+    public PlotArea(Box domain) {
         super();
         this.domain = domain;
         xScale = panelWidth / domain.getIntervals().get(0).getWidth();
         yScale = panelHeight / domain.getIntervals().get(1).getWidth();
     }
 
-    public PlotPanel() {
+    public PlotArea() {
         super();
     }
 
