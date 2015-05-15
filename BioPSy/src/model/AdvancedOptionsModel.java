@@ -9,7 +9,7 @@ public class AdvancedOptionsModel {
 
     private static String drealBinPath = "./dReal";
 
-    private static String drealOptions = "-precision=1e-3";
+    private static String drealOptions = "--precision 1e-3";
 
     private static String parsynBinPath = "./ParSyn";
 
