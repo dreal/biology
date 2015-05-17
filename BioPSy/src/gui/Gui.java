@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.DefaultCaret;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
@@ -63,7 +62,7 @@ public class Gui implements ActionListener {
 
 	private JScrollPane paramsScroll, speciesScroll, outputScroll, sbmlScroll, logScroll, graphOutputScroll;
 
-    private PlotPanel plotPanel2D;
+    private PlotArea plotPanel2D;
 
 	private JLabel sbmlLabel, seriesLabel;
 
@@ -228,6 +227,7 @@ public class Gui implements ActionListener {
         buttonsPanel.add(progressBar);
         buttonsPanel.add(stopButton);
 
+
         middlePanel.add(tabbedPane, BorderLayout.CENTER);
         middlePanel.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -259,7 +259,11 @@ public class Gui implements ActionListener {
 			gui.setSize(frameSize);
 		}
 
-		// Position the frame
+        stopButton.setPreferredSize(new Dimension((gui.getWidth() / 8) - 20, 50));
+        progressBar.setPreferredSize(new Dimension((7 * gui.getWidth() / 8) - 20, 50));
+
+
+        // Position the frame
 		int x = screenSize.width / 2 - frameSize.width / 2;
 		int y = screenSize.height / 2 - frameSize.height / 2;
 		gui.setLocation(x, y);
@@ -558,7 +562,7 @@ public class Gui implements ActionListener {
 
                     if(domain.getIntervals().size() == 2) {
                         tabbedPane.setEnabledAt(6, true);
-                        plotPanel2D = new PlotPanel(domain);
+                        plotPanel2D = new PlotArea(domain);
                         graphOutputScroll.setViewportView(plotPanel2D);
                     } else {
                         tabbedPane.setEnabledAt(6, false);
@@ -608,43 +612,43 @@ public class Gui implements ActionListener {
 
                                         //progressBar.setVisible(false);
                                         if(bgWorker.getParsyn() == null) {
+                                            logTable.addEntry("Execution", "ParSyn not found");
                                             JOptionPane.showMessageDialog(gui,
                                                     "ParSyn not found",
                                                     "Parameter Synthesis",
                                                     JOptionPane.ERROR_MESSAGE);
-                                            logTable.addEntry("Execution", "ParSyn not found");
                                         } else {
                                             switch(bgWorker.getParsyn().exitValue()) {
                                                 case 0:
+                                                    logTable.addEntry("Execution", "successful termination");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Parameter synthesis terminated successfully",
                                                             "Parameter Synthesis",
                                                             JOptionPane.INFORMATION_MESSAGE);
-                                                    logTable.addEntry("Execution", "successful termination");
                                                     break;
 
                                                 case 1:
+                                                    logTable.addEntry("Execution", "abnormal termination");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Failure during execution. See the log for more information.",
                                                             "Parameter Synthesis",
                                                             JOptionPane.ERROR_MESSAGE);
-                                                    logTable.addEntry("Execution", "abnormal termination");
                                                     break;
 
                                                 case 137:
+                                                    logTable.addEntry("Execution", "terminated by the user");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Parameter synthesis was terminated by the user",
                                                             "Parameter Synthesis",
                                                             JOptionPane.INFORMATION_MESSAGE);
-                                                    logTable.addEntry("Execution", "terminated by the user");
                                                     break;
 
                                                 case 134:
+                                                    logTable.addEntry("Execution", "terminated with minor issues");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Parameter synthesis terminated with minor issues",
                                                             "Parameter Synthesis",
                                                             JOptionPane.WARNING_MESSAGE);
-                                                    logTable.addEntry("Execution", "terminated with minor issues");
                                                     break;
                                             }
                                         }
