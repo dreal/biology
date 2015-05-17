@@ -612,43 +612,43 @@ public class Gui implements ActionListener {
 
                                         //progressBar.setVisible(false);
                                         if(bgWorker.getParsyn() == null) {
+                                            logTable.addEntry("Execution", "ParSyn not found");
                                             JOptionPane.showMessageDialog(gui,
                                                     "ParSyn not found",
                                                     "Parameter Synthesis",
                                                     JOptionPane.ERROR_MESSAGE);
-                                            logTable.addEntry("Execution", "ParSyn not found");
                                         } else {
                                             switch(bgWorker.getParsyn().exitValue()) {
                                                 case 0:
+                                                    logTable.addEntry("Execution", "successful termination");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Parameter synthesis terminated successfully",
                                                             "Parameter Synthesis",
                                                             JOptionPane.INFORMATION_MESSAGE);
-                                                    logTable.addEntry("Execution", "successful termination");
                                                     break;
 
                                                 case 1:
+                                                    logTable.addEntry("Execution", "abnormal termination");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Failure during execution. See the log for more information.",
                                                             "Parameter Synthesis",
                                                             JOptionPane.ERROR_MESSAGE);
-                                                    logTable.addEntry("Execution", "abnormal termination");
                                                     break;
 
                                                 case 137:
+                                                    logTable.addEntry("Execution", "terminated by the user");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Parameter synthesis was terminated by the user",
                                                             "Parameter Synthesis",
                                                             JOptionPane.INFORMATION_MESSAGE);
-                                                    logTable.addEntry("Execution", "terminated by the user");
                                                     break;
 
                                                 case 134:
+                                                    logTable.addEntry("Execution", "terminated with minor issues");
                                                     JOptionPane.showMessageDialog(gui,
                                                             "Parameter synthesis terminated with minor issues",
                                                             "Parameter Synthesis",
                                                             JOptionPane.WARNING_MESSAGE);
-                                                    logTable.addEntry("Execution", "terminated with minor issues");
                                                     break;
                                             }
                                         }
