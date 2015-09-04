@@ -63,7 +63,7 @@ public class Utility {
 			output += "(declare-fun t_t () Real)\n";
 			output += "(declare-fun time_0 () Real)\n";
 		}
-		for (String variable : odeModel.getArrayOfVariables()) {
+		for (String variable : odeModel.getArrayOfODEVariables()) {
 			output += "(declare-fun " + variable + " () Real)\n";
 			if (trace != null) {
 				for (int i = 0; i < trace.getTimePoints().length; i++) {
@@ -77,7 +77,7 @@ public class Utility {
 		}
 		output += "(define-ode flow_1 ((= d/dt[t] 1)";
 		String vars = "t";
-		for (String variable : odeModel.getArrayOfVariables()) {
+		for (String variable : odeModel.getArrayOfODEVariables()) {
 			output += " (= d/dt[" + variable + "] "
 					+ prefixASTNodeToString(odeModel.getODE(variable)) + ")";
 			vars += " " + variable;
@@ -85,7 +85,7 @@ public class Utility {
 		output += "))\n";
 		if (trace != null) {
 			for (String variable : trace.getVariables()) {
-				for (String var : odeModel.getArrayOfVariables()) {
+				for (String var : odeModel.getArrayOfODEVariables()) {
 					if (var.equals(variable)) {
 						for (int i = 0; i < trace.getValues(variable).length; i++) {
 							output += "(assert (>= " + variable + "_" + i + " "
@@ -110,7 +110,7 @@ public class Utility {
 			}
 		}
 		else {
-			for (String variable : odeModel.getArrayOfVariables()) {
+			for (String variable : odeModel.getArrayOfODEVariables()) {
 				output += "(assert (>= " + variable + "_0 " + odeModel.getInitialValue(variable)
 						+ "))\n";
 				output += "(assert (<= " + variable + "_0 " + odeModel.getInitialValue(variable)
@@ -218,16 +218,19 @@ public class Utility {
 		}
 		return node;
 	}
-
+	
 	/**
 	 * 
 	 * Returns a String representation of the given ASTNode equation in prefix notation form.
+	 * Additionally adds a suffix to the variables in the equation.
 	 * 
 	 * @param math
 	 *            - the equation to convert to prefix notation
-	 * @return The prefix notation String representation of the provided equation
-	 */
-	public static String prefixASTNodeToString(ASTNode math) {
+	 * @param suffix
+	 *            - the suffix to add to the variables
+	 * @return The prefix notation String representation of the provided equation with suffixes on the variables
+	 */	
+	public static String prefixASTNodeToStringWithSuffix(ASTNode math, String suffix) {
 		if (math.getType() == ASTNode.Type.CONSTANT_E) {
 			return "exponentiale";
 		}
@@ -241,14 +244,14 @@ public class Utility {
 			return "true";
 		}
 		else if (math.getType() == ASTNode.Type.DIVIDE) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(/ " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION) {
 			String result = "( " + math.getName();
 			for (int i = 0; i < math.getChildCount(); i++) {
-				String child = prefixASTNodeToString(math.getChild(i));
+				String child = prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				result += child;
 				if (i + 1 < math.getChildCount()) {
 					result += " ";
@@ -258,86 +261,86 @@ public class Utility {
 			return result;
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ABS) {
-			return "(abs " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(abs " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCCOS) {
-			return "(acos " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(acos " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCCOSH) {
-			return "(acosh " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(acosh " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCCOT) {
-			return "(acot " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(acot " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCCOTH) {
-			return "(acoth " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(acoth " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCCSC) {
-			return "(acsc " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(acsc " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCCSCH) {
-			return "(acsch " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(acsch " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCSEC) {
-			return "(asec " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(asec " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCSECH) {
-			return "(asech " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(asech " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCSIN) {
-			return "(asin " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(asin " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCSINH) {
-			return "(asinh " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(asinh " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCTAN) {
-			return "(atan " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(atan " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ARCTANH) {
-			return "(atanh " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(atanh " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_CEILING) {
-			return "(ceil " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(ceil " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_COS) {
-			return "(cos " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(cos " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_COSH) {
-			return "(cosh " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(cosh " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_COT) {
-			return "(cot " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(cot " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_COTH) {
-			return "(coth " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(coth " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_CSC) {
-			return "(csc " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(csc " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_CSCH) {
-			return "(csch " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(csch " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_DELAY) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(delay " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_EXP) {
-			return "(exp " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(exp " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_FACTORIAL) {
-			return "(factorial " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(factorial " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_FLOOR) {
-			return "(floor " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(floor " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_LN) {
-			return "(ln " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(ln " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_LOG) {
 			String result = "(log ";
 			for (int i = 0; i < math.getChildCount(); i++) {
-				String child = prefixASTNodeToString(math.getChild(i));
+				String child = prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				result += child;
 				if (i + 1 < math.getChildCount()) {
 					result += " ";
@@ -349,7 +352,7 @@ public class Utility {
 		else if (math.getType() == ASTNode.Type.FUNCTION_PIECEWISE) {
 			String result = "(piecewise ";
 			for (int i = 0; i < math.getChildCount(); i++) {
-				String child = prefixASTNodeToString(math.getChild(i));
+				String child = prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				result += child;
 				if (i + 1 < math.getChildCount()) {
 					result += " ";
@@ -359,32 +362,32 @@ public class Utility {
 			return result;
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_POWER) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(^ " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_ROOT) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(root " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_SEC) {
-			return "(sec " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(sec " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_SECH) {
-			return "(sech " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(sech " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_SIN) {
-			return "(sin " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(sin " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_SINH) {
-			return "(sinh " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(sinh " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_TAN) {
-			return "(tan " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(tan " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.FUNCTION_TANH) {
-			return "(tanh " + prefixASTNodeToString(math.getChild(0)) + ")";
+			return "(tanh " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 		}
 		else if (math.getType() == ASTNode.Type.INTEGER) {
 			return "" + math.getInteger();
@@ -394,7 +397,7 @@ public class Utility {
 				return "";
 			String result = "(and ";
 			for (int i = 0; i < math.getChildCount(); i++) {
-				String child = prefixASTNodeToString(math.getChild(i));
+				String child = prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				result += child;
 				if (i + 1 < math.getChildCount()) {
 					result += " ";
@@ -407,7 +410,7 @@ public class Utility {
 			if (math.getChildCount() == 0)
 				return "";
 			String result = "(not ";
-			String child = prefixASTNodeToString(math.getChild(0));
+			String child = prefixASTNodeToStringWithSuffix(math.getChild(0), suffix);
 			result += child;
 			result += ")";
 			return result;
@@ -417,7 +420,7 @@ public class Utility {
 				return "";
 			String result = "(or ";
 			for (int i = 0; i < math.getChildCount(); i++) {
-				String child = prefixASTNodeToString(math.getChild(i));
+				String child = prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				result += child;
 				if (i + 1 < math.getChildCount()) {
 					result += " ";
@@ -431,7 +434,7 @@ public class Utility {
 				return "";
 			String result = "(xor ";
 			for (int i = 0; i < math.getChildCount(); i++) {
-				String child = prefixASTNodeToString(math.getChild(i));
+				String child = prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				result += child;
 				if (i + 1 < math.getChildCount()) {
 					result += " ";
@@ -442,14 +445,14 @@ public class Utility {
 		}
 		else if (math.getType() == ASTNode.Type.MINUS) {
 			if (math.getChildCount() == 1) {
-				return "(- 0.0 " + prefixASTNodeToString(math.getChild(0)) + ")";
+				return "(- 0.0 " + prefixASTNodeToStringWithSuffix(math.getChild(0), suffix) + ")";
 			}
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(- " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.NAME) {
-			return math.getName();
+			return math.getName() + suffix;
 		}
 		else if (math.getType() == ASTNode.Type.NAME_AVOGADRO) {
 			return "avogadro";
@@ -461,10 +464,10 @@ public class Utility {
 			String returnVal = "";
 			for (int i = 0; i < math.getChildCount(); i++) {
 				if (i != math.getChildCount() - 1) {
-					returnVal += "(+ " + prefixASTNodeToString(math.getChild(i)) + " ";
+					returnVal += "(+ " + prefixASTNodeToStringWithSuffix(math.getChild(i), suffix) + " ";
 				}
 				else {
-					returnVal += prefixASTNodeToString(math.getChild(i));
+					returnVal += prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				}
 			}
 			for (int i = 0; i < math.getChildCount() - 1; i++) {
@@ -473,8 +476,8 @@ public class Utility {
 			return returnVal;
 		}
 		else if (math.getType() == ASTNode.Type.POWER) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(^ " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.RATIONAL) {
@@ -487,43 +490,43 @@ public class Utility {
 			return math.getMantissa() + "e" + math.getExponent();
 		}
 		else if (math.getType() == ASTNode.Type.RELATIONAL_EQ) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(= " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.RELATIONAL_GEQ) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(>= " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.RELATIONAL_GT) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(> " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.RELATIONAL_LEQ) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(<= " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.RELATIONAL_LT) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(< " + leftStr + " " + rightStr + ")";
 		}
 		else if (math.getType() == ASTNode.Type.RELATIONAL_NEQ) {
-			String leftStr = prefixASTNodeToString(math.getLeftChild());
-			String rightStr = prefixASTNodeToString(math.getRightChild());
+			String leftStr = prefixASTNodeToStringWithSuffix(math.getLeftChild(), suffix);
+			String rightStr = prefixASTNodeToStringWithSuffix(math.getRightChild(), suffix);
 			return "(not (= " + leftStr + " " + rightStr + "))";
 		}
 		else if (math.getType() == ASTNode.Type.TIMES) {
 			String returnVal = "";
 			for (int i = 0; i < math.getChildCount(); i++) {
 				if (i != math.getChildCount() - 1) {
-					returnVal += "(* " + prefixASTNodeToString(math.getChild(i)) + " ";
+					returnVal += "(* " + prefixASTNodeToStringWithSuffix(math.getChild(i), suffix) + " ";
 				}
 				else {
-					returnVal += prefixASTNodeToString(math.getChild(i));
+					returnVal += prefixASTNodeToStringWithSuffix(math.getChild(i), suffix);
 				}
 			}
 			for (int i = 0; i < math.getChildCount() - 1; i++) {
@@ -540,6 +543,18 @@ public class Utility {
 			}
 		}
 		return "";
+	}
+
+	/**
+	 * 
+	 * Returns a String representation of the given ASTNode equation in prefix notation form.
+	 * 
+	 * @param math
+	 *            - the equation to convert to prefix notation
+	 * @return The prefix notation String representation of the provided equation
+	 */
+	public static String prefixASTNodeToString(ASTNode math) {
+		return prefixASTNodeToStringWithSuffix(math, "");
 	}
 
 	public static class Tuple<X, Y> {

@@ -58,7 +58,7 @@ public class Gui implements ActionListener {
 
 	private JTextField sbml, series;
 
-	private JButton browseSBML, browseSeries, generateSMT2, run, advancedOptionsButton, stopButton;
+	private JButton browseSBML, browseSeries, run, advancedOptionsButton, stopButton;
 
 	private JScrollPane paramsScroll, speciesScroll, outputScroll, sbmlScroll, logScroll, graphOutputScroll;
 
@@ -319,6 +319,9 @@ public class Gui implements ActionListener {
 							}
 						}
 					}
+					for (String var : assignments) {
+						vars.add(var);
+					}
 					for (Reaction reaction : document.getModel()
 							.getListOfReactions()) {
 						for (LocalParameter parameter : reaction
@@ -456,6 +459,7 @@ public class Gui implements ActionListener {
 			try {
 				Map<String, Tuple<Double, Double>> variables = new HashMap<String, Tuple<Double, Double>>();
 				Map<String, ASTNode> odes = new HashMap<String, ASTNode>();
+				Map<String, ASTNode> assignments = new HashMap<String, ASTNode>();
 				List<String> params = new ArrayList<String>();
                 domain = new Box(Box.BoxType.DOMAIN);
                 Map<String, Double> epsilon = new HashMap<String, Double>();
@@ -505,6 +509,12 @@ public class Gui implements ActionListener {
 				ODEModel model = new ODEModel(SBMLReader.read(new File(sbml
 						.getText().trim())), params);
                 Map<String, Double> noise = new HashMap<String, Double>();
+                for (String var : model.getArrayOfODEVariables()) {
+                	odes.put(var, model.getODE(var));
+                }
+                for (String var : model.getArrayOfAssignedVariables()) {
+                	assignments.put(var, model.getAssignment(var));
+                }
 				for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
 
                     double varLeft = Double
@@ -531,10 +541,10 @@ public class Gui implements ActionListener {
                             ((JLabel) speciesPanel.getComponent(i)).getText(),
                             new Tuple<Double, Double>(varLeft, varRight));
 
-					odes.put(
-							((JLabel) speciesPanel.getComponent(i)).getText(),
-							model.getODE(((JLabel) speciesPanel.getComponent(i))
-									.getText()));
+//					odes.put(
+//							((JLabel) speciesPanel.getComponent(i)).getText(),
+//							model.getODE(((JLabel) speciesPanel.getComponent(i))
+//									.getText()));
 
                     if(Double.parseDouble(((JTextField) speciesPanel.getComponent(i + 3)).getText().trim()) <= 0) {
                         inputValidation = false;
@@ -553,7 +563,7 @@ public class Gui implements ActionListener {
                 if(inputValidation) {
                     SMT2SettingsParser.writeSettingsToFile(
                             "model.xml",
-                            new SMT2Settings(variables, "t", odes, TraceParser
+                            new SMT2Settings(variables, "t", odes, assignments, TraceParser
                                     .parseCopasiOutput(new File(series.getText()
                                             .trim())), noise, epsilon));
 

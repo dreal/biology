@@ -30,6 +30,8 @@ import org.sbml.jsbml.SpeciesReference;
 public class ODEModel {
 
 	private Map<String, ASTNode> odes; // A mapping of variables to differential equations
+	
+	private Map<String, ASTNode> assignments; // A collection of assignment rules
 
 	private Map<String, Double> initialValues; // Initial values for each variable
 
@@ -47,8 +49,15 @@ public class ODEModel {
 	 */
 	public ODEModel(SBMLDocument document, List<String> interestingParameters) {
 		odes = new HashMap<String, ASTNode>();
+		assignments = new HashMap<String, ASTNode>();
 		initialValues = new HashMap<String, Double>();
 		parameters = new HashMap<String, Double>();
+		for (Rule rule : document.getModel().getListOfRules()) {
+			if (rule.isAssignment()) {
+				AssignmentRule assignmentRule = ((AssignmentRule) rule);
+				assignments.put(assignmentRule.getVariable(), assignmentRule.getMath());
+			}
+		}
 		for (Reaction reaction : document.getModel().getListOfReactions()) {
 			ListOf<SpeciesReference> products = reaction.getListOfProducts();
 			ListOf<SpeciesReference> reactants = reaction.getListOfReactants();
@@ -173,7 +182,7 @@ public class ODEModel {
 			}
 		}
 		for (Species species : document.getModel().getListOfSpecies()) {
-			if (!odes.containsKey(species.getId())) {
+			if (!assignments.containsKey(species.getId()) && !odes.containsKey(species.getId())) {
 				odes.put(species.getId(), new ASTNode(0.0));
 			}
 			if (species.isSetValue()) {
@@ -184,7 +193,7 @@ public class ODEModel {
 			}
 		}
 		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
-		replaceAllAssignmentRules(document.getModel().getListOfRules());
+//		replaceAllParameterAssignmentRules(document.getModel().getListOfRules());
 		for (Compartment compartment : document.getModel().getListOfCompartments()) {
 			if (!odes.containsKey(compartment.getId())) {
 				if (compartment.isSetValue()) {
@@ -233,17 +242,17 @@ public class ODEModel {
 		}
 	}
 
-	private void replaceAllAssignmentRules(ListOf<Rule> rules) {
-		for (Rule rule : rules) {
-			if (rule.isAssignment()) {
-				AssignmentRule aRule = ((AssignmentRule) rule);
-				replaceAllWithMath(aRule.getVariable(), aRule.getMath());
-				odes.remove(aRule.getVariable());
-				parameters.remove(aRule.getVariable());
-				initialValues.remove(aRule.getVariable());
-			}
-		}
-	}
+//	private void replaceAllParameterAssignmentRules(ListOf<Rule> rules) {
+//		for (Rule rule : rules) {
+//			if (rule.isAssignment()) {
+//				AssignmentRule aRule = ((AssignmentRule) rule);
+//				replaceAllWithMath(aRule.getVariable(), aRule.getMath());
+//				odes.remove(aRule.getVariable());
+//				parameters.remove(aRule.getVariable());
+//				initialValues.remove(aRule.getVariable());
+//			}
+//		}
+//	}
 
 	private void replaceAllFunctionDefinitions(ListOf<FunctionDefinition> functions) {
 		for (String key : odes.keySet()) {
@@ -362,6 +371,18 @@ public class ODEModel {
 	public ASTNode getODE(String variable) {
 		return odes.get(variable);
 	}
+	
+	/**
+	 * 
+	 * Returns the assignment rule associated with the provided variable.
+	 * 
+	 * @param variable
+	 *            - the variable for which the assignment rule should be returned
+	 * @return The assignment rule associated with the given variable
+	 */
+	public ASTNode getAssignment(String variable) {
+		return assignments.get(variable);
+	}
 
 	/**
 	 * 
@@ -377,11 +398,21 @@ public class ODEModel {
 
 	/**
 	 * 
-	 * Returns an array of variable names.
+	 * Returns an array of ODE variable names.
 	 * 
-	 * @return The array of variable names
+	 * @return The array of ODE variable names
 	 */
-	public String[] getArrayOfVariables() {
+	public String[] getArrayOfODEVariables() {
 		return odes.keySet().toArray(new String[0]);
+	}
+	
+	/**
+	 * 
+	 * Returns an array of assigned variable names.
+	 * 
+	 * @return The array of assigned variable names
+	 */
+	public String[] getArrayOfAssignedVariables() {
+		return assignments.keySet().toArray(new String[0]);
 	}
 }

@@ -1,12 +1,9 @@
 package parser;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,16 +16,11 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.sbml.jsbml.ASTNode;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import util.SMT2Settings;
-import util.Trace;
 import util.Utility;
-import util.Utility.Tuple;
 
 public class SMT2SettingsParser {
 
@@ -143,6 +135,11 @@ public class SMT2SettingsParser {
 				variables.add(odeVariable);
 			}
 		}
+		for (String assignedVariable : settings.getAssignedVariables()) {
+			if (!variables.contains(assignedVariable)) {
+				variables.add(assignedVariable);
+			}
+		}
 		for (String variable : settings.getAllVariables()) {
 			if (!variables.contains(variable)) {
 				variables.add(variable);
@@ -155,7 +152,7 @@ public class SMT2SettingsParser {
 		Element declaration = doc.createElement("declare");
 		for (String variable : variables) {
 			Element var = doc.createElement("var");
-			if (settings.getODEVariables().contains(variable)) {
+			if (settings.getODEVariables().contains(variable) || settings.getAssignedVariables().contains(variable)) {
 				var.setAttribute("type", "var");
 			}
 			else {
@@ -182,14 +179,28 @@ public class SMT2SettingsParser {
 		var.appendChild(name);
 		declaration.appendChild(var);
 		topLevelElement.appendChild(declaration);
+		Element assignments = doc.createElement("assignments");
+		for (String variable : settings.getAssignedVariables()) {
+			Element assignment = doc.createElement("assignment");
+			assignment.setAttribute("var", variable);
+			Element eq1 = doc.createElement("eq1");
+			eq1.setTextContent("(= " + variable + " " + Utility.prefixASTNodeToString(settings.getAssignment(variable)) + ")");
+			Element eq2 = doc.createElement("eq2");
+			eq2.setTextContent("(= " + variable + "_0_0 " + Utility.prefixASTNodeToStringWithSuffix(settings.getAssignment(variable), "_0_0") + ")");
+			Element eq3 = doc.createElement("eq3");
+			eq3.setTextContent("(= " + variable + "_0_t " + Utility.prefixASTNodeToStringWithSuffix(settings.getAssignment(variable), "_0_t") + ")");
+			assignment.appendChild(eq1);
+			assignment.appendChild(eq2);
+			assignment.appendChild(eq3);
+			assignments.appendChild(assignment);
+		}
+		topLevelElement.appendChild(assignments);
 		Element odes = doc.createElement("odes");
-		for (String variable : variables) {
-			if (settings.getODEVariables().contains(variable)) {
-				Element ode = doc.createElement("ode");
-				ode.setTextContent("(= d/dt[" + variable + "] "
-						+ Utility.prefixASTNodeToString(settings.getODE(variable)) + ")");
-				odes.appendChild(ode);
-			}
+		for (String variable : settings.getODEVariables()) {
+			Element ode = doc.createElement("ode");
+			ode.setTextContent("(= d/dt[" + variable + "] " + Utility.prefixASTNodeToString(settings.getODE(variable))
+					+ ")");
+			odes.appendChild(ode);
 		}
 		topLevelElement.appendChild(odes);
 		Element series = doc.createElement("series");
