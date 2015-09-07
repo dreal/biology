@@ -287,18 +287,32 @@ public class Gui implements ActionListener {
                 try {
 					SBMLDocument document = SBMLReader.read(new File(sbml
 							.getText()));
+					List<String> speciesIDs = new ArrayList<String>();
+					for (Species species : document.getModel().getListOfSpecies()) {
+						speciesIDs.add(species.getId());
+					}
+					List<String> parameterIDs = new ArrayList<String>();
+					for (Parameter param : document.getModel().getListOfParameters()) {
+						parameterIDs.add(param.getId());
+					}
 					List<String> assignments = new ArrayList<String>();
+					List<String> parameterAssignments = new ArrayList<String>();
 					for (Rule rule : document.getModel().getListOfRules()) {
 						if (rule.isAssignment()) {
 							AssignmentRule aRule = ((AssignmentRule) rule);
-							assignments.add(aRule.getVariable());
+							if (speciesIDs.contains(aRule.getVariable())) {
+								assignments.add(aRule.getVariable());
+							}
+							else if (parameterIDs.contains(aRule.getVariable())) {
+								parameterAssignments.add(aRule.getVariable());
+							}
 						}
 					}
 					Map<String,String> parameters = new HashMap<String,String>();
 					List<String> vars = new ArrayList<String>();
 					for (Parameter param : document.getModel()
 							.getListOfParameters()) {
-						if (!assignments.contains(param.getId())) {
+						if (!parameterAssignments.contains(param.getId())) {
 							parameters.put(param.getId(), String.valueOf(param.getValue()));
 						}
 					}
@@ -402,17 +416,25 @@ public class Gui implements ActionListener {
                                 "Time series parser",
                                 JOptionPane.ERROR_MESSAGE);
                     } else {
-                        for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
-                            double varMin = trace.getMinForVar(((JLabel) speciesPanel.getComponent(i)).getText());
-                            double varMax = trace.getMaxForVar(((JLabel) speciesPanel.getComponent(i)).getText());
-                            double interval = varMax - varMin;
-                            if (interval != 0) {
-                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(varMin - 0.5 * interval));
-                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(varMax + 0.5 * interval));
-                            } else {
-                                ((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(0.5 * varMin));
-                                ((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(1.5 * varMax));
-                            }
+						for (int i = 4; i < speciesPanel.getComponentCount(); i += 4) {
+							if (Arrays.asList(trace.getVariables()).contains(
+									((JLabel) speciesPanel.getComponent(i)).getText())) {
+								double varMin = trace.getMinForVar(((JLabel) speciesPanel.getComponent(i)).getText());
+								double varMax = trace.getMaxForVar(((JLabel) speciesPanel.getComponent(i)).getText());
+								double interval = varMax - varMin;
+								if (interval != 0) {
+									((JTextField) speciesPanel.getComponent(i + 1)).setText(Double.toString(varMin
+											- 0.5 * interval));
+									((JTextField) speciesPanel.getComponent(i + 2)).setText(Double.toString(varMax
+											+ 0.5 * interval));
+								}
+								else {
+									((JTextField) speciesPanel.getComponent(i + 1)).setText(Double
+											.toString(0.5 * varMin));
+									((JTextField) speciesPanel.getComponent(i + 2)).setText(Double
+											.toString(1.5 * varMax));
+								}
+							}
                         }
                         tabbedPane.setSelectedIndex(1);
                         //timeSeriesTextArea.read(new FileReader(series.getText()), null);

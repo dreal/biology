@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,10 +53,20 @@ public class ODEModel {
 		assignments = new HashMap<String, ASTNode>();
 		initialValues = new HashMap<String, Double>();
 		parameters = new HashMap<String, Double>();
+		List<String> speciesIDs = new ArrayList<String>();
+		for (Species species : document.getModel().getListOfSpecies()) {
+			speciesIDs.add(species.getId());
+		}
+		List<String> parameterIDs = new ArrayList<String>();
+		for (Parameter param : document.getModel().getListOfParameters()) {
+			parameterIDs.add(param.getId());
+		}
 		for (Rule rule : document.getModel().getListOfRules()) {
 			if (rule.isAssignment()) {
 				AssignmentRule assignmentRule = ((AssignmentRule) rule);
-				assignments.put(assignmentRule.getVariable(), assignmentRule.getMath());
+				if (speciesIDs.contains(assignmentRule.getVariable())) {
+					assignments.put(assignmentRule.getVariable(), assignmentRule.getMath());
+				}
 			}
 		}
 		for (Reaction reaction : document.getModel().getListOfReactions()) {
@@ -193,7 +204,7 @@ public class ODEModel {
 			}
 		}
 		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
-//		replaceAllParameterAssignmentRules(document.getModel().getListOfRules());
+		replaceAllParameterAssignmentRules(document.getModel().getListOfRules(), parameterIDs);
 		for (Compartment compartment : document.getModel().getListOfCompartments()) {
 			if (!odes.containsKey(compartment.getId())) {
 				if (compartment.isSetValue()) {
@@ -242,17 +253,19 @@ public class ODEModel {
 		}
 	}
 
-//	private void replaceAllParameterAssignmentRules(ListOf<Rule> rules) {
-//		for (Rule rule : rules) {
-//			if (rule.isAssignment()) {
-//				AssignmentRule aRule = ((AssignmentRule) rule);
-//				replaceAllWithMath(aRule.getVariable(), aRule.getMath());
-//				odes.remove(aRule.getVariable());
-//				parameters.remove(aRule.getVariable());
-//				initialValues.remove(aRule.getVariable());
-//			}
-//		}
-//	}
+	private void replaceAllParameterAssignmentRules(ListOf<Rule> rules, List<String> parameterIDs) {
+		for (Rule rule : rules) {
+			if (rule.isAssignment()) {
+				AssignmentRule aRule = ((AssignmentRule) rule);
+				if (parameterIDs.contains(aRule.getVariable())) {
+					replaceAllWithMath(aRule.getVariable(), aRule.getMath());
+					odes.remove(aRule.getVariable());
+					parameters.remove(aRule.getVariable());
+					initialValues.remove(aRule.getVariable());
+				}
+			}
+		}
+	}
 
 	private void replaceAllFunctionDefinitions(ListOf<FunctionDefinition> functions) {
 		for (String key : odes.keySet()) {
