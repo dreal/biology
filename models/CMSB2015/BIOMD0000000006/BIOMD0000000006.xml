@@ -211,11 +211,7 @@
             <apply>
               <times/>
               <ci> k4 </ci>
-              <apply>
-                <minus/>
-                <ci> v </ci>
-                <ci> u </ci>
-              </apply>
+              <ci> z </ci>
               <apply>
                 <plus/>
                 <ci> alpha </ci>
