@@ -204,7 +204,7 @@ public class ODEModel {
 			}
 		}
 		replaceAllFunctionDefinitions(document.getModel().getListOfFunctionDefinitions());
-		replaceAllParameterAssignmentRules(document.getModel().getListOfRules(), parameterIDs);
+		replaceAllAssignmentRules(document.getModel().getListOfRules(), parameterIDs);
 		for (Compartment compartment : document.getModel().getListOfCompartments()) {
 			if (!odes.containsKey(compartment.getId())) {
 				if (compartment.isSetValue()) {
@@ -253,16 +253,14 @@ public class ODEModel {
 		}
 	}
 
-	private void replaceAllParameterAssignmentRules(ListOf<Rule> rules, List<String> parameterIDs) {
+	private void replaceAllAssignmentRules(ListOf<Rule> rules, List<String> parameterIDs) {
 		for (Rule rule : rules) {
 			if (rule.isAssignment()) {
 				AssignmentRule aRule = ((AssignmentRule) rule);
-				if (parameterIDs.contains(aRule.getVariable())) {
-					replaceAllWithMath(aRule.getVariable(), aRule.getMath());
-					odes.remove(aRule.getVariable());
-					parameters.remove(aRule.getVariable());
-					initialValues.remove(aRule.getVariable());
-				}
+				replaceAllWithMath(aRule.getVariable(), aRule.getMath());
+				odes.remove(aRule.getVariable());
+				parameters.remove(aRule.getVariable());
+				initialValues.remove(aRule.getVariable());
 			}
 		}
 	}
