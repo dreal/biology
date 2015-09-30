@@ -183,13 +183,10 @@ public class SMT2SettingsParser {
 		for (String variable : settings.getAssignedVariables()) {
 			Element assignment = doc.createElement("assignment");
 			assignment.setAttribute("var", variable);
-			Element eq1 = doc.createElement("eq1");
-			eq1.setTextContent("(= " + variable + " " + Utility.prefixASTNodeToString(settings.getAssignment(variable)) + ")");
-			Element eq2 = doc.createElement("eq2");
+    		Element eq2 = doc.createElement("eq1");
 			eq2.setTextContent("(= " + variable + "_0_0 " + Utility.prefixASTNodeToStringWithSuffix(settings.getAssignment(variable), "_0_0") + ")");
-			Element eq3 = doc.createElement("eq3");
+			Element eq3 = doc.createElement("eq2");
 			eq3.setTextContent("(= " + variable + "_0_t " + Utility.prefixASTNodeToStringWithSuffix(settings.getAssignment(variable), "_0_t") + ")");
-			assignment.appendChild(eq1);
 			assignment.appendChild(eq2);
 			assignment.appendChild(eq3);
 			assignments.appendChild(assignment);
@@ -211,7 +208,7 @@ public class SMT2SettingsParser {
 			for (String variable : variables) {
 				for (String traceVariable : settings.getTrace().getVariables()) {
                     if (variable.equals(traceVariable)) {
-						if (settings.getODEVariables().contains(traceVariable)) {
+						if ((settings.getODEVariables().contains(traceVariable)) || (settings.getAssignedVariables().contains(traceVariable))) {
                             if(!Double.isNaN(settings.getTrace().getValue(traceVariable, timePoint))) {
                                 double noise = settings.getNoise().get(traceVariable);
                                 Element interval = doc.createElement("interval");

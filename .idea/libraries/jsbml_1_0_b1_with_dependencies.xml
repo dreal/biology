@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jsbml-1.0-b1-with-dependencies">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/BioPSy/lib/jsbml-1.0-b1-with-dependencies.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

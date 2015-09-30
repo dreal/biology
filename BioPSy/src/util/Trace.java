@@ -13,6 +13,13 @@ public class Trace {
 	
 	public Trace(List<String> variables, List<Double> timePoints, List<List<Double>> data) {
 		this.variables = variables.toArray(new String[0]);
+        /*
+        System.out.println("Variables:");
+        for(int i = 0; i < this.variables.length; i++)
+        {
+            System.out.println(this.variables[i]);
+        }
+        */
 		this.timePoints = new double[timePoints.size()];
 		for (int i = 0; i < timePoints.size(); i++) {
 			this.timePoints[i] = timePoints.get(i);
@@ -110,8 +117,8 @@ public class Trace {
 	
 	public String toString() {
 		String trace = "((\"time\"";
-		for (String variable : variables) {
-			trace += ", \"" + variable + "\"";
+		for (int i = 0; i < variables.length; i++) {
+			trace += ", \"" + variables[i] + "\"";
 		}
 		trace += ")";
 		for (int i = 0; i < timePoints.length; i++) {
@@ -120,6 +127,7 @@ public class Trace {
 				trace += ", " + value;
 			}
 			trace += ")";
+            //System.out.println(trace);
 		}
 		trace += ")";
 		return trace;

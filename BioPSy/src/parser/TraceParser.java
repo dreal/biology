@@ -49,7 +49,20 @@ public class TraceParser {
             }
 		}
 		scanner.close();
-		return new Trace(variables, timePoints, data);
+        /*
+        System.out.println("Data:");
+        for(int i = 0; i < data.size(); i++) {
+            for(int j = 0; j < data.get(i).size(); j++) {
+                System.out.println(data.get(i).get(j) + ",");
+            }
+            System.out.println();
+        }
+        System.out.println("Number of rows: " + data.size());
+        System.out.println("Number of columns: " + data.get(0).size());
+        */
+        Trace resultTrace = new Trace(variables, timePoints, data);
+        //System.out.println(resultTrace);
+		return resultTrace;
 	}
 
 }
