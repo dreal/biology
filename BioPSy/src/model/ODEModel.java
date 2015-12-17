@@ -72,6 +72,15 @@ public class ODEModel {
 		for (Reaction reaction : document.getModel().getListOfReactions()) {
 			ListOf<SpeciesReference> products = reaction.getListOfProducts();
 			ListOf<SpeciesReference> reactants = reaction.getListOfReactants();
+			List<String> participants = new ArrayList<String>();
+			for (SpeciesReference product : products) {
+				participants.add(product.getSpecies());
+			}
+			for (SpeciesReference reactant : reactants) {
+				if (!participants.contains(reactant.getSpecies())) {
+					participants.add(reactant.getSpecies());
+				}
+			}
 			ASTNode newNode = new ASTNode(reaction.getKineticLaw().getMath());
 			// List<ASTNode> reacts = new ArrayList<ASTNode>();
 			// for (SpeciesReference reactant : reactants) {
@@ -81,99 +90,59 @@ public class ODEModel {
 			// }
 			// }
 			// newNode = ASTNode.times(ASTNode.times(reacts.toArray(new ASTNode[0])), newNode);
-			for (SpeciesReference product : products) {
-				if (!document.getModel().getListOfSpecies().get(product.getSpecies())
-						.isBoundaryCondition()) {
-					if (product.isSetStoichiometry() && product.getStoichiometry() != 1) {
-						newNode = ASTNode.times(new ASTNode(product.getStoichiometry()), newNode);
+			for (String participant : participants) {
+				if (!document.getModel().getListOfSpecies().get(participant).isBoundaryCondition()) {
+					double stoich = 0.0;
+					for (SpeciesReference product : products) {
+						if (product.getSpecies().equals(participant) && product.isSetStoichiometry()) {
+							stoich += product.getStoichiometry();
+						}
 					}
-					if (!odes.containsKey(product.getSpecies())) {
-						for (LocalParameter parameter : reaction.getKineticLaw()
-								.getListOfLocalParameters()) {
-							String newName = reaction.getId() + "_" + parameter.getId();
-							if (interestingParameters.contains(newName)) {
-								replace(parameter.getId(), newName, newNode);
-								if (parameter.isSetValue()) {
-									parameters.put(newName, parameter.getValue());
+					for (SpeciesReference reactant : reactants) {
+						if (reactant.getSpecies().equals(participant) && reactant.isSetStoichiometry()) {
+							stoich -= reactant.getStoichiometry();
+						}
+					}
+					if (stoich != 0.0) {
+						if (stoich != 1.0) {
+							newNode = ASTNode.times(new ASTNode(stoich), newNode);
+						}
+						if (!odes.containsKey(participant)) {
+							for (LocalParameter parameter : reaction.getKineticLaw().getListOfLocalParameters()) {
+								String newName = reaction.getId() + "_" + parameter.getId();
+								if (interestingParameters.contains(newName)) {
+									replace(parameter.getId(), newName, newNode);
+									if (parameter.isSetValue()) {
+										parameters.put(newName, parameter.getValue());
+									}
+									else {
+										parameters.put(newName, 0.0);
+									}
 								}
 								else {
-									parameters.put(newName, 0.0);
+									replace(parameter.getId(), parameter.getValue(), newNode);
 								}
 							}
-							else {
-								replace(parameter.getId(), parameter.getValue(), newNode);
-							}
+							odes.put(participant, newNode);
 						}
-						odes.put(product.getSpecies(), newNode);
-					}
-					else {
-						for (LocalParameter parameter : reaction.getKineticLaw()
-								.getListOfLocalParameters()) {
-							String newName = reaction.getId() + "_" + parameter.getId();
-							if (interestingParameters.contains(newName)) {
-								replace(parameter.getId(), newName, newNode);
-								if (parameter.isSetValue()) {
-									parameters.put(newName, parameter.getValue());
+						else {
+							for (LocalParameter parameter : reaction.getKineticLaw().getListOfLocalParameters()) {
+								String newName = reaction.getId() + "_" + parameter.getId();
+								if (interestingParameters.contains(newName)) {
+									replace(parameter.getId(), newName, newNode);
+									if (parameter.isSetValue()) {
+										parameters.put(newName, parameter.getValue());
+									}
+									else {
+										parameters.put(newName, 0.0);
+									}
 								}
 								else {
-									parameters.put(newName, 0.0);
+									replace(parameter.getId(), parameter.getValue(), newNode);
 								}
 							}
-							else {
-								replace(parameter.getId(), parameter.getValue(), newNode);
-							}
+							odes.put(participant, ASTNode.sum(odes.get(participant), newNode));
 						}
-						odes.put(product.getSpecies(),
-								ASTNode.sum(odes.get(product.getSpecies()), newNode));
-					}
-				}
-			}
-			for (SpeciesReference reactant : reactants) {
-				if (!document.getModel().getListOfSpecies().get(reactant.getSpecies())
-						.isBoundaryCondition()) {
-					if (reactant.isSetStoichiometry() && reactant.getStoichiometry() != 1) {
-						newNode = ASTNode.times(new ASTNode(reactant.getStoichiometry()), newNode);
-					}
-					if (!odes.containsKey(reactant.getSpecies())) {
-						for (LocalParameter parameter : reaction.getKineticLaw()
-								.getListOfLocalParameters()) {
-							String newName = reaction.getId() + "_" + parameter.getId();
-							if (interestingParameters.contains(newName)) {
-								replace(parameter.getId(), newName, newNode);
-								if (parameter.isSetValue()) {
-									parameters.put(newName, parameter.getValue());
-								}
-								else {
-									parameters.put(newName, 0.0);
-								}
-							}
-							else {
-								replace(parameter.getId(), parameter.getValue(), newNode);
-							}
-						}
-						ASTNode negNode = new ASTNode('-');
-						negNode.addChild(newNode);
-						odes.put(reactant.getSpecies(), negNode);
-					}
-					else {
-						for (LocalParameter parameter : reaction.getKineticLaw()
-								.getListOfLocalParameters()) {
-							String newName = reaction.getId() + "_" + parameter.getId();
-							if (interestingParameters.contains(newName)) {
-								replace(parameter.getId(), newName, newNode);
-								if (parameter.isSetValue()) {
-									parameters.put(newName, parameter.getValue());
-								}
-								else {
-									parameters.put(newName, 0.0);
-								}
-							}
-							else {
-								replace(parameter.getId(), parameter.getValue(), newNode);
-							}
-						}
-						odes.put(reactant.getSpecies(),
-								ASTNode.diff(odes.get(reactant.getSpecies()), newNode));
 					}
 				}
 			}
