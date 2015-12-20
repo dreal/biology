@@ -2,51 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="de45002d-58bf-4fee-91f8-17551f6c2b45" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/AdvancedOptionsDialog.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/model/AdvancedOptionsModel.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/BackgroundWorker.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/main/BioPSy.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/Box$BoxType.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/Box.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/BoxTable.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/Gui$1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/Gui$2.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/Gui$3.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/Gui.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/Interval.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/LogTable.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/ModelSettings.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/parser/ModelSettingsParser.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/model/ODEModel.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/parser/OutputParser.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/PlotArea.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/SMT2Settings.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/parser/SMT2SettingsParser.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/model/TimeSeriesModel.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/TimeSeriesPanel$1.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/gui/TimeSeriesPanel.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/Trace.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/parser/TraceParser.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/Utility$Tuple.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/out/production/BioPSy/util/Utility.class" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/BioPSy.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/biopsy-master.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/biopsy-master.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/jsbml_1_0_b1_with_dependencies.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/CMSB2015/BIOMD0000000006/BIOMD0000000006_time_series_data.csv" afterPath="$PROJECT_DIR$/models/CMSB2015/BIOMD0000000006/BIOMD0000000006_time_series_data.csv" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/BioPSy/doc/install.md" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/BioPSy/doc/usage.md" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BioPSy/src/main/BioPSy.java" afterPath="$PROJECT_DIR$/BioPSy/src/main/BioPSy.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BioPSy/src/parser/SMT2SettingsParser.java" afterPath="$PROJECT_DIR$/BioPSy/src/parser/SMT2SettingsParser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BioPSy/src/util/Trace.java" afterPath="$PROJECT_DIR$/BioPSy/src/util/Trace.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BioPSy/src/parser/TraceParser.java" afterPath="$PROJECT_DIR$/BioPSy/src/parser/TraceParser.java" />
     </list>
     <ignored path="biopsy-master.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -71,11 +30,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BioPSy.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="BioPSy.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/BioPSy/src/main/BioPSy.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="975">
-              <caret line="46" column="85" selection-start-line="46" selection-start-column="85" selection-end-line="46" selection-end-column="85" />
+            <state vertical-scroll-proportion="0.4930468" vertical-offset="0" max-vertical-offset="975">
+              <caret line="27" column="55" selection-start-line="27" selection-start-column="55" selection-end-line="27" selection-end-column="55" />
               <folding />
             </state>
           </provider>
@@ -84,9 +43,12 @@
       <file leaf-file-name="ModelSettingsParser.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/ModelSettingsParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="990">
+            <state vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="990">
               <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#1419#1427#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -96,7 +58,12 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="154" max-vertical-offset="975">
               <caret line="49" column="9" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#396#404#0" expanded="false" />
+                <element signature="e#449#457#0" expanded="false" />
+                <element signature="e#502#516#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -107,12 +74,7 @@
             <state vertical-scroll-proportion="0.0" vertical-offset="1339" max-vertical-offset="2160">
               <caret line="129" column="14" selection-start-line="129" selection-start-column="14" selection-end-line="129" selection-end-column="14" />
               <folding>
-                <element signature="e#1056#1057#0" expanded="true" />
-                <element signature="e#1079#1080#0" expanded="true" />
-                <element signature="e#1116#1117#0" expanded="true" />
-                <element signature="e#1140#1141#0" expanded="true" />
-                <element signature="e#3432#3433#0" expanded="true" />
-                <element signature="e#3459#3460#0" expanded="true" />
+                <element signature="imports" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -121,9 +83,16 @@
       <file leaf-file-name="TimeSeriesModel.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BioPSy/src/model/TimeSeriesModel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
+            <state vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="330">
               <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#199#207#0" expanded="false" />
+                <element signature="e#261#262#0" expanded="false" />
+                <element signature="e#301#302#0" expanded="false" />
+                <element signature="e#351#352#0" expanded="false" />
+                <element signature="e#384#385#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -133,16 +102,37 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="7683" max-vertical-offset="11145">
               <caret line="612" column="94" selection-start-line="612" selection-start-column="94" selection-end-line="612" selection-end-column="94" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#2478#2766#0" expanded="false" />
+                <element signature="e#2765#2766#0" expanded="false" />
+                <element signature="e#9216#9224#0" expanded="false" />
+                <element signature="e#9390#9398#0" expanded="false" />
+                <element signature="e#9566#9574#0" expanded="false" />
+                <element signature="e#9632#9640#0" expanded="false" />
+                <element signature="e#10093#10108#0" expanded="false" />
+                <element signature="e#10150#10158#0" expanded="false" />
+                <element signature="e#11330#11338#0" expanded="false" />
+                <element signature="e#17645#17676#0" expanded="false" />
+                <element signature="e#17723#17740#0" expanded="false" />
+                <element signature="e#17794#17811#0" expanded="false" />
+                <element signature="e#17854#17862#0" expanded="false" />
+                <element signature="e#17977#17993#0" expanded="false" />
+                <element signature="e#20641#20657#0" expanded="false" />
+                <element signature="e#24395#29976#0" expanded="false" />
+                <element signature="e#29975#29976#0" expanded="false" />
+                <element signature="e#30109#31042#0" expanded="false" />
+                <element signature="e#31041#31042#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SMT2SettingsParser.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SMT2SettingsParser.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/SMT2SettingsParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.73957014" vertical-offset="1425" max-vertical-offset="3855">
-              <caret line="154" column="79" selection-start-line="154" selection-start-column="79" selection-end-line="154" selection-end-column="79" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1425" max-vertical-offset="3885">
+              <caret line="122" column="0" selection-start-line="122" selection-start-column="0" selection-end-line="122" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -159,14 +149,13 @@
         <option value="$PROJECT_DIR$/BioPSy/src/util/Trace.java" />
         <option value="$PROJECT_DIR$/BioPSy/src/parser/TraceParser.java" />
         <option value="$PROJECT_DIR$/BioPSy/src/parser/SMT2SettingsParser.java" />
+        <option value="$PROJECT_DIR$/BioPSy/src/main/BioPSy.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1" />
-    <option name="y" value="-1" />
-    <option name="width" value="2562" />
-    <option name="height" value="1317" />
+    <option name="width" value="2560" />
+    <option name="height" value="1312" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -191,8 +180,8 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -551,7 +540,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="-1" width="2562" height="1317" extended-state="7" />
+    <frame x="0" y="0" width="2560" height="1312" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
@@ -605,19 +594,104 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/OutputParser.java">
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/main/BioPSy.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.39010066" vertical-offset="0" max-vertical-offset="1290">
-          <caret line="51" column="57" selection-start-line="51" selection-start-column="57" selection-end-line="51" selection-end-column="57" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="975">
+          <caret line="46" column="85" selection-start-line="46" selection-start-column="85" selection-end-line="46" selection-end-column="85" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/BioPSy/src/main/BioPSy.java">
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/ModelSettingsParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="975">
-          <caret line="46" column="85" selection-start-line="46" selection-start-column="85" selection-end-line="46" selection-end-column="85" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="990">
+          <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#1419#1427#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/TraceParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="154" max-vertical-offset="975">
+          <caret line="49" column="9" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#396#404#0" expanded="false" />
+            <element signature="e#449#457#0" expanded="false" />
+            <element signature="e#502#516#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/util/Trace.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1339" max-vertical-offset="2160">
+          <caret line="129" column="14" selection-start-line="129" selection-start-column="14" selection-end-line="129" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/model/TimeSeriesModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="330">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#199#207#0" expanded="false" />
+            <element signature="e#261#262#0" expanded="false" />
+            <element signature="e#301#302#0" expanded="false" />
+            <element signature="e#351#352#0" expanded="false" />
+            <element signature="e#384#385#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/gui/Gui.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="7683" max-vertical-offset="11145">
+          <caret line="612" column="94" selection-start-line="612" selection-start-column="94" selection-end-line="612" selection-end-column="94" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2478#2766#0" expanded="false" />
+            <element signature="e#2765#2766#0" expanded="false" />
+            <element signature="e#9216#9224#0" expanded="false" />
+            <element signature="e#9390#9398#0" expanded="false" />
+            <element signature="e#9566#9574#0" expanded="false" />
+            <element signature="e#9632#9640#0" expanded="false" />
+            <element signature="e#10093#10108#0" expanded="false" />
+            <element signature="e#10150#10158#0" expanded="false" />
+            <element signature="e#11330#11338#0" expanded="false" />
+            <element signature="e#17645#17676#0" expanded="false" />
+            <element signature="e#17723#17740#0" expanded="false" />
+            <element signature="e#17794#17811#0" expanded="false" />
+            <element signature="e#17854#17862#0" expanded="false" />
+            <element signature="e#17977#17993#0" expanded="false" />
+            <element signature="e#20641#20657#0" expanded="false" />
+            <element signature="e#24395#29976#0" expanded="false" />
+            <element signature="e#29975#29976#0" expanded="false" />
+            <element signature="e#30109#31042#0" expanded="false" />
+            <element signature="e#31041#31042#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/SMT2SettingsParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3855">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/OutputParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.39010066" vertical-offset="0" max-vertical-offset="1290">
+          <caret line="51" column="57" selection-start-line="51" selection-start-column="57" selection-end-line="51" selection-end-column="57" />
         </state>
       </provider>
     </entry>
@@ -633,7 +707,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="990">
           <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#1419#1427#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -642,12 +719,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="1339" max-vertical-offset="2160">
           <caret line="129" column="14" selection-start-line="129" selection-start-column="14" selection-end-line="129" selection-end-column="14" />
           <folding>
-            <element signature="e#1056#1057#0" expanded="true" />
-            <element signature="e#1079#1080#0" expanded="true" />
-            <element signature="e#1116#1117#0" expanded="true" />
-            <element signature="e#1140#1141#0" expanded="true" />
-            <element signature="e#3432#3433#0" expanded="true" />
-            <element signature="e#3459#3460#0" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -656,7 +728,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="330">
           <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#199#207#0" expanded="false" />
+            <element signature="e#261#262#0" expanded="false" />
+            <element signature="e#301#302#0" expanded="false" />
+            <element signature="e#351#352#0" expanded="false" />
+            <element signature="e#384#385#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -664,7 +743,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="154" max-vertical-offset="975">
           <caret line="49" column="9" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#396#404#0" expanded="false" />
+            <element signature="e#449#457#0" expanded="false" />
+            <element signature="e#502#516#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -680,14 +764,51 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="7683" max-vertical-offset="11145">
           <caret line="612" column="94" selection-start-line="612" selection-start-column="94" selection-end-line="612" selection-end-column="94" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2478#2766#0" expanded="false" />
+            <element signature="e#2765#2766#0" expanded="false" />
+            <element signature="e#9216#9224#0" expanded="false" />
+            <element signature="e#9390#9398#0" expanded="false" />
+            <element signature="e#9566#9574#0" expanded="false" />
+            <element signature="e#9632#9640#0" expanded="false" />
+            <element signature="e#10093#10108#0" expanded="false" />
+            <element signature="e#10150#10158#0" expanded="false" />
+            <element signature="e#11330#11338#0" expanded="false" />
+            <element signature="e#17645#17676#0" expanded="false" />
+            <element signature="e#17723#17740#0" expanded="false" />
+            <element signature="e#17794#17811#0" expanded="false" />
+            <element signature="e#17854#17862#0" expanded="false" />
+            <element signature="e#17977#17993#0" expanded="false" />
+            <element signature="e#20641#20657#0" expanded="false" />
+            <element signature="e#24395#29976#0" expanded="false" />
+            <element signature="e#29975#29976#0" expanded="false" />
+            <element signature="e#30109#31042#0" expanded="false" />
+            <element signature="e#31041#31042#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/BioPSy/src/parser/SMT2SettingsParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.73957014" vertical-offset="1425" max-vertical-offset="3855">
-          <caret line="154" column="79" selection-start-line="154" selection-start-column="79" selection-end-line="154" selection-end-column="79" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1425" max-vertical-offset="3885">
+          <caret line="122" column="0" selection-start-line="122" selection-start-column="0" selection-end-line="122" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/model/ODEModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.6795302" vertical-offset="1350" max-vertical-offset="5655">
+          <caret line="53" column="54" selection-start-line="53" selection-start-column="54" selection-end-line="53" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BioPSy/src/main/BioPSy.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4930468" vertical-offset="0" max-vertical-offset="975">
+          <caret line="27" column="55" selection-start-line="27" selection-start-column="55" selection-end-line="27" selection-end-column="55" />
           <folding />
         </state>
       </provider>

@@ -31,7 +31,7 @@ public class BioPSy {
 //				IFormulaParser parser = new FormulaParserLL3(new StringReader(""));
 //				ASTNode property = ASTNode.parseFormula(prop, parser);
 //				System.out.println(Utility.writeSMT2ToString(SBMLReader.read(new File(args[0])),
-//						TraceParser.parseCopasiOutput(new File(args[1])), property));l
+//						TraceParser.parseCopasiOutput(new File(args[1])), property));
 //			}
 //			catch (Exception e) {
 //				System.out.println("Invalid arguments.");

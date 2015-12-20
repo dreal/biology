@@ -125,11 +125,13 @@ public class SMT2SettingsParser {
 			throws ParserConfigurationException, TransformerFactoryConfigurationError,
 			FileNotFoundException, TransformerException {
 		List<String> variables = new ArrayList<String>();
+        /*
 		for (String traceVariable : settings.getTrace().getVariables()) {
 			if (settings.getODEVariables().contains(traceVariable)) {
 				variables.add(traceVariable);
 			}
 		}
+		*/
 		for (String odeVariable : settings.getODEVariables()) {
 			if (!variables.contains(odeVariable)) {
 				variables.add(odeVariable);
