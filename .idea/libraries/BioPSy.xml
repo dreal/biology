@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="BioPSy">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/BioPSy/bin/BioPSy.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
